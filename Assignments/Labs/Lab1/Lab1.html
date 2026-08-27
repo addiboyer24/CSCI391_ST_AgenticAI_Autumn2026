@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — Lab 1: Environment Setup &amp; First Chatbot</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: #1e1e1e;
+    background: #d8d8d8;
+  }
+
+  .doc-page {
+    background: white;
+    width: 816px;
+    min-height: 1056px;
+    margin: 20px auto;
+    box-shadow: 0 3px 18px rgba(0,0,0,.20);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-page {
+    background: white;
+    width: 816px;
+    height: 1056px;
+    margin: 20px auto;
+    box-shadow: 0 3px 18px rgba(0,0,0,.20);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .pg-hdr {
+    display: flex;
+    justify-content: space-between;
+    padding: 13px 48px 9px;
+    border-bottom: 1px solid #aaa;
+    font-size: 8pt;
+    color: #555;
+    flex-shrink: 0;
+  }
+
+  .pg-ftr {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 48px 13px;
+    border-top: 1px solid #aaa;
+    font-size: 8pt;
+    color: #555;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+
+  .pg-body { flex: 1; padding: 26px 48px 20px; }
+
+  /* ── COVER ─────────────────────────────────────────── */
+  .cv-topbar {
+    background: #6B0F1A;
+    padding: 17px 48px;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .cv-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 64px;
+  }
+  .cv-univ  { font-size: 12.5pt; font-weight: 700; color: #6B0F1A; letter-spacing: .1em; text-transform: uppercase; }
+  .cv-rule  { width: 56px; height: 3px; background: #6B0F1A; margin: 18px auto 22px; }
+  .cv-course { font-size: 11.5pt; color: #333; margin-bottom: 4px; }
+  .cv-sem   { font-size: 10pt; color: #666; margin-bottom: 52px; }
+  .cv-tag   { font-size: 8.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #6B0F1A; margin-bottom: 10px; }
+  .cv-num   { font-size: 38pt; font-weight: 700; color: #1e1e1e; line-height: 1.0; }
+  .cv-title { font-size: 19pt; font-weight: 400; color: #333; margin-bottom: 28px; line-height: 1.3; }
+  .cv-meta  { font-size: 9.5pt; color: #666; }
+  .cv-ftr   { padding: 15px 48px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 8.5pt; color: #666; }
+
+  /* ── HEADINGS ──────────────────────────────────────── */
+  h1 {
+    font-size: 14pt; font-weight: 700; color: #6B0F1A;
+    padding-bottom: 6px; border-bottom: 1.5px solid #6B0F1A;
+    margin: 22px 0 11px; line-height: 1.3;
+  }
+  h1:first-child { margin-top: 0; }
+  h2 {
+    font-size: 12pt; font-weight: 700; color: #6B0F1A;
+    padding-bottom: 5px; border-bottom: 1.5px solid #6B0F1A;
+    margin: 20px 0 9px; line-height: 1.3;
+  }
+  h3 { font-size: 11pt; font-weight: 700; color: #2a2a2a; margin: 15px 0 6px; }
+
+  p { margin-bottom: 9px; }
+  ol, ul { margin: 7px 0 11px; padding-left: 26px; }
+  li { margin-bottom: 5px; line-height: 1.55; }
+  ul { list-style-type: disc; }
+
+  code {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 8.8pt; background: #f0f0f0;
+    padding: 1px 5px; border-radius: 3px; color: #2a2a2a;
+  }
+
+  .cb {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 9.5pt; background: #f2f2f2;
+    border: 1px solid #d0d0d0; border-radius: 4px;
+    padding: 9px 16px; margin: 9px 0 11px;
+    color: #1a1a1a; white-space: pre; line-height: 1.5;
+  }
+
+  /* ── CALLOUTS ──────────────────────────────────────── */
+  .callout { padding: 9px 14px 9px 16px; border-radius: 3px; margin: 11px 0; font-size: 10pt; line-height: 1.55; }
+  .callout-lbl { display: block; font-weight: 700; font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .warn { background: #fff4f0; border-left: 4px solid #b71c1c; }
+  .warn .callout-lbl { color: #b71c1c; }
+  .note { background: #f0f4ff; border-left: 4px solid #1a4fa8; }
+  .note .callout-lbl { color: #1a4fa8; }
+  .tip  { background: #f0faf4; border-left: 4px solid #1a7a3c; }
+  .tip  .callout-lbl { color: #1a7a3c; }
+
+  /* ── DOC REFERENCE BLOCK ───────────────────────────── */
+  .doc-ref {
+    background: #f8f6ff; border: 1px solid #c9bfee;
+    border-left: 4px solid #5c35b5; border-radius: 3px;
+    padding: 9px 14px; margin: 9px 0 13px;
+    font-size: 9.5pt; line-height: 1.6;
+  }
+  .doc-ref .doc-ref-lbl {
+    display: block; font-weight: 700; font-size: 8pt;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: #5c35b5; margin-bottom: 5px;
+  }
+  .doc-ref a { color: #5c35b5; text-decoration: none; font-weight: 500; }
+  .doc-ref a:hover { text-decoration: underline; }
+  .doc-ref ul { margin: 4px 0 0; padding-left: 18px; }
+  .doc-ref li { margin-bottom: 3px; }
+
+  /* ── MODEL CARD GRID ───────────────────────────────── */
+  .model-grid { display: flex; flex-direction: column; gap: 7px; margin: 10px 0 13px; }
+  .model-card {
+    display: flex; align-items: flex-start; gap: 12px;
+    border: 1px solid #d8d8d8; border-left: 4px solid #6B0F1A;
+    border-radius: 3px; padding: 8px 12px;
+    background: #fafafa; font-size: 9.5pt; line-height: 1.55;
+  }
+  .model-card-id {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 8.2pt; font-weight: 600; color: #6B0F1A;
+    flex-shrink: 0; padding-top: 1px; white-space: nowrap;
+  }
+  .model-card-desc { flex: 1; min-width: 0; color: #333; }
+
+  /* ── STARTER CODE BLOCKS ───────────────────────────── */
+  .src-hdr {
+    background: #2e2e2e; color: #e8e8e8;
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 8pt; font-weight: 600; padding: 6px 16px;
+    border-radius: 4px 4px 0 0; margin-top: 14px;
+    letter-spacing: .025em; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .src-hdr span { font-size: 7.5pt; color: #aaa; font-weight: 400; font-style: italic; }
+  .cb-src {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 7.8pt; background: #fcfcfc;
+    border: 1px solid #ccc; border-top: 2px solid #6B0F1A;
+    border-radius: 0 0 4px 4px; padding: 12px 16px;
+    margin-bottom: 14px; color: #1e1e1e;
+    white-space: pre; line-height: 1.55; overflow-x: auto;
+  }
+  .tc { color: #b05000; font-weight: 600; }
+  .cm { color: #707070; }
+
+  /* ── LINKS ─────────────────────────────────────────── */
+  a.dl { color: #6B0F1A; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(107,15,26,.4); }
+  a.dl:hover { border-bottom-color: #6B0F1A; }
+
+  /* ── WORKBOOK TABLES ───────────────────────────────── */
+  .obs-tbl { width: 100%; border-collapse: collapse; margin: 8px 0 10px; font-size: 10pt; }
+  .obs-tbl td { padding: 7px 11px; border: 1px solid #c0c0c0; vertical-align: middle; }
+  .obs-tbl td:first-child { background: #f4f4f4; font-weight: 600; color: #333; width: 44%; }
+
+  .cmp-tbl { width: 100%; border-collapse: collapse; margin: 7px 0 9px; font-size: 10pt; }
+  .cmp-tbl th { background: #6B0F1A; color: white; padding: 7px 11px; text-align: left; font-weight: 600; }
+  .cmp-tbl td { padding: 7px 11px; border: 1px solid #c0c0c0; vertical-align: middle; }
+  .cmp-tbl td:first-child { background: #f4f4f4; font-weight: 600; color: #333; width: 31%; }
+
+  .ag-tbl { width: 100%; border-collapse: collapse; margin: 8px 0 11px; font-size: 10pt; }
+  .ag-tbl th { background: #6B0F1A; color: white; padding: 7px 11px; text-align: left; font-weight: 600; }
+  .ag-tbl td { padding: 7px 11px; border: 1px solid #c0c0c0; vertical-align: middle; }
+  .ag-tbl td:first-child { background: #f4f4f4; font-weight: 500; width: 46%; }
+  .ag-tbl td:nth-child(2), .ag-tbl td:nth-child(3) { width: 8%; text-align: center; }
+  .ag-tbl td:last-child { width: 38%; }
+
+  .sc-tbl { width: 100%; border-collapse: collapse; margin: 7px 0 9px; font-size: 10pt; }
+  .sc-tbl th { background: #3a3a3a; color: white; padding: 7px 11px; text-align: left; font-weight: 600; }
+  .sc-tbl td { padding: 6px 11px; border: 1px solid #c0c0c0; vertical-align: middle; }
+  .sc-tbl td:first-child { background: #f4f4f4; font-weight: 500; color: #333; }
+  .sc-tbl tr.tot td { background: #e8e8e8; font-weight: 700; border-top: 2px solid #888; }
+
+  /* ── MODEL-ID ROW inside score table ───────────────── */
+  .sc-tbl tr.mid td { background: #fff8f0; font-weight: 600; font-style: italic; }
+  .sc-tbl tr.mid td:first-child { background: #fff8f0; color: #6B0F1A; }
+
+  /* ── SUMMARY TABLE (3 chosen models) ───────────────── */
+  .sum-tbl { width: 100%; border-collapse: collapse; margin: 7px 0 9px; font-size: 9.5pt; }
+  .sum-tbl th { background: #6B0F1A; color: white; padding: 7px 9px; font-weight: 600; text-align: center; border: 1px solid #5a0c16; }
+  .sum-tbl th:first-child { text-align: left; width: 34%; }
+  .sum-tbl td { padding: 6px 9px; border: 1px solid #c0c0c0; text-align: center; vertical-align: middle; }
+  .sum-tbl td:first-child { background: #f4f4f4; font-weight: 500; text-align: left; color: #333; }
+  .sum-tbl tr.id-row td { background: #fff8f0; font-style: italic; font-size: 8.5pt; }
+  .sum-tbl tr.id-row td:first-child { background: #fff8f0; font-weight: 600; color: #6B0F1A; font-style: normal; }
+
+  /* ── FORM ELEMENTS ─────────────────────────────────── */
+  .chk-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .chk { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5pt; cursor: pointer; white-space: nowrap; }
+  .chk input[type="checkbox"] { width: 13px; height: 13px; accent-color: #6B0F1A; cursor: pointer; flex-shrink: 0; }
+
+  .blank { display: inline-block; border-bottom: 1px solid #aaa; min-width: 120px; height: 17px; vertical-align: bottom; }
+  .blank-full { display: block; width: 100%; border-bottom: 1px solid #aaa; min-height: 20px; margin-top: 3px; padding-bottom: 1px; }
+
+  .write-box {
+    display: block; width: 100%; min-height: 70px;
+    border: 1px solid #bbb; border-radius: 3px;
+    padding: 7px 10px; margin-top: 5px; font-size: 9.5pt;
+    color: #bbb; font-family: inherit;
+  }
+  .write-sm { min-height: 42px; }
+
+  .prompt { background: #fafafa; border: 1px solid #ddd; border-left: 4px solid #6B0F1A; padding: 7px 14px; margin: 5px 0 9px; font-style: italic; font-size: 10pt; color: #333; }
+  .focus-note { font-size: 8.8pt; color: #666; font-style: italic; margin-bottom: 5px; }
+
+  a { color: #6B0F1A; }
+
+  /* ── NUMBERED STEP LIST ────────────────────────────── */
+  .step-list { counter-reset: steps; list-style: none; padding-left: 0; margin: 10px 0 13px; }
+  .step-list li { counter-increment: steps; display: flex; gap: 13px; margin-bottom: 9px; align-items: flex-start; }
+  .step-list li::before {
+    content: counter(steps);
+    min-width: 22px; height: 22px;
+    background: #6B0F1A; color: white;
+    border-radius: 50%; font-size: 8.5pt; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-list li > div { flex: 1; min-width: 0; line-height: 1.65; }
+
+  /* ── HELPERS ───────────────────────────────────────── */
+  .mt0  { margin-top: 0 !important; }
+  .mt8  { margin-top: 8px !important; }
+  .mt12 { margin-top: 12px !important; }
+  .mt16 { margin-top: 16px !important; }
+  .mt20 { margin-top: 20px !important; }
+  .mb8  { margin-bottom: 8px !important; }
+  .mb12 { margin-bottom: 12px !important; }
+  .mb16 { margin-bottom: 16px !important; }
+
+  @media print {
+    body { background: white; }
+    .doc-page, .cover-page { box-shadow: none; margin: 0; width: 100%; page-break-after: always; }
+    @page { size: letter; margin: .55in .75in .6in; }
+    h1, h2, h3 { page-break-after: avoid; }
+    .cb, .cb-src, table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     COVER
+═══════════════════════════════════════════════════ -->
+<div class="cover-page">
+  <div class="cv-topbar">
+    <span>University of Montana</span>
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+  </div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-course">CSCI 391 &mdash; ST: Agentic Artificial Intelligence</div>
+    <div class="cv-sem">Autumn Semester 2026</div>
+    <div class="cv-tag">Implementation Lab &bull; Week 1</div>
+    <div class="cv-num">Lab 1</div>
+    <div class="cv-title">Environment Setup &amp;<br>First Chatbot</div>
+    <div class="cv-meta">CSCI 391 &mdash; ST: Agentic Artificial Intelligence &nbsp;&bull;&nbsp; Autumn Semester 2026</div>
+  </div>
+  <div class="cv-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 2 — Overview + Objectives
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Lab Overview</h1>
+    <p>This lab establishes the development environment for CSCI 391 and introduces the first implementation of an LLM-powered application. You will first build a bare-bones chatbot using Python and OpenRouter, then extend that application by adding web search with Tavily. The lab is intentionally hands-on: you are expected to implement the missing functionality, run the provided tests, inspect the outputs, and explain what you observe.</p>
+    <p>The lab also introduces an important distinction from our first lecture: an application that calls an LLM is not automatically an agent. You will evaluate the chatbot against the formal definition of an agentic AI system and then consider how adding an external tool changes the application's capabilities.</p>
+
+    <h1>Learning Objectives</h1>
+    <p>Upon successful completion of this lab, students will be able to:</p>
+    <ul>
+      <li>Configure the Python development environment used for CSCI 391.</li>
+      <li>Use environment variables to securely provide API credentials to a Python application.</li>
+      <li>Implement a basic conversational application using an LLM API.</li>
+      <li>Test an LLM application using repeatable prompts and expected behaviors.</li>
+      <li>Explain why a basic chatbot does not satisfy the formal definition of an agentic AI system.</li>
+      <li>Implement an external web-search capability using the Tavily client library.</li>
+      <li>Evaluate how external information retrieval changes the quality and usefulness of LLM responses.</li>
+      <li>Explain how a system prompt influences an LLM application's behavior and customizability.</li>
+    </ul>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 3 — Part 1: Environment Setup
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 1 &mdash; Environment Setup</h1>
+    <p>Complete the following steps before beginning the chatbot implementation. Download links are provided for each tool.</p>
+
+    <ol>
+      <li>Download and install <a class="dl" href="https://git-scm.com/downloads" target="_blank">Git ↗</a>.</li>
+      <li>Clone the <a class="dl" href="https://github.com/addiboyer24/CSCI391_ST_AgenticAI_Autumn2026" target="_blank">Course GitHub Repository ↗</a> and watch the repository. Include a screenshot showing that you are watching the repository in your submission.</li>
+      <li>Download <a class="dl" href="https://www.microsoft.com/en-us/microsoft-teams/download-app" target="_blank">Microsoft Teams ↗</a> and verify access to the <a class="dl" href="https://teams.microsoft.com/l/team/19%3ABdg_IwHMZ9fc00o2xXEaFXtaOoDF8NR-2RfTBU2kzjc1%40thread.tacv2/conversations?groupId=3ab4259d-11fa-4d14-95ca-7c3b42495e55&tenantId=68407ce5-03da-49ff-af0a-724be0d37c9d" target="_blank">CSCI 391 Teams Channel ↗</a>. Include a screenshot demonstrating access to the course recordings and recurring meetings in your submission.</li>
+      <li>Download and install <a class="dl" href="https://code.visualstudio.com/download" target="_blank">Visual Studio Code ↗</a>.</li>
+      <li>Download and install <a class="dl" href="https://www.python.org/downloads/release/python-31210/" target="_blank">Python 3.12.10 ↗</a>.</li>
+      <li>Navigate to the <code>Assignments\Labs</code> folder from a command-line window within Visual Studio Code.</li>
+      <li>Verify that your IDE is targeting the correct Python version:</li>
+    </ol>
+
+    <div class="cb">python --version</div>
+    <p>The output should identify Python 3.12.10.</p>
+
+    <ol start="8">
+      <li><strong>Install the dependencies required for the labs.</strong></li>
+    </ol>
+    <div class="cb">python -m pip install -r .\requirements.txt</div>
+    <p>If you need to upgrade pip first:</p>
+    <div class="cb">python -m pip install --upgrade pip</div>
+
+    <ol start="9">
+      <li>Request a personal OpenRouter API key from the instructor for access to the free models used in the course.</li>
+      <li>Create a local <code>.env</code> file in your Lab1 project directory and add your OpenRouter key using the variable name <code>OPENROUTER_API_KEY</code>.</li>
+    </ol>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Security</span>
+      Do not hard-code your API key in Python source code. Do not commit your <code>.env</code> file or API key to GitHub. Use the <code>python-dotenv</code> library to load variables from your <code>.env</code> file at runtime, and retrieve them with <code>os.environ.get()</code>.
+    </div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <ul>
+        <li><a href="https://pypi.org/project/python-dotenv/" target="_blank">python-dotenv — PyPI</a> &mdash; loading <code>.env</code> files into the Python environment</li>
+        <li><a href="https://docs.python.org/3/library/os.html#os.environ" target="_blank">os.environ — Python Standard Library</a> &mdash; reading environment variables at runtime</li>
+      </ul>
+    </div>
+
+    <h2>Starter Code &mdash; Begin With a Working Shell</h2>
+    <p>Starter files for both chatbots are provided on the following pages and in the course repository. Copy the appropriate starter into your Lab1 folder, rename it, and complete every <code>TODO</code> before running. Do not submit the starter without implementing the missing functionality.</p>
+    <ul>
+      <li><code>chatbot_starter.py</code> &mdash; save as <code>chatbot.py</code> &mdash; bare-bones chatbot (Part 2).</li>
+      <li><code>chatbot_extended_starter.py</code> &mdash; save as <code>chatbot_extended.py</code> &mdash; Tavily-enabled chatbot (Part 5).</li>
+    </ul>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 4 — Part 2: Implement + chatbot_starter.py
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 2 &mdash; Implement the Bare-Bones Chatbot</h1>
+    <p>Save <code>chatbot_starter.py</code> as <code>chatbot.py</code> in your Lab1 folder and complete every <code>TODO</code>. Your finished application should follow this flow:</p>
+
+    <ol class="step-list">
+      <li><div>Load environment variables from your <code>.env</code> file using <code>python-dotenv</code>, then retrieve <code>OPENROUTER_API_KEY</code> via <code>os.environ.get()</code>.</div></li>
+      <li><div>Optionally accept a model identifier as a command-line argument so the active model can be switched without editing source code.</div></li>
+      <li><div>Define a system prompt string that sets the assistant's role and behavior.</div></li>
+      <li><div>Read the user's question from standard input.</div></li>
+      <li><div>Send the system prompt and user message to the OpenRouter chat completions endpoint and receive a response.</div></li>
+      <li><div>Print the assistant's reply to the console.</div></li>
+    </ol>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <ul>
+        <li><a href="https://openrouter.ai/docs/api-reference/chat-completion" target="_blank">OpenRouter — Chat Completions API Reference</a> &mdash; request body, authentication, and response schema</li>
+        <li><a href="https://openrouter.ai/docs/quickstart" target="_blank">OpenRouter — Quickstart Guide</a> &mdash; end-to-end example of a first API call</li>
+        <li><a href="https://platform.openai.com/docs/api-reference/chat" target="_blank">OpenAI — Chat Completions Reference</a> &mdash; shared message format (<code>role</code>, <code>content</code>, <code>choices</code>)</li>
+      </ul>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Tip</span>
+      Every request requires a <strong>messages array</strong> containing at minimum a <code>system</code> message and a <code>user</code> message. The response text lives at <code>choices[0].message.content</code> in the returned JSON.
+    </div>
+
+    <h2>chatbot_starter.py &mdash; Starter Code</h2>
+    <div class="src-hdr">chatbot_starter.py <span>save as chatbot.py in your Lab1 folder &mdash; complete every TODO before running</span></div>
+<div class="cb-src"><span class="cm">import sys
+import os
+import requests
+from dotenv import load_dotenv</span>
+
+
+def main(args) -> None:
+    SYSTEM_PROMPT = "You are a helpful assistant."
+
+    <span class="tc"># TODO 1: Call load_dotenv() to load variables from your .env file.</span>
+
+    <span class="tc"># TODO 2: Read the optional model identifier from args.
+    #         Default to "nvidia/nemotron-3-super-120b-a12b:free" if not provided.</span>
+    model = None
+
+    <span class="tc"># TODO 3: Retrieve OPENROUTER_API_KEY from the environment using os.environ.get().</span>
+    openrouter_api_key = None
+
+    print(f"Using model: {model}")
+
+    while True:
+        user_input = input("Hi, I'm a chatbot. How can I help you today? (Type 'exit' to quit)\n")
+        if user_input.lower() == "exit":
+            break
+
+        <span class="tc"># TODO 4: Define the OpenRouter chat completions endpoint URL.</span>
+        url = None
+
+        <span class="tc"># TODO 5: Build the HTTP request headers.
+        #         Include: Authorization (Bearer token) and Content-Type.</span>
+        headers = {}
+
+        <span class="tc"># TODO 6: Build the JSON payload.
+        #         Required keys: model, and a messages list containing
+        #         a system message dict and a user message dict.</span>
+        payload = {}
+
+        <span class="tc"># TODO 7: Send a POST request to the API using requests.post().</span>
+        response = None
+
+        <span class="tc"># TODO 8: Handle the response.
+        #         On success (status OK): extract and print choices[0].message.content.
+        #         On failure: print the status code and response text.</span>
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])</div>
+
+    <p>Once your implementation is complete, run the application from the <code>Assignments\Labs</code> directory:</p>
+    <div class="cb">python .\Lab1\chatbot.py</div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 5 — Part 3: Tests + Part 4: Agent Analysis
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 3 &mdash; Required Tests: Bare-Bones Chatbot</h1>
+    <p>Run each test against your implementation. Record the result and briefly explain what the result demonstrates. These tests are designed to reveal both the capabilities and the limitations of an LLM application that has no access to external tools or current information.</p>
+
+    <h3>Test 1 &mdash; General Knowledge</h3>
+    <div class="cb">What is the capital of Montana?</div>
+    <p>Expected behavior: the model should provide a reasonable factual answer. Record the response and evaluate its quality.</p>
+
+    <h3>Test 2 &mdash; Current Information</h3>
+    <div class="cb">What is the weather in Missoula, MT today?</div>
+    <p>Expected behavior: the model may explain that it cannot access current weather information. Record the response and explain whether it is useful to someone who genuinely needs today's weather.</p>
+
+    <h3>Test 3 &mdash; Recent Information</h3>
+    <div class="cb">What are the latest major developments in artificial intelligence?</div>
+    <p>Evaluate whether the response can reliably answer a question that depends on recent information. Do not assume that a fluent, confident-sounding answer is necessarily current or accurate.</p>
+
+    <h3>Test 4 &mdash; Student-Selected Prompt</h3>
+    <p>Choose a prompt that you believe will expose a limitation of a chatbot without access to external tools.</p>
+    <div class="cb">YOUR PROMPT HERE</div>
+    <p>Briefly explain why you selected this prompt and evaluate the response.</p>
+
+    <h1>Part 4 &mdash; Is This Chatbot an Agent?</h1>
+    <p>In lecture, an Agentic AI System was defined as software that, given a goal expressed in natural language, chooses its own next action from a set of tools, executes that action against an external environment, observes the result, and repeats the cycle until it judges the goal to be met or gives up.</p>
+    <p>Use this definition to analyze your bare-bones chatbot. Explain where the application falls short. Your response must address all six elements:</p>
+    <ul>
+      <li>A goal expressed in natural language.</li>
+      <li>Choosing its own next action.</li>
+      <li>A set of tools.</li>
+      <li>Executing an action against an external environment.</li>
+      <li>Observing the result and repeating the cycle.</li>
+      <li>Continuing until the goal is met or the system gives up.</li>
+    </ul>
+    <p>Your answer should clearly distinguish between an LLM <em>generating text in response to a prompt</em> and an agent <em>taking actions in an environment</em>.</p>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 6 — Part 5: Tavily
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 5 &mdash; Add Web Search with Tavily</h1>
+    <p>You will now extend the chatbot so that it retrieves current information from the web before asking the LLM to answer. Save <code>chatbot_extended_starter.py</code> as <code>chatbot_extended.py</code> in your Lab1 folder and complete every <code>TODO</code>. Your extended application should follow this flow:</p>
+
+    <ol class="step-list">
+      <li><div>Read the user's query from standard input.</div></li>
+      <li><div>Pass the query to the Tavily search client to retrieve a set of relevant, up-to-date web results.</div></li>
+      <li><div>Combine the search results with the original user query to form an enriched prompt.</div></li>
+      <li><div>Send the enriched prompt to the OpenRouter chat completions endpoint.</div></li>
+      <li><div>Print the model's response to the console.</div></li>
+    </ol>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <ul>
+        <li><a href="https://docs.tavily.com/sdk/python" target="_blank">Tavily — Python SDK Reference</a> &mdash; client initialization, <code>search()</code> method, and result schema</li>
+        <li><a href="https://docs.tavily.com/docs/rest-api/api-reference" target="_blank">Tavily — REST API Reference</a> &mdash; request parameters, search depth options, and response fields</li>
+        <li><a href="https://app.tavily.com" target="_blank">app.tavily.com</a> &mdash; create an account and generate your API key</li>
+      </ul>
+    </div>
+
+    <h3>Setup Steps</h3>
+    <ol>
+      <li>Create a Tavily account at <a class="dl" href="https://app.tavily.com" target="_blank">app.tavily.com ↗</a>. You may sign up with your GitHub account or university email.</li>
+      <li>Generate a Tavily API key from the dashboard.</li>
+      <li>Add the key to your <code>.env</code> file using the variable name <code>TAVILY_API_KEY</code>.</li>
+      <li>Open <code>chatbot_extended_starter.py</code> (shown on the next page) and complete every <code>TODO</code>.</li>
+      <li>Run your extended chatbot from the <code>Assignments\Labs</code> directory once all TODOs are implemented.</li>
+    </ol>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Tip</span>
+      Review the Tavily result schema carefully. Each result object contains a <code>url</code>, <code>title</code>, and <code>content</code> field. Decide how you will format and inject these fields into your LLM prompt so the model can reason over them effectively.
+    </div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 7 — chatbot_extended_starter.py
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h2 class="mt0">chatbot_extended_starter.py &mdash; Starter Code</h2>
+    <div class="src-hdr">chatbot_extended_starter.py <span>save as chatbot_extended.py in your Lab1 folder &mdash; complete every TODO before running</span></div>
+<div class="cb-src"><span class="cm">import sys
+import os
+import requests
+from dotenv import load_dotenv
+from tavily import TavilyClient</span>
+
+
+def main(args) -> None:
+    SYSTEM_PROMPT = "You are a helpful assistant."
+
+    <span class="tc"># TODO 1: Call load_dotenv() to load variables from your .env file.</span>
+
+    <span class="tc"># TODO 2: Read the optional model identifier from args.
+    #         Default to "nvidia/nemotron-3-super-120b-a12b:free" if not provided.</span>
+    model = None
+
+    <span class="tc"># TODO 3: Retrieve OPENROUTER_API_KEY from the environment using os.environ.get().</span>
+    openrouter_api_key = None
+
+    <span class="tc"># TODO 4: Retrieve TAVILY_API_KEY from the environment using os.environ.get().</span>
+    tavily_api_key = None
+
+    print(f"Using model: {model}")
+
+    <span class="tc"># TODO 5: Initialize the TavilyClient using your tavily_api_key.</span>
+    client = None
+
+    while True:
+        user_input = input("Hi, I'm a chatbot. How can I help you today? (Type 'exit' to quit)\n")
+        if user_input.lower() == "exit":
+            break
+
+        <span class="tc"># TODO 6: Use the Tavily client to perform an advanced web search.
+        #         Pass user_input as the query and use search_depth="advanced".</span>
+        search_results = None
+
+        <span class="tc"># TODO 7: Define the OpenRouter chat completions endpoint URL.</span>
+        url = None
+
+        <span class="tc"># TODO 8: Build the HTTP request headers.
+        #         Include: Authorization (Bearer token) and Content-Type.</span>
+        headers = {}
+
+        <span class="tc"># TODO 9: Build the JSON payload.
+        #         Combine the user's question with the Tavily search results
+        #         in the user message content.</span>
+        payload = {}
+
+        <span class="tc"># TODO 10: Send a POST request to the API using requests.post().</span>
+        response = None
+
+        <span class="tc"># TODO 11: Handle the response.
+        #          On success (status OK): extract and print choices[0].message.content.
+        #          On failure: print the status code and response text.</span>
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])</div>
+
+    <p>Once all TODOs are implemented, run the extended chatbot from the <code>Assignments\Labs</code> directory:</p>
+    <div class="cb">python .\Lab1\chatbot_extended.py</div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 7</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 8 — Parts 6–8
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 6 &mdash; Required Tests: Web-Enabled Chatbot</h1>
+    <p>Run the same prompts from Part 3 against your extended chatbot. You are testing whether external information retrieval changes the answer&mdash;not simply whether the program produces output.</p>
+
+    <h3>Test 5 &mdash; Current Weather</h3>
+    <div class="cb">What is the weather in Missoula, MT today?</div>
+    <p>Compare this response with your Test 2 result. Identify what information was unavailable to the bare-bones chatbot and whether the Tavily-enabled version was better able to answer the question.</p>
+
+    <h3>Test 6 &mdash; Recent Information</h3>
+    <div class="cb">What are the latest major developments in artificial intelligence?</div>
+    <p>Compare this response with Test 3. Discuss whether web search improved freshness, relevance, completeness, or confidence.</p>
+
+    <h3>Test 7 &mdash; Stable Knowledge</h3>
+    <div class="cb">What is the capital of Montana?</div>
+    <p>Did web search meaningfully improve this response? Explain why adding a tool is not automatically beneficial for every type of prompt.</p>
+
+    <h3>Test 8 &mdash; Tool-Dependent Prompt</h3>
+    <p>Create and run your own prompt that should benefit from current web information.</p>
+    <div class="cb">YOUR PROMPT HERE</div>
+    <p>Compare the result with the equivalent bare-bones chatbot test.</p>
+
+    <h1>Part 7 &mdash; Compare the Two Implementations</h1>
+    <p>Complete a short written comparison of your bare-bones and Tavily-enabled chatbots. Address the following questions:</p>
+    <ul>
+      <li>Which prompts benefited most from web search, and why?</li>
+      <li>Which prompts benefited least from web search, and why?</li>
+      <li>Did the addition of web search always improve the answer?</li>
+      <li>What new failure modes are introduced when the application relies on retrieved information?</li>
+      <li>Does adding Tavily make the application an agent under the formal definition from lecture? Explain your answer.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Note</span>
+      Access to information is not the same as agency. The lecture notes explicitly distinguish information access from the ability to autonomously choose and execute actions in an environment.
+    </div>
+
+    <h1>Part 8 &mdash; System Prompt Experiment</h1>
+    <p>Modify <code>SYSTEM_PROMPT</code> in your chatbot and rerun at least two tests. Try at least two of the following changes:</p>
+    <ul>
+      <li>Change the assistant's role or area of expertise.</li>
+      <li>Require concise answers.</li>
+      <li>Require a specific response structure (e.g., bullet points, numbered steps).</li>
+      <li>Instruct the assistant to clearly distinguish known facts from uncertainty.</li>
+      <li>Change the intended audience or tone.</li>
+    </ul>
+    <p>For each modification, record what changed. Discuss the effect on quality, consistency, tone, structure, and customizability. Use specific examples from your test runs.</p>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 9 — Part 9: Model Comparison
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 9 &mdash; Model Component Comparison</h1>
+    <p>The LLM is a replaceable component of your application. Five free models are available for this course through OpenRouter. <strong>Choose any three</strong> to compare, then run the same chatbot against each of your selected models, keeping the system prompt, user prompt, and all other settings identical across every run.</p>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Selection Tip</span>
+      Consider choosing models that differ meaningfully from one another — for example, one general-purpose model, one domain-specialized model, and one that differs in scale. This will produce more interesting observations than running three similar models.
+    </div>
+
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="model-card-id">minimax/minimax-m2.7:free</div>
+        <div class="model-card-desc">MiniMax M2.7 &mdash; large mixture-of-experts model with strong general reasoning, instruction following, and multilingual capabilities.</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-id">nvidia/nemotron-3-super-120b-a12b:free</div>
+        <div class="model-card-desc">NVIDIA Nemotron Super &mdash; 120B total / 12B active parameters; 1M context window; designed for complex multi-agent applications.</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-id">nvidia/nemotron-3-ultra-550b-a55b:free</div>
+        <div class="model-card-desc">NVIDIA Nemotron Ultra &mdash; 550B total / 55B active parameters; NVIDIA's largest open model, targeting advanced reasoning and instruction tasks.</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-id">cohere/north-mini-code:free</div>
+        <div class="model-card-desc">Cohere North Mini Code &mdash; compact code-specialized model optimized for programming assistance, code generation, and technical problem-solving.</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-id">inclusionai/ling-3.0-flash-fin:free</div>
+        <div class="model-card-desc">InclusionAI Ling 3.0 Flash &mdash; fast, finance-domain model optimized for financial analysis, numerical reasoning, and domain-specific question answering.</div>
+      </div>
+    </div>
+
+    <p>Run the three commands corresponding to your selected models:</p>
+    <div class="cb">python .\Lab1\chatbot.py minimax/minimax-m2.7:free
+python .\Lab1\chatbot.py nvidia/nemotron-3-super-120b-a12b:free
+python .\Lab1\chatbot.py nvidia/nemotron-3-ultra-550b-a55b:free
+python .\Lab1\chatbot.py cohere/north-mini-code:free
+python .\Lab1\chatbot.py inclusionai/ling-3.0-flash-fin:free</div>
+
+    <p>For each of your three models, record response quality, factual accuracy, relevance, verbosity, and approximate response speed. Then answer:</p>
+    <ul>
+      <li>Which of your three models produced the best overall responses?</li>
+      <li>Which followed your system prompt most consistently?</li>
+      <li>Which performed best on reasoning-heavy prompts?</li>
+      <li>Did the best-performing model without web search remain the best when given Tavily results?</li>
+      <li>What tradeoffs did you observe among quality, latency, and any domain specialization?</li>
+      <li>Which model would you choose for a real application, and why?</li>
+    </ul>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <ul>
+        <li><a href="https://openrouter.ai/models?q=:free" target="_blank">OpenRouter — Free Text Model Catalog</a> &mdash; authoritative source for model specifications, context windows, and capabilities</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 9</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 10 — Part 10: Submission + Prep
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>Part 10 &mdash; Submission Requirements</h1>
+    <p>Submit the completed Student Observation Workbook together with your source code and required screenshots. Your submission must include:</p>
+    <ul>
+      <li>Screenshot showing you are watching the course GitHub repository.</li>
+      <li>Screenshot demonstrating Microsoft Teams access to CSCI 391 recordings and recurring meetings.</li>
+      <li>Evidence that Python 3.12.10 is installed and being used by your IDE.</li>
+      <li>Completed bare-bones chatbot implementation (<code>chatbot.py</code>).</li>
+      <li>Completed Tavily-enabled chatbot implementation (<code>chatbot_extended.py</code>).</li>
+      <li>Results and written evaluations for Tests 1–8.</li>
+      <li>Explanation of why the bare-bones chatbot does not satisfy the formal definition of an agentic AI system.</li>
+      <li>Comparison of the bare-bones and web-enabled implementations.</li>
+      <li>System-prompt experiment and analysis.</li>
+      <li>Model component comparison for your three selected models, including a justification for your selection.</li>
+      <li>Any additional questions or observations assigned during the lab session.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Security Reminder</span>
+      Never include your OpenRouter or Tavily API keys in screenshots, your submitted document, source control, or any other shared course material.
+    </div>
+
+    <h2>Preparation for Next Lecture</h2>
+    <p>Acquire a copy of the required textbook and read <em>Chapter 1, "What Agentic AI Actually Is (and Isn't),"</em> and <em>Chapter 2, "A Short, Honest History of Agents,"</em> before the next session.</p>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 10</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK DIVIDER
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Environment Setup &amp; First Chatbot</span>
+  </div>
+  <div class="pg-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:800px;">
+    <div style="text-align:center;max-width:480px;">
+      <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6B0F1A;margin-bottom:14px;">Lab 1 &mdash; Autumn 2026</div>
+      <div style="font-size:30pt;font-weight:700;color:#1e1e1e;line-height:1.15;margin-bottom:20px;">Student Observation<br>Workbook</div>
+      <div style="width:60px;height:3px;background:#6B0F1A;margin:0 auto 24px;"></div>
+      <div style="font-size:11pt;color:#444;line-height:1.7;">Use this section to record the results of your experiments. Complete the checkboxes, ratings, and short evidence prompts rather than writing open-ended essays.</div>
+    </div>
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 11</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK A — Test Records
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>A. Bare-Bones Chatbot &mdash; Test Records</h1>
+
+    <h2>Test 1 &mdash; General Knowledge</h2>
+    <div class="focus-note">Test focus: No external or current information should be required.</div>
+    <div class="prompt">What is the capital of Montana?</div>
+    <table class="obs-tbl">
+      <tr><td>Did the chatbot answer the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes, completely</label><label class="chk"><input type="checkbox"> Partially</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Was the answer factually correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Mostly</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> Cannot determine</label></div></td></tr>
+      <tr><td>Did the question require current/external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Did the chatbot have access to that information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Usefulness (1–5)</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+      <tr><td>One specific strength or limitation</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>One-sentence conclusion</td><td>This test demonstrates that <span class="blank-full"></span></td></tr>
+    </table>
+
+    <h2>Test 2 &mdash; Current Information</h2>
+    <div class="focus-note">Test focus: This question depends on current, real-time information.</div>
+    <div class="prompt">What is the weather in Missoula, MT today?</div>
+    <table class="obs-tbl">
+      <tr><td>Did the chatbot answer the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes, completely</label><label class="chk"><input type="checkbox"> Partially</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Was the answer factually correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Mostly</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> Cannot determine</label></div></td></tr>
+      <tr><td>Did the question require current/external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Did the chatbot have access to that information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Usefulness (1–5)</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+      <tr><td>One specific strength or limitation</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>One-sentence conclusion</td><td>This test demonstrates that <span class="blank-full"></span></td></tr>
+    </table>
+
+    <h2>Test 3 &mdash; Recent Information</h2>
+    <div class="focus-note">Test focus: This question requires knowledge beyond the model's training cutoff.</div>
+    <div class="prompt">What are the latest major developments in artificial intelligence?</div>
+    <table class="obs-tbl">
+      <tr><td>Did the chatbot answer the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes, completely</label><label class="chk"><input type="checkbox"> Partially</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Was the answer factually correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Mostly</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> Cannot determine</label></div></td></tr>
+      <tr><td>Did the question require current/external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Did the chatbot have access to that information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Usefulness (1–5)</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+      <tr><td>One specific strength or limitation</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>One-sentence conclusion</td><td>This test demonstrates that <span class="blank-full"></span></td></tr>
+    </table>
+
+    <h2>Test 4 &mdash; Student-Selected Prompt</h2>
+    <div class="focus-note">Test focus: A prompt of your choice that exposes a limitation of a chatbot without external tools.</div>
+    <div class="prompt" style="font-style:normal;color:#999;">Write your prompt here.</div>
+    <table class="obs-tbl">
+      <tr><td>Did the chatbot answer the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes, completely</label><label class="chk"><input type="checkbox"> Partially</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Was the answer factually correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Mostly</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> Cannot determine</label></div></td></tr>
+      <tr><td>Did the question require current/external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Did the chatbot have access to that information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Usefulness (1–5)</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+      <tr><td>One specific strength or limitation</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>One-sentence conclusion</td><td>This test demonstrates that <span class="blank-full"></span></td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 12</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK B — Agent Analysis + C start
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>B. Is the Bare-Bones Chatbot an Agent?</h1>
+    <p>Use the formal definition from lecture. For each characteristic, select Yes or No and provide brief evidence.</p>
+
+    <table class="ag-tbl">
+      <thead><tr><th>Agent Characteristic</th><th>Yes</th><th>No</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Receives a goal in natural language</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Chooses its own next action</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Has access to tools</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Executes an action against an external environment</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Observes the result</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Repeats the cycle</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Determines when goal is met / gives up</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Conclusion</h3>
+    <p>Would you classify the bare-bones chatbot as an agent?</p>
+    <div class="chk-group mt8 mb12">
+      <label class="chk"><input type="checkbox"> Yes</label>
+      <label class="chk"><input type="checkbox"> No</label>
+      <label class="chk"><input type="checkbox"> Not enough information</label>
+    </div>
+    <p><strong>Most important missing characteristic:</strong> <span class="blank" style="min-width:300px;"></span></p>
+    <p class="mt12"><strong>Explain in 2–3 sentences:</strong></p>
+    <div class="write-box"></div>
+
+    <h1 class="mt20">C. Bare-Bones vs. Tavily &mdash; Before/After Comparison</h1>
+    <p>Run the same prompt with and without Tavily. Complete each table using evidence drawn directly from the two responses.</p>
+
+    <h2>Test 5 &mdash; Current Weather</h2>
+    <div class="prompt">What is the weather in Missoula, MT today?</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Without Tavily</th><th>With Tavily</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Information current?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td></tr>
+        <tr><td>Useful (1–5)</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td></tr>
+        <tr><td>Used external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Did Tavily improve the response?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Substantially</label><label class="chk"><input type="checkbox"> Moderately</label><label class="chk"><input type="checkbox"> Slightly</label><label class="chk"><input type="checkbox"> Not at all</label><label class="chk"><input type="checkbox"> Made it worse</label></div>
+    <p><strong>Primary reason (select one):</strong></p>
+    <div class="chk-group mt8 mb8" style="font-size:9pt;">
+      <label class="chk"><input type="checkbox"> Required current information</label>
+      <label class="chk"><input type="checkbox"> Search provided useful context</label>
+      <label class="chk"><input type="checkbox"> Search results were irrelevant</label>
+      <label class="chk"><input type="checkbox"> Model misinterpreted results</label>
+      <label class="chk"><input type="checkbox"> Web search was unnecessary</label>
+      <label class="chk"><input type="checkbox"> Other: <span class="blank" style="min-width:80px;"></span></label>
+    </div>
+    <p><strong>Evidence</strong> &mdash; copy one sentence from the response that supports your conclusion:</p>
+    <div class="write-box write-sm mt8"></div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 13</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK C (cont.) — Tests 6–8
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h2 class="mt0">Test 6 &mdash; Recent Information</h2>
+    <div class="prompt">What are the latest major developments in artificial intelligence?</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Without Tavily</th><th>With Tavily</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Information current?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td></tr>
+        <tr><td>Useful (1–5)</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td></tr>
+        <tr><td>Used external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Did Tavily improve the response?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Substantially</label><label class="chk"><input type="checkbox"> Moderately</label><label class="chk"><input type="checkbox"> Slightly</label><label class="chk"><input type="checkbox"> Not at all</label><label class="chk"><input type="checkbox"> Made it worse</label></div>
+    <p><strong>Evidence:</strong></p>
+    <div class="write-box write-sm mt8 mb16"></div>
+
+    <h2>Test 7 &mdash; Stable Knowledge</h2>
+    <div class="prompt">What is the capital of Montana?</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Without Tavily</th><th>With Tavily</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Information current?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td></tr>
+        <tr><td>Useful (1–5)</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td></tr>
+        <tr><td>Used external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Did Tavily improve the response?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Substantially</label><label class="chk"><input type="checkbox"> Moderately</label><label class="chk"><input type="checkbox"> Slightly</label><label class="chk"><input type="checkbox"> Not at all</label><label class="chk"><input type="checkbox"> Made it worse</label></div>
+    <p><strong>Evidence:</strong></p>
+    <div class="write-box write-sm mt8 mb16"></div>
+
+    <h2>Test 8 &mdash; Tool-Dependent Prompt</h2>
+    <div class="prompt" style="font-style:normal;color:#999;">Write your prompt here.</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Without Tavily</th><th>With Tavily</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Information current?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label><label class="chk"><input type="checkbox"> N/A</label></div></td></tr>
+        <tr><td>Useful (1–5)</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td></tr>
+        <tr><td>Used external information?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Did Tavily improve the response?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Substantially</label><label class="chk"><input type="checkbox"> Moderately</label><label class="chk"><input type="checkbox"> Slightly</label><label class="chk"><input type="checkbox"> Not at all</label><label class="chk"><input type="checkbox"> Made it worse</label></div>
+    <p><strong>Primary reason (select one):</strong></p>
+    <div class="chk-group mt8 mb8" style="font-size:9pt;">
+      <label class="chk"><input type="checkbox"> Required current information</label>
+      <label class="chk"><input type="checkbox"> Search provided useful context</label>
+      <label class="chk"><input type="checkbox"> Search results were irrelevant</label>
+      <label class="chk"><input type="checkbox"> Model misinterpreted results</label>
+      <label class="chk"><input type="checkbox"> Web search was unnecessary</label>
+      <label class="chk"><input type="checkbox"> Other: <span class="blank" style="min-width:80px;"></span></label>
+    </div>
+    <p><strong>Evidence:</strong></p>
+    <div class="write-box write-sm mt8"></div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 14</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK D — System Prompt Experiment
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>D. System Prompt Experiment</h1>
+    <p>Run the same user prompt with both system prompts below. Do not change the user prompt between runs.</p>
+
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:50%">System Prompt A</th><th style="width:50%">System Prompt B</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-family:'JetBrains Mono',Consolas,monospace;font-size:9pt;background:#fafafa;">You are a helpful assistant.</td>
+          <td style="font-family:'JetBrains Mono',Consolas,monospace;font-size:9pt;background:#fafafa;">You are a concise technical assistant. Answer in no more than three bullet points.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="cmp-tbl mt12">
+      <thead><tr><th>Observation</th><th>Prompt A</th><th>Prompt B</th></tr></thead>
+      <tbody>
+        <tr><td>Followed requested format?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Number of bullets</td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td></tr>
+        <tr><td>Response length</td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td></tr>
+        <tr><td>Answered the question?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Useful (1–5)</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td><td><span class="blank" style="min-width:36px;"></span>&nbsp;/ 5</td></tr>
+      </tbody>
+    </table>
+
+    <p class="mt12"><strong>Did Prompt B change the model's behavior?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Significantly</label><label class="chk"><input type="checkbox"> Somewhat</label><label class="chk"><input type="checkbox"> Very little</label><label class="chk"><input type="checkbox"> Not at all</label></div>
+    <p><strong>What changed? (Select all that apply)</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Length</label><label class="chk"><input type="checkbox"> Format</label><label class="chk"><input type="checkbox"> Tone</label><label class="chk"><input type="checkbox"> Content</label><label class="chk"><input type="checkbox"> Nothing significant</label><label class="chk"><input type="checkbox"> Other: <span class="blank" style="min-width:80px;"></span></label></div>
+    <p><strong>One-sentence conclusion:</strong> The system prompt can/cannot be used to <span class="blank-full"></span></p>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 15</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK E — Model Comparison (3 chosen, p1)
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>E. Model Component Comparison</h1>
+    <p>Record the three models you selected from the five available options, then complete a score table for each. Keep the system prompt, user prompt, and settings identical across all three runs. Score each criterion 0–2 (10 points total per model).</p>
+
+    <!-- Selection record -->
+    <div style="background:#fafafa;border:1px solid #d8d8d8;border-left:4px solid #6B0F1A;border-radius:3px;padding:10px 14px;margin:10px 0 16px;">
+      <div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B0F1A;margin-bottom:8px;">Models Selected</div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:10pt;">
+        <div><strong>Model 1:</strong> <span class="blank" style="min-width:380px;"></span></div>
+        <div><strong>Model 2:</strong> <span class="blank" style="min-width:380px;"></span></div>
+        <div><strong>Model 3:</strong> <span class="blank" style="min-width:380px;"></span></div>
+      </div>
+      <div style="margin-top:9px;font-size:9pt;color:#555;"><strong>Briefly explain why you chose these three models:</strong></div>
+      <div class="write-box write-sm mt8"></div>
+    </div>
+
+    <!-- Score table 1 -->
+    <h2>Model 1 &mdash; <span style="font-weight:400;color:#666;font-size:10.5pt;">see selection above</span></h2>
+    <table class="sc-tbl">
+      <thead><tr><th style="width:74%">Criterion</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Factual accuracy (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Relevance (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Followed system prompt (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Appropriate level of detail (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr class="tot"><td><strong>TOTAL</strong></td><td><strong><span class="blank" style="min-width:26px;"></span>&nbsp;/ 10</strong></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Strength:</strong> <span class="blank" style="min-width:175px;"></span> &nbsp;&nbsp; <strong>Weakness:</strong> <span class="blank" style="min-width:175px;"></span></p>
+
+    <!-- Score table 2 -->
+    <h2>Model 2 &mdash; <span style="font-weight:400;color:#666;font-size:10.5pt;">see selection above</span></h2>
+    <table class="sc-tbl">
+      <thead><tr><th style="width:74%">Criterion</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Factual accuracy (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Relevance (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Followed system prompt (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Appropriate level of detail (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr class="tot"><td><strong>TOTAL</strong></td><td><strong><span class="blank" style="min-width:26px;"></span>&nbsp;/ 10</strong></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Strength:</strong> <span class="blank" style="min-width:175px;"></span> &nbsp;&nbsp; <strong>Weakness:</strong> <span class="blank" style="min-width:175px;"></span></p>
+
+    <!-- Score table 3 -->
+    <h2>Model 3 &mdash; <span style="font-weight:400;color:#666;font-size:10.5pt;">see selection above</span></h2>
+    <table class="sc-tbl">
+      <thead><tr><th style="width:74%">Criterion</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr><td>Answered the question (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Factual accuracy (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Relevance (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Followed system prompt (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr><td>Appropriate level of detail (0–2)</td><td><span class="blank" style="min-width:26px;"></span>&nbsp;/ 2</td></tr>
+        <tr class="tot"><td><strong>TOTAL</strong></td><td><strong><span class="blank" style="min-width:26px;"></span>&nbsp;/ 10</strong></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Strength:</strong> <span class="blank" style="min-width:175px;"></span> &nbsp;&nbsp; <strong>Weakness:</strong> <span class="blank" style="min-width:175px;"></span></p>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 16</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK E (cont.) — Summary
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h2 class="mt0">Model Comparison Summary</h2>
+    <p>Fill in the model identifiers in the header row, then complete the summary using your observations.</p>
+
+    <table class="sum-tbl">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          <th>Model 1</th>
+          <th>Model 2</th>
+          <th>Model 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="id-row">
+          <td>Model identifier</td>
+          <td><span class="blank" style="min-width:100px;"></span></td>
+          <td><span class="blank" style="min-width:100px;"></span></td>
+          <td><span class="blank" style="min-width:100px;"></span></td>
+        </tr>
+        <tr><td>Overall score / 10</td><td><span class="blank" style="min-width:36px;"></span></td><td><span class="blank" style="min-width:36px;"></span></td><td><span class="blank" style="min-width:36px;"></span></td></tr>
+        <tr><td>Best reasoning</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td></tr>
+        <tr><td>Best instruction following</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td></tr>
+        <tr><td>Best factual performance</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td></tr>
+        <tr><td>Best response quality</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td></tr>
+        <tr><td>Fastest observed</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td></tr>
+      </tbody>
+    </table>
+
+    <p class="mt12"><strong>Which model performed best overall?</strong></p>
+    <div class="chk-group mt8 mb12">
+      <label class="chk"><input type="checkbox"> Model 1</label>
+      <label class="chk"><input type="checkbox"> Model 2</label>
+      <label class="chk"><input type="checkbox"> Model 3</label>
+      <label class="chk"><input type="checkbox"> Tie</label>
+    </div>
+
+    <p><strong>Which model would you select for a real application, and why?</strong> (3–4 sentences)</p>
+    <div class="write-box" style="min-height:80px;"></div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>Page 17</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK F — Final Reflection
+═══════════════════════════════════════════════════ -->
+<div class="doc-page" style="margin-bottom:24px;">
+  <div class="pg-hdr">
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+    <span>Lab 1 &mdash; Student Observation Workbook</span>
+  </div>
+  <div class="pg-body">
+
+    <h1>F. Final Lab Reflection</h1>
+    <p>Answer the following questions. Keep each response to 2–4 sentences unless otherwise indicated.</p>
+
+    <h3>1. What capability was unavailable to the bare-bones chatbot that Tavily added?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>2. Why does adding web search not automatically make the application an agent?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>3. What was the most important difference you observed among the three models you selected?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>4. Why did you choose the three models you did, and would you make a different selection if you ran this lab again?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>5. Give one example where a model's fluent response did not necessarily mean the answer was reliable.</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>6. What is one engineering lesson you learned from changing the model component while keeping the application the same?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>University of Montana &nbsp;|&nbsp; CSCI 391 &mdash; Agentic Artificial Intelligence &nbsp;|&nbsp; Lab 1</span>
+  </div>
+</div>
+
+</body>
+</html>
