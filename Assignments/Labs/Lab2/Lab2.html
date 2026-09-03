@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — Lab 2: Agent Anatomy &amp; Automation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif; font-size:10.5pt; line-height:1.65; color:#1e1e1e; background:#d8d8d8; }
+  .doc-page { background:#fff; width:816px; min-height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; }
+  .cover-page { background:#fff; width:816px; height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; overflow:hidden; }
+  .pg-hdr { display:flex; justify-content:space-between; padding:13px 48px 9px; border-bottom:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; }
+  .pg-ftr { display:flex; justify-content:space-between; padding:9px 48px 13px; border-top:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; margin-top:auto; }
+  .pg-body { flex:1; padding:26px 48px 20px; }
+
+  .cv-topbar { background:#6B0F1A; padding:17px 48px; display:flex; justify-content:space-between; color:white; font-size:8.5pt; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+  .cv-body { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 64px; }
+  .cv-univ { font-size:12.5pt; font-weight:700; color:#6B0F1A; letter-spacing:.1em; text-transform:uppercase; }
+  .cv-rule { width:56px; height:3px; background:#6B0F1A; margin:18px auto 22px; }
+  .cv-course { font-size:11.5pt; color:#333; margin-bottom:4px; }
+  .cv-sem { font-size:10pt; color:#666; margin-bottom:52px; }
+  .cv-tag { font-size:8.5pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#6B0F1A; margin-bottom:10px; }
+  .cv-num { font-size:38pt; font-weight:700; color:#1e1e1e; line-height:1; }
+  .cv-title { font-size:19pt; font-weight:400; color:#333; margin-bottom:12px; line-height:1.3; }
+  .cv-subtitle { font-size:10.5pt; color:#666; margin-bottom:28px; }
+  .cv-meta { font-size:9.5pt; color:#666; }
+  .cv-ftr { padding:15px 48px; border-top:1px solid #ddd; display:flex; justify-content:space-between; font-size:8.5pt; color:#666; }
+
+  h1 { font-size:14pt; font-weight:700; color:#6B0F1A; padding-bottom:6px; border-bottom:1.5px solid #6B0F1A; margin:22px 0 11px; line-height:1.3; }
+  h1:first-child { margin-top:0; }
+  h2 { font-size:12pt; font-weight:700; color:#6B0F1A; padding-bottom:5px; border-bottom:1.5px solid #6B0F1A; margin:20px 0 9px; line-height:1.3; }
+  h3 { font-size:11pt; font-weight:700; color:#2a2a2a; margin:15px 0 6px; }
+  p { margin-bottom:9px; }
+  ol,ul { margin:7px 0 11px; padding-left:26px; }
+  li { margin-bottom:5px; line-height:1.55; }
+  ul { list-style-type:disc; }
+  code { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:8.8pt; background:#f0f0f0; padding:1px 5px; border-radius:3px; color:#2a2a2a; }
+
+  .cb { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f2f2f2; border:1px solid #d0d0d0; border-radius:4px; padding:9px 16px; margin:9px 0 11px; color:#1a1a1a; white-space:pre-wrap; line-height:1.5; }
+  .callout { padding:9px 14px 9px 16px; border-radius:3px; margin:11px 0; font-size:10pt; line-height:1.55; }
+  .callout-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+  .warn { background:#fff4f0; border-left:4px solid #b71c1c; } .warn .callout-lbl { color:#b71c1c; }
+  .note { background:#f0f4ff; border-left:4px solid #1a4fa8; } .note .callout-lbl { color:#1a4fa8; }
+  .tip { background:#f0faf4; border-left:4px solid #1a7a3c; } .tip .callout-lbl { color:#1a7a3c; }
+  .doc-ref { background:#f8f6ff; border:1px solid #c9bfee; border-left:4px solid #5c35b5; border-radius:3px; padding:9px 14px; margin:9px 0 13px; font-size:9.5pt; line-height:1.6; }
+  .doc-ref .doc-ref-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; color:#5c35b5; margin-bottom:5px; }
+  .doc-ref a { color:#5c35b5; text-decoration:none; font-weight:500; }
+  .step-list { counter-reset:steps; list-style:none; padding-left:0; margin:10px 0 13px; }
+  .step-list li { counter-increment:steps; display:flex; gap:13px; margin-bottom:9px; align-items:flex-start; }
+  .step-list li::before { content:counter(steps); min-width:22px; height:22px; background:#6B0F1A; color:white; border-radius:50%; font-size:8.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  .flow { border:1px solid #ccc; background:#fafafa; padding:12px 16px; margin:10px 0 13px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:9pt; line-height:1.9; }
+  .flow strong { color:#6B0F1A; }
+  .taxonomy { width:100%; border-collapse:collapse; margin:8px 0 12px; font-size:9.4pt; }
+  .taxonomy th { background:#6B0F1A; color:white; padding:7px 9px; text-align:left; }
+  .taxonomy td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .taxonomy td:first-child { background:#f4f4f4; font-weight:700; width:22%; }
+  .obs-tbl { width:100%; border-collapse:collapse; margin:8px 0 10px; font-size:9.7pt; }
+  .obs-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; }
+  .obs-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:top; }
+  .obs-tbl td:first-child { background:#f4f4f4; font-weight:600; width:31%; }
+  .cmp-tbl { width:100%; border-collapse:collapse; margin:7px 0 9px; font-size:9.6pt; }
+  .cmp-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .cmp-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .cmp-tbl td:first-child { background:#f4f4f4; font-weight:600; width:34%; }
+  .chk-group { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .chk { display:inline-flex; align-items:center; gap:4px; font-size:9.5pt; white-space:nowrap; }
+  .chk input { width:13px; height:13px; accent-color:#6B0F1A; }
+  .write-box { display:block; width:100%; min-height:70px; border:1px solid #bbb; border-radius:3px; padding:7px 10px; margin-top:5px; color:#bbb; }
+  .write-sm { min-height:42px; }
+  .prompt { background:#fafafa; border:1px solid #ddd; border-left:4px solid #6B0F1A; padding:7px 14px; margin:5px 0 9px; font-style:italic; font-size:10pt; color:#333; }
+  .blank { display:inline-block; border-bottom:1px solid #aaa; min-width:120px; height:17px; vertical-align:bottom; }
+  .blank-full { display:block; width:100%; border-bottom:1px solid #aaa; min-height:20px; margin-top:3px; }
+  .src-hdr { background:#2e2e2e; color:#e8e8e8; font-family:'JetBrains Mono',monospace; font-size:8pt; font-weight:600; padding:6px 16px; border-radius:4px 4px 0 0; margin-top:14px; display:flex; justify-content:space-between; }
+  .cb-src { font-family:'JetBrains Mono',Consolas,monospace; font-size:7.5pt; background:#fcfcfc; border:1px solid #ccc; border-top:2px solid #6B0F1A; border-radius:0 0 4px 4px; padding:12px 16px; margin-bottom:14px; white-space:pre-wrap; line-height:1.52; }
+  .tc { color:#b05000; font-weight:600; }
+  .cm { color:#707070; }
+  .rubric { width:100%; border-collapse:collapse; margin:7px 0 12px; font-size:9.3pt; }
+  .rubric th { background:#3a3a3a; color:white; padding:7px 9px; text-align:left; }
+  .rubric td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .rubric td:first-child { width:26%; font-weight:600; background:#f4f4f4; }
+  .page-break { page-break-before:always; }
+
+  .focus-note { font-size:8.8pt; color:#666; font-style:italic; margin-bottom:5px; }
+  .ag-tbl { width:100%; border-collapse:collapse; margin:8px 0 11px; font-size:9.6pt; }
+  .ag-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .ag-tbl td { padding:6px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .ag-tbl td:first-child { background:#f4f4f4; font-weight:500; width:46%; }
+  .ag-tbl td:nth-child(2), .ag-tbl td:nth-child(3) { width:8%; text-align:center; }
+  .ag-tbl td:last-child { width:38%; }
+  a.dl { color:#6B0F1A; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(107,15,26,.4); }
+  .mt0  { margin-top:0 !important; }
+  .mt8  { margin-top:8px !important; }
+  .mt12 { margin-top:12px !important; }
+  .mt16 { margin-top:16px !important; }
+  .mt20 { margin-top:20px !important; }
+  .mb8  { margin-bottom:8px !important; }
+  .mb12 { margin-bottom:12px !important; }
+  .mb16 { margin-bottom:16px !important; }
+  @media print {
+    body { background:white; }
+    .doc-page,.cover-page { box-shadow:none; margin:0; width:100%; page-break-after:always; }
+    @page { size:letter; margin:.55in .75in .6in; }
+    h1,h2,h3 { page-break-after:avoid; }
+    .cb,.cb-src,table,.flow { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-page">
+  <div class="cv-topbar"><span>University of Montana</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-course">CSCI 391 — ST: Agentic Artificial Intelligence</div>
+    <div class="cv-sem">Autumn Semester 2026</div>
+    <div class="cv-tag">Implementation Lab • Week 2</div>
+    <div class="cv-num">Lab 2</div>
+    <div class="cv-title">Agent Anatomy &amp; Automation</div>
+    <div class="cv-subtitle">Building a Minimum Viable ReAct Agent</div>
+    <div class="cv-meta">CSCI 391 — ST: Agentic Artificial Intelligence &nbsp;•&nbsp; Autumn Semester 2026</div>
+  </div>
+  <div class="cv-ftr"><span>University of Montana — Autumn 2026</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Prerequisites</h1>
+    <p><strong>Before beginning this lab, you must read Chapter 2, “Intelligent Agents,” from the course Artificial Intelligence textbook.</strong></p>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Required Reading</span>
+      <strong>Artificial Intelligence — Chapter 2: Intelligent Agents</strong><br>
+      <a href="ArtificialIntelligence_Textbook_Chapter_2_Agents.pdf">Open Chapter 2 PDF</a><br>
+      Read the complete chapter before starting the implementation portion of this lab. The chapter introduces the concepts of <em>agents, environments, percepts, percept sequences, agent functions, agent programs, rational agents,</em> and different types of environments that we will use throughout this lab.
+    </div>
+
+    <p>As you read, pay particular attention to the relationship between an agent and its environment: an agent <strong>perceives</strong> its environment through sensors and <strong>acts</strong> upon that environment through actuators. The chapter also distinguishes the abstract <em>agent function</em> from the concrete <em>agent program</em> that implements it.</p>
+
+    <h3>Reading Checklist</h3>
+    <ul>
+      <li>☐ I have read Chapter 2, “Intelligent Agents.”</li>
+      <li>☐ I can explain what an agent is in terms of perception and action.</li>
+      <li>☐ I can distinguish an agent function from an agent program.</li>
+      <li>☐ I can describe an agent's environment and percepts.</li>
+      <li>☐ I understand why the nature of an environment influences agent design.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why This Reading Matters</span>
+      This lab is an implementation exercise, but the implementation should be driven by the concepts in Chapter 2. You will use those concepts to describe your agent before coding it and to analyze whether your finished system actually exhibits agent-like behavior.
+    </div>
+
+    <h1>Lab Overview</h1>
+    <p>In Lab 1, you built and evaluated an LLM-powered chatbot and then extended that application with web search. This lab builds directly on that work, but shifts the central question from <em>what can an LLM application answer?</em> to <em>what does it mean for an application to act as an agent?</em></p>
+    <p>You will begin with the concepts from Chapter 2 and our discussion of the five-level agent taxonomy. You will then transform a simple LLM application into a small, goal-directed system that can select actions, observe the results, and decide what to do next.</p>
+    <p>The implementation will use a simplified <strong>ReAct loop</strong>:</p>
+    <div class="flow"><strong>THOUGHT</strong> → <strong>ACTION</strong> → <strong>OBSERVATION</strong> → <strong>THOUGHT</strong> → <strong>ACTION</strong> → … → <strong>FINAL ANSWER</strong></div>
+    <p>The goal is not to build a production agent. The goal is to understand the smallest set of components required to create agent-like behavior and to recognize the engineering tradeoffs introduced by autonomy.</p>
+
+    <h1>Learning Objectives</h1>
+    <p>Upon successful completion of this lab, students will be able to:</p>
+    <ul>
+      <li>Distinguish scripted automation, an LLM application, and an agent using the five-level taxonomy discussed in lecture.</li>
+      <li>Describe an agent using concepts from Chapter 2, including goals, percepts, actions, environments, and performance measures.</li>
+      <li>Explain the purpose of the ReAct <strong>Thought → Action → Observation</strong> loop.</li>
+      <li>Extend an existing LLM application with a small set of callable tools.</li>
+      <li>Implement a bounded agent loop that can use observations to determine subsequent actions.</li>
+      <li>Instrument an agent so that its actions and observations can be inspected.</li>
+      <li>Identify common failure modes involving tool selection, missing information, repeated actions, and step limits.</li>
+      <li>Defend the level of agency represented by your implementation.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Connection to Lab 1</span>
+      You will reuse the Python environment, OpenRouter configuration, and general request/response pattern from Lab 1. You should not need to create a new API account or relearn the basic OpenRouter request structure.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 1 — From Automation to Agency</h1>
+    <p>Before writing code, classify the following systems using the five-level taxonomy from lecture. The purpose of this exercise is to establish what changes as we move from predetermined automation toward autonomous behavior.</p>
+
+    <table class="taxonomy">
+      <thead><tr><th>Level</th><th>Description</th><th>Key Characteristic</th></tr></thead>
+      <tbody>
+        <tr><td>Level 0 — Scripted Automation</td><td>Explicit rules determine what the system does.</td><td>The developer determines the sequence of actions.</td></tr>
+        <tr><td>Level 1 — LLM as a Component</td><td>An LLM generates or transforms information within an application.</td><td>The surrounding application still determines the workflow.</td></tr>
+        <tr><td>Level 2 — Tool-Using LLM</td><td>The LLM can select from available tools.</td><td>The model can choose an action rather than only generate text.</td></tr>
+        <tr><td>Level 3 — Goal-Directed Agent</td><td>The system can pursue a goal through multiple actions.</td><td>Later actions can depend on observations from earlier actions.</td></tr>
+        <tr><td>Level 4 — Persistent Agent</td><td>The system maintains information across interactions.</td><td>Persistent state or memory influences future behavior.</td></tr>
+        <tr><td>Level 5 — Multi-Agent System</td><td>Multiple agents interact to accomplish tasks.</td><td>Agency is distributed across multiple cooperating or competing agents.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Scenario A — Scripted Workflow</h3>
+    <div class="prompt">A program receives a support request. If the request contains the word "refund," it runs <code>lookup_order()</code>, then <code>check_policy()</code>, then <code>issue_refund()</code>. The sequence is hard-coded.</div>
+    <p>What level is this system, and why?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Scenario B — LLM Application</h3>
+    <div class="prompt">A user enters a question. The application sends the question to an LLM and prints the response.</div>
+    <p>What level is this system, and why?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Scenario C — Tool-Using System</h3>
+    <div class="prompt">An LLM is given access to <code>search()</code> and <code>calculator()</code>. It can choose to call one of those tools before producing its answer.</div>
+    <p>What level is this system? What additional behavior would make the distinction between Level 2 and Level 3 more meaningful?</p>
+    <div class="write-box"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Lab Focus</span>
+      Do not equate "uses a tool" with "fully autonomous agent." In this lab you will investigate what changes when the system can use the result of one action to determine what it should do next.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 2 — Describe Your Agent</h1>
+    <p>Chapter 2 describes agents in terms of what they perceive, what they can do, and the environment in which they operate. Before implementation, describe the research agent you are about to build.</p>
+
+    <table class="obs-tbl">
+      <tr><td>Goal</td><td>What is the agent trying to accomplish?</td></tr>
+      <tr><td>Performance Measure</td><td>What would make the agent's result good? Consider accuracy, relevance, completeness, and efficiency.</td></tr>
+      <tr><td>Environment</td><td>What external environment does the agent interact with?</td></tr>
+      <tr><td>Percepts / Observations</td><td>What information can the agent receive from the user and from its tools?</td></tr>
+      <tr><td>Actions</td><td>What actions can the agent take?</td></tr>
+      <tr><td>Tools</td><td>What capabilities will the agent be given?</td></tr>
+      <tr><td>Termination</td><td>How will the agent know it has enough information to answer?</td></tr>
+    </table>
+
+    <h2>Agent Environment</h2>
+    <p>Use Chapter 2 terminology to characterize your environment.</p>
+    <table class="cmp-tbl">
+      <tr><th>Property</th><th>Your Classification</th><th>Why?</th></tr>
+      <tr><td>Observable</td><td>Fully / Partially / Unobservable</td><td></td></tr>
+      <tr><td>Agents</td><td>Single / Multiagent</td><td></td></tr>
+      <tr><td>Determinism</td><td>Deterministic / Nondeterministic</td><td></td></tr>
+    </table>
+
+    <h2>Minimum Viable Agent</h2>
+    <p>For this lab, your minimum viable agent will contain four essential pieces:</p>
+    <ol>
+      <li><strong>Goal / System Prompt</strong> — instructions that establish the agent's role and objective.</li>
+      <li><strong>Tools</strong> — capabilities the model can invoke.</li>
+      <li><strong>Context</strong> — the user's request and observations returned by tools.</li>
+      <li><strong>Agent Loop</strong> — repeated decision, action, and observation until the task is complete or the agent gives up.</li>
+    </ol>
+
+    <div class="flow">
+      USER GOAL<br>
+      ↓<br>
+      <strong>MODEL DECISION</strong><br>
+      ↓<br>
+      <strong>ACTION / TOOL CALL</strong><br>
+      ↓<br>
+      <strong>OBSERVATION</strong><br>
+      ↓<br>
+      <strong>MODEL DECISION</strong><br>
+      ↓<br>
+      …<br>
+      ↓<br>
+      <strong>FINAL ANSWER</strong>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Important</span>
+      The loop is the central object of this lab. Do not focus on making the agent "smart." Focus on making the architecture observable, bounded, and correct.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 3 — Build a Tool-Using LLM</h1>
+    <p>Begin with the code you developed in Lab 1. Your first task is to add a small set of capabilities that the model can choose to use.</p>
+
+    <h3>Required Tools</h3>
+    <p>Implement the following two tools as ordinary Python functions. The tools should return information to the calling program rather than directly generating the final response.</p>
+
+    <table class="obs-tbl">
+      <tr><td><code>calculator(expression)</code></td><td>Evaluate a basic mathematical expression and return the result.</td></tr>
+      <tr><td><code>search_web(query)</code></td><td>Use the web-search capability from Lab 1 to retrieve relevant information.</td></tr>
+    </table>
+
+    <p>You may reuse your Lab 1 Tavily implementation. The important change is <strong>who decides when the search occurs</strong>. In Lab 1, your application searched first and then passed the results to the LLM. In this lab, the LLM should be able to decide whether a search is necessary.</p>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>Python — <code>eval()</code> for the Calculator Tool</strong><br>
+      <a href="https://docs.python.org/3/library/functions.html#eval" target="_blank">eval() — Python Standard Library ↗</a><br>
+      <code>eval()</code> will evaluate an arithmetic expression string, but by default it can reach Python's entire built-in namespace. When the string being evaluated comes from model-generated input, that is a real code-execution risk, not a hypothetical one. Restrict what <code>eval()</code> can see by supplying explicit globals/locals dictionaries, e.g. <code>eval(expression, {"__builtins__": {}}, allowed_names)</code>, where <code>allowed_names</code> contains only the arithmetic functions you intend to expose.
+      <ul>
+        <li><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" target="_blank">ast.literal_eval() — Python Standard Library ↗</a> &mdash; a safer alternative worth knowing about when you only need to parse literal values (numbers, strings, lists) rather than evaluate expressions.</li>
+      </ul>
+    </div>
+
+    <h3>Tool-Using Flow</h3>
+    <div class="flow">USER QUESTION → MODEL → <strong>TOOL SELECTION</strong> → TOOL RESULT → MODEL → FINAL ANSWER</div>
+
+    <p>At this stage, allow the model to make <strong>one</strong> tool decision. Do not implement the repeated loop yet.</p>
+
+    <h2>Tool Descriptions</h2>
+    <p>For each tool, provide the model with a clear description and the information it needs to call the tool correctly. Think carefully about the difference between:</p>
+    <div class="cb">"Search the web."</div>
+    <p>and:</p>
+    <div class="cb">"Search the web for information needed to answer the user's question. Provide a concise search query describing the specific information you need."</div>
+
+    <p>Explain why the second description gives the model more useful information about when and how to use the tool.</p>
+    <div class="write-box"></div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>OpenRouter — Tool / Function Calling</strong><br>
+      <a href="https://openrouter.ai/docs/guides/features/tool-calling" target="_blank">Client Tools — OpenRouter Documentation ↗</a><br>
+      OpenRouter uses the OpenAI-compatible <code>tools</code> request parameter. Each tool is described with a <code>name</code>, a natural-language <code>description</code>, and a JSON Schema <code>parameters</code> object listing the arguments the model may supply. The model never executes a tool itself &mdash; it returns a <code>tool_calls</code> array naming the requested tool and its arguments as a JSON string, your program executes the corresponding Python function, and the result is appended back into <code>messages</code> with <code>role: "tool"</code> (matched to the request via <code>tool_call_id</code>) so the model can observe it on the next turn. This request/execute/observe cycle is what makes the ReAct loop possible.
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Reuse Your Lab 1 Work</span>
+      Your Lab 1 code already knows how to call OpenRouter and Tavily. Reuse that knowledge. The new problem is not "How do I call an API?" It is "How do I let the model choose and repeat actions?"
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 4 — Implement the ReAct Loop</h1>
+    <p>You will now modify your tool-using application so that the model can perform multiple actions. Your program should continue until the model produces a final answer or a maximum number of steps has been reached.</p>
+
+    <h3>The Required Pattern</h3>
+    <div class="flow">
+      <strong>THOUGHT</strong><br>
+      "What information or action do I need next?"<br>
+      ↓<br>
+      <strong>ACTION</strong><br>
+      Select and execute a tool.<br>
+      ↓<br>
+      <strong>OBSERVATION</strong><br>
+      Receive the tool's result.<br>
+      ↓<br>
+      Return the observation to the model.<br>
+      ↓<br>
+      <strong>THOUGHT</strong> → <strong>ACTION</strong> → <strong>OBSERVATION</strong> → …
+    </div>
+
+    <h2>Starter Implementation</h2>
+    <p>Create <code>agent_starter.py</code> in your Lab2 folder. Complete every <code>TODO</code>. Your implementation should be based on the concepts and code you already used in Lab 1.</p>
+
+    <div class="src-hdr">agent_starter.py <span>complete every TODO before running</span></div>
+    <div class="cb-src">import os
+import sys
+import requests
+from dotenv import load_dotenv
+
+MAX_STEPS = 5
+
+def calculator(expression):
+    <span class="tc"># TODO 1: Implement a simple calculator tool.</span>
+    <span class="tc"># Return a string containing the calculation result.</span>
+    pass
+
+def search_web(query):
+    <span class="tc"># TODO 2: Reuse your Lab 1 web-search implementation.</span>
+    <span class="tc"># Return a concise string containing useful search results.</span>
+    pass
+
+def main(args):
+    load_dotenv()
+
+    <span class="tc"># TODO 3: Read the OpenRouter API key from the environment.</span>
+    openrouter_api_key = None
+
+    <span class="tc"># TODO 4: Set the model. You may reuse the model you selected in Lab 1.</span>
+    model = None
+
+    SYSTEM_PROMPT = """
+    You are a helpful research agent.
+
+    Your goal is to answer the user's question accurately.
+    You may use the available tools when additional information
+    or calculation is necessary.
+
+    After observing a tool result, decide what to do next.
+    Stop when you have enough information to provide a final answer.
+    """
+
+    <span class="tc"># TODO 5: Define your tool descriptions.</span>
+    tools = []
+
+    messages = []
+
+    user_input = input("What would you like me to investigate?\n")
+    messages.append({"role": "user", "content": user_input})
+
+    for step in range(1, MAX_STEPS + 1):
+
+        print(f"\n--- STEP {step} ---")
+
+        <span class="tc"># TODO 6: Send the current conversation to the model.</span>
+        <span class="tc"># Include the system prompt and tool definitions.</span>
+        response = None
+
+        <span class="tc"># TODO 7: Extract the model's message and any requested tool calls.</span>
+        message = None
+        tool_calls = []
+
+        <span class="tc"># TODO 8: If the model did not request a tool,</span>
+        <span class="tc"># print its response and terminate the loop.</span>
+
+        <span class="tc"># TODO 9: Append the model's message to the conversation.</span>
+
+        for call in tool_calls:
+            <span class="tc"># TODO 10: Determine which tool was requested.</span>
+            <span class="tc"># Execute it with the supplied arguments.</span>
+            tool_result = None
+
+            <span class="tc"># TODO 11: Print the ACTION and OBSERVATION so you can inspect the loop.</span>
+
+            <span class="tc"># TODO 12: Append the tool result to messages so the model</span>
+            <span class="tc"># can observe it on the next iteration.</span>
+
+    else:
+        print("\nAgent stopped: maximum step budget reached.")
+
+if __name__ == "__main__":
+    main(sys.argv[1:])</div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Design Requirement</span>
+      Your loop must have a maximum step limit. An agent that can continue calling tools forever is not a successful implementation. A bounded agent must be able to give up.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 5 — Observe Your Agent</h1>
+    <p>Once your implementation works, modify the console output so that you can see what the agent is doing at each step. You are not being graded on producing a hidden chain-of-thought transcript. The purpose is to make the <strong>agent loop</strong> observable.</p>
+
+    <p>Your output should make it possible to identify:</p>
+    <ul>
+      <li>The current step number.</li>
+      <li>Which tool the model selected.</li>
+      <li>The arguments supplied to that tool.</li>
+      <li>The observation returned by the tool.</li>
+      <li>When the agent stops and produces its final answer.</li>
+    </ul>
+
+    <h3>Example Trace</h3>
+    <div class="cb">--- STEP 1 ---
+ACTION: search_web
+ARGUMENTS: {"query": "Montana population 2025"}
+OBSERVATION: ...
+
+--- STEP 2 ---
+ACTION: calculator
+ARGUMENTS: {"expression": "1,140,000 * 2"}
+OBSERVATION: 2,280,000
+
+--- STEP 3 ---
+FINAL ANSWER:
+Approximately 2.28 million.</div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>The <code>content</code> Property on Reasoning Models</strong><br>
+      <a href="https://openrouter.ai/docs/guides/best-practices/reasoning-tokens" target="_blank">Reasoning Tokens — OpenRouter Documentation ↗</a><br>
+      A returned message has two fields worth distinguishing when you log the THOUGHT step. <code>message["content"]</code> is the model's ordinary text output &mdash; on a turn where the model only requests a tool call, many models leave this field empty or <code>null</code>. Reasoning models can additionally return a separate <code>message["reasoning"]</code> field containing their internal reasoning trace, which some providers omit unless the request asks for it. Your THOUGHT logging should handle both cases gracefully rather than assuming <code>content</code> is always populated.
+    </div>
+
+    <p>Run your agent on the following prompts and record the observed behavior.</p>
+
+    <h3>Test 1 — No Tool Needed</h3>
+    <div class="prompt">What is the capital of Montana?</div>
+    <table class="cmp-tbl">
+      <tr><th>Observation</th><th>Result</th></tr>
+      <tr><td>Tools used?</td><td></td></tr>
+      <tr><td>Number of steps</td><td></td></tr>
+      <tr><td>Answered correctly?</td><td>Yes / Partial / No</td></tr>
+    </table>
+
+    <h3>Test 2 — Calculator</h3>
+    <div class="prompt">What is 37 × 84?</div>
+    <table class="cmp-tbl">
+      <tr><th>Observation</th><th>Result</th></tr>
+      <tr><td>Tool selected</td><td></td></tr>
+      <tr><td>Number of steps</td><td></td></tr>
+      <tr><td>Answered correctly?</td><td>Yes / Partial / No</td></tr>
+    </table>
+
+    <h3>Test 3 — Search</h3>
+    <div class="prompt">What are the latest major developments in artificial intelligence?</div>
+    <table class="cmp-tbl">
+      <tr><th>Observation</th><th>Result</th></tr>
+      <tr><td>Tool selected</td><td></td></tr>
+      <tr><td>Number of steps</td><td></td></tr>
+      <tr><td>Was current information obtained?</td><td>Yes / Partial / No</td></tr>
+    </table>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Compare With Lab 1</span>
+      In Lab 1, your web-enabled chatbot searched the web as part of a predetermined application flow. In this lab, the model decides whether a search is needed and can use the result to determine its next action.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 6 — Multi-Step Agent Tasks</h1>
+    <p>A central purpose of the ReAct loop is to allow later actions to depend on earlier observations. Test whether your agent can actually do this.</p>
+
+    <h3>Test 4 — Search Then Calculate</h3>
+    <div class="prompt">Find the current population of Montana and calculate what that population would be if it increased by 10%.</div>
+    <p>Record the sequence of actions. Did the agent search first and then use the search result to construct its calculation?</p>
+    <table class="cmp-tbl">
+      <tr><th>Observation</th><th>Result</th></tr>
+      <tr><td>Action 1</td><td></td></tr>
+      <tr><td>Observation 1</td><td></td></tr>
+      <tr><td>Action 2</td><td></td></tr>
+      <tr><td>Observation 2</td><td></td></tr>
+      <tr><td>Final answer quality</td><td>0 / 1 / 2 / 3 / 4 / 5</td></tr>
+    </table>
+
+    <h3>Test 5 — Compare Two Sources of Information</h3>
+    <div class="prompt">Find the populations of Montana and Idaho, determine which state has the larger population, and calculate the approximate difference.</div>
+    <p>Describe the agent's sequence of actions. Did it perform multiple searches or calculations? Did it use observations from earlier steps?</p>
+    <div class="write-box"></div>
+
+    <h3>Test 6 — Student-Selected Task</h3>
+    <p>Create a task that requires at least two different actions. Your task must require the agent to use an observation from one action when deciding what to do next.</p>
+    <div class="cb">YOUR PROMPT HERE</div>
+    <p>Why does this task require an agent loop rather than a single LLM response?</p>
+    <div class="write-box write-sm"></div>
+
+    <h2>What Makes Test 5 Different?</h2>
+    <p>Consider these two application designs:</p>
+    <div class="cb">DESIGN A
+search_web(user_question)
+calculator(...)
+final_response(...)
+
+DESIGN B
+MODEL → choose action → observe result → MODEL → choose next action → ...</div>
+    <p>Explain the architectural difference between the two designs. Focus on <strong>who determines the next action</strong> and <strong>how observations influence subsequent behavior</strong>.</p>
+    <div class="write-box"></div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 8</span></div>
+</div>
+
+<!-- PAGE 9 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 7 — Break Your Agent</h1>
+    <p>Agents introduce new failure modes because the system can choose actions rather than simply follow a predetermined workflow. In this section, intentionally change your implementation and observe what happens.</p>
+
+    <h3>Experiment A — Reduce the Step Budget</h3>
+    <p>Change <code>MAX_STEPS</code> from 5 to 2. Run Test 5 again.</p>
+    <table class="cmp-tbl">
+      <tr><th>Observation</th><th>Before</th><th>After</th></tr>
+      <tr><td>Completed the task?</td><td></td><td></td></tr>
+      <tr><td>Number of steps</td><td></td><td></td></tr>
+      <tr><td>Final response useful?</td><td></td><td></td></tr>
+    </table>
+    <p>Why is a step budget important for an agent?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment B — Remove a Tool</h3>
+    <p>Temporarily remove <code>calculator()</code> and run a calculation-heavy prompt.</p>
+    <p>What does the agent do when the capability it needs is unavailable?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment C — Tool Selection</h3>
+    <p>Run a prompt that could reasonably be answered either from the model's existing knowledge or by searching the web. Record whether the agent searches.</p>
+    <div class="write-box"></div>
+
+    <h3>Experiment D — Repeated Actions</h3>
+    <p>Use a difficult or ambiguous prompt and watch for repeated or unnecessary tool calls. If the agent repeats an action, describe what happened and what might have prevented it.</p>
+    <div class="write-box"></div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Engineering Lesson</span>
+      More autonomy means more possible behaviors. That can make a system more flexible, but it also creates more ways for the system to fail. A successful agent therefore needs explicit boundaries, termination conditions, and observable behavior.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 9</span></div>
+</div>
+
+<!-- PAGE 10 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 8 — Classify Your Agent</h1>
+    <p>Use the five-level taxonomy from lecture to classify the system you built. You must defend your classification rather than simply selecting a level.</p>
+
+    <table class="taxonomy">
+      <thead><tr><th>Question</th><th>Your Answer</th></tr></thead>
+      <tbody>
+        <tr><td>What is the agent's goal?</td><td></td></tr>
+        <tr><td>Can the model choose among multiple actions?</td><td>Yes / No</td></tr>
+        <tr><td>Can it execute those actions against an external environment?</td><td>Yes / No</td></tr>
+        <tr><td>Can it observe the result of an action?</td><td>Yes / No</td></tr>
+        <tr><td>Can an observation change its next action?</td><td>Yes / No</td></tr>
+        <tr><td>Can it perform multiple actions toward one goal?</td><td>Yes / No</td></tr>
+        <tr><td>Does it maintain persistent memory across runs?</td><td>Yes / No</td></tr>
+        <tr><td>Does it coordinate with other agents?</td><td>Yes / No</td></tr>
+      </tbody>
+    </table>
+
+    <h3>My Classification</h3>
+    <div class="chk-group">
+      <label class="chk"><input type="checkbox"> Level 0</label>
+      <label class="chk"><input type="checkbox"> Level 1</label>
+      <label class="chk"><input type="checkbox"> Level 2</label>
+      <label class="chk"><input type="checkbox"> Level 3</label>
+      <label class="chk"><input type="checkbox"> Level 4</label>
+      <label class="chk"><input type="checkbox"> Level 5</label>
+    </div>
+
+    <p class="mt12"><strong>Defend your classification in 4–6 sentences.</strong></p>
+    <div class="write-box"></div>
+
+    <h2>One Level Higher</h2>
+    <p>What would you need to add to your implementation to move it one level higher in the taxonomy? Do not simply name a technology. Describe the new capability or behavior.</p>
+    <div class="write-box"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Think Like an Architect</span>
+      A system's label is less important than its behavior. Your explanation should point to specific implementation details that justify the level you selected.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 10</span></div>
+</div>
+
+<!-- PAGE 11 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 9 — Chapter 2 Analysis</h1>
+    <p>Return to Chapter 2 and use its terminology to analyze the agent you built. Keep your answers grounded in the actual implementation rather than describing an idealized agent.</p>
+
+    <h3>1. Agent Function</h3>
+    <p>In your own words, describe how your implementation maps what the agent currently knows or observes to an action.</p>
+    <div class="write-box"></div>
+
+    <h3>2. Goal-Based Behavior</h3>
+    <p>Explain how the user's goal affects the actions selected by your agent. Why is this different from a fixed condition–action workflow?</p>
+    <div class="write-box"></div>
+
+    <h3>3. Partial Observability</h3>
+    <p>What information does your agent <em>not</em> have access to? How could incomplete or inaccurate observations affect its decisions?</p>
+    <div class="write-box"></div>
+
+    <h3>4. Rationality and Performance</h3>
+    <p>What would a "good" agent do when it is uncertain whether a tool result is reliable? Identify at least one performance criterion that should influence its behavior.</p>
+    <div class="write-box"></div>
+
+    <h3>5. Environment</h3>
+    <p>Would you describe the agent's environment as fully observable or partially observable? Deterministic or nondeterministic? Defend each choice with an example from your testing.</p>
+    <div class="write-box"></div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 11</span></div>
+</div>
+
+<!-- PAGE 12 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body">
+    <h1>Part 10 — Submission Requirements</h1>
+    <p>Submit the completed Student Observation Workbook together with your source code and required screenshots. Your submission must include:</p>
+    <ul>
+      <li>Completed <code>agent.py</code> implementation.</li>
+      <li>Evidence that the agent successfully executes at least one multi-step task.</li>
+      <li>A console screenshot showing an observable agent trace with actions and observations.</li>
+      <li>Results and written evaluations for Tests 1–6.</li>
+      <li>Results from the four failure-mode experiments in Part 7.</li>
+      <li>Your five-level taxonomy classification and written defense.</li>
+      <li>Your Chapter 2 agent/environment analysis.</li>
+      <li>A short final reflection comparing the Lab 1 chatbot with the Lab 2 agent.</li>
+      <li>Any additional questions or observations assigned during the lab session.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Security Reminder</span>
+      Never include your OpenRouter or Tavily API keys in screenshots, your submitted document, source control, or any other shared course material.
+    </div>
+
+    <h2>Implementation Requirements</h2>
+    <table class="rubric">
+      <thead><tr><th>Requirement</th><th>Minimum Standard</th></tr></thead>
+      <tbody>
+        <tr><td>Tools</td><td>At least <code>calculator()</code> and <code>search_web()</code>.</td></tr>
+        <tr><td>Agent loop</td><td>Repeated decision → action → observation behavior.</td></tr>
+        <tr><td>Multi-step behavior</td><td>At least one test requires more than one tool action.</td></tr>
+        <tr><td>Termination</td><td>Final response or explicit maximum-step termination.</td></tr>
+        <tr><td>Observability</td><td>Console output makes tool actions and observations visible.</td></tr>
+        <tr><td>Security</td><td>API keys remain in environment variables and are not submitted.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Preparation for Next Lecture</h2>
+    <p>Review your agent implementation and be prepared to explain where the decision-making loop occurs. Bring your Student Observation Workbook to class.</p>
+    <p><strong>Prerequisite confirmation:</strong> Chapter 2, “Intelligent Agents,” should be completed before submitting this lab.</p>
+    <p>Acquire a copy of the required textbook and read <em>Chapter 3, "The Anatomy of an Agent,"</em> and <em>Chapter 4, "When Not to Build an Agent,"</em> before the next session.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 12</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK DIVIDER
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Agent Anatomy &amp; Automation</span></div>
+  <div class="pg-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:800px;">
+    <div style="text-align:center;max-width:480px;">
+      <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6B0F1A;margin-bottom:14px;">Lab 2 — Autumn 2026</div>
+      <div style="font-size:30pt;font-weight:700;color:#1e1e1e;line-height:1.15;margin-bottom:20px;">Student Observation<br>Workbook</div>
+      <div style="width:60px;height:3px;background:#6B0F1A;margin:0 auto 24px;"></div>
+      <div style="font-size:11pt;color:#444;line-height:1.7;">Use this section to record the results of your experiments. Complete the checkboxes, ratings, and short evidence prompts rather than writing open-ended essays.</div>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 13</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK A/B — Taxonomy + Agent Specification
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <p><strong>Name:</strong> <span class="blank" style="min-width:220px;"></span> &nbsp;&nbsp; <strong>Date:</strong> <span class="blank" style="min-width:140px;"></span></p>
+
+    <h1 class="mt12">A. From Automation to Agency</h1>
+    <p>Classify each Part 1 scenario using the five-level taxonomy, then answer the summary question.</p>
+
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:34%">Scenario</th><th>Level (0–5)</th></tr></thead>
+      <tbody>
+        <tr><td>Scenario A — Scripted Workflow</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 0</label><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+        <tr><td>Scenario B — LLM Application</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 0</label><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+        <tr><td>Scenario C — Tool-Using System</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 0</label><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>What distinguishes a tool-using LLM (Level 2) from a goal-directed agent (Level 3)?</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h1 class="mt20">B. Agent Specification</h1>
+    <p>Describe the research agent you built, using Chapter 2 terminology.</p>
+    <table class="obs-tbl">
+      <tr><td>Goal</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Performance measure</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Environment</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Percepts / observations</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Actions</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Tools</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Termination condition</td><td><span class="blank-full"></span></td></tr>
+    </table>
+
+    <h2 class="mt12">Environment Classification</h2>
+    <table class="cmp-tbl">
+      <thead><tr><th>Property</th><th>Classification</th><th>Why?</th></tr></thead>
+      <tbody>
+        <tr><td>Observable</td><td><div class="chk-group" style="font-size:8.6pt;"><label class="chk"><input type="checkbox"> Fully</label><label class="chk"><input type="checkbox"> Partially</label><label class="chk"><input type="checkbox"> Unobservable</label></div></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Agents</td><td><div class="chk-group" style="font-size:8.6pt;"><label class="chk"><input type="checkbox"> Single</label><label class="chk"><input type="checkbox"> Multiagent</label></div></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Determinism</td><td><div class="chk-group" style="font-size:8.6pt;"><label class="chk"><input type="checkbox"> Deterministic</label><label class="chk"><input type="checkbox"> Nondeterministic</label></div></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 14</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK C — Agent Trace Tests
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>C. Agent Trace — Test Records</h1>
+    <p>Run each prompt through your finished agent and record what actually happened.</p>
+
+    <h2>Test 1 — Basic Query</h2>
+    <div class="focus-note">Test focus: Does the agent avoid calling a tool when one isn't necessary?</div>
+    <div class="prompt">What is the capital of Montana?</div>
+    <table class="obs-tbl">
+      <tr><td>Tool(s) used</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Number of steps</td><td><span class="blank" style="min-width:60px;"></span></td></tr>
+      <tr><td>Correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Anything surprising?</td><td><span class="blank-full"></span></td></tr>
+    </table>
+
+    <h2>Test 2 — Calculator</h2>
+    <div class="focus-note">Test focus: Correct tool selection and correct argument passing.</div>
+    <div class="prompt">What is 37 × 84?</div>
+    <table class="obs-tbl">
+      <tr><td>Tool selected</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Arguments passed</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Observation returned</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Final answer correct?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+    </table>
+
+    <h2>Test 3 — Search</h2>
+    <div class="focus-note">Test focus: Information beyond the model's training cutoff.</div>
+    <div class="prompt">What are the latest major developments in artificial intelligence?</div>
+    <table class="obs-tbl">
+      <tr><td>Tool selected</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Number of steps</td><td><span class="blank" style="min-width:60px;"></span></td></tr>
+      <tr><td>Information current?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> Partial</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>Usefulness (1–5)</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div></td></tr>
+    </table>
+
+    <p><strong>What did the agent do differently from your Lab 1 web-enabled chatbot?</strong></p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 15</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK D — Multi-Step Agent Tasks
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>D. Multi-Step Agent Tasks</h1>
+    <p>A central purpose of the ReAct loop is to allow later actions to depend on earlier observations.</p>
+
+    <h2>Test 4 — Search Then Calculate</h2>
+    <div class="focus-note">Test focus: Does a later action depend on an earlier observation?</div>
+    <div class="prompt">Find the current population of Montana and calculate what that population would be if it increased by 10%.</div>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:14%">Step</th><th style="width:38%">Action</th><th>Observation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>2</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>3</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>4</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Final answer quality</strong></p>
+    <div class="chk-group mt8 mb12"><label class="chk"><input type="checkbox"> 0</label><label class="chk"><input type="checkbox"> 1</label><label class="chk"><input type="checkbox"> 2</label><label class="chk"><input type="checkbox"> 3</label><label class="chk"><input type="checkbox"> 4</label><label class="chk"><input type="checkbox"> 5</label></div>
+    <p><strong>Did a later action depend on an earlier observation?</strong></p>
+    <div class="chk-group mt8 mb8"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div>
+    <p><strong>Explain:</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Test 5 — Compare Montana and Idaho</h2>
+    <div class="focus-note">Test focus: Multiple searches and cross-referenced observations.</div>
+    <div class="prompt">Find the populations of Montana and Idaho, determine which state has the larger population, and calculate the approximate difference.</div>
+    <p><strong>Describe the action sequence in 3–5 sentences.</strong></p>
+    <div class="write-box"></div>
+
+    <h2 class="mt16">Test 6 — Your Own Task</h2>
+    <p><strong>Prompt</strong> (must require at least two actions, where the second depends on the first's observation):</p>
+    <div class="write-box write-sm"></div>
+    <p><strong>Why does this require an agent loop rather than a single LLM response?</strong></p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 16</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK E — Failure-Mode Experiments
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>E. Failure-Mode Experiments</h1>
+    <p>Intentionally change your implementation and observe what happens. Record evidence, not just impressions.</p>
+
+    <h2>Experiment A — Step Budget</h2>
+    <div class="focus-note">Change MAX_STEPS from 5 to 2, then run Test 5 again.</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Before (5 steps)</th><th>After (2 steps)</th></tr></thead>
+      <tbody>
+        <tr><td>Completed the task?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Number of steps used</td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td></tr>
+        <tr><td>Final response useful?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Why is a step budget important for an agent?</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Experiment B — Remove a Tool</h2>
+    <div class="focus-note">Temporarily remove calculator() and run a calculation-heavy prompt.</div>
+    <p><strong>What did the agent do when the capability it needed was unavailable?</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Experiment C — Tool Selection</h2>
+    <div class="focus-note">Run a prompt answerable either from existing knowledge or by searching.</div>
+    <p><strong>Did the agent search when it could have answered from existing knowledge? Was that a good decision?</strong></p>
+    <div class="write-box"></div>
+
+    <h2 class="mt16">Experiment D — Repeated Actions</h2>
+    <div class="focus-note">Use a difficult or ambiguous prompt and watch for repeated or unnecessary tool calls.</div>
+    <p><strong>Did you observe repeated or unnecessary actions? What might have caused them?</strong></p>
+    <div class="write-box"></div>
+
+    <h2 class="mt16">Most Important Failure Mode</h2>
+    <p>Which failure mode would be most important to address before using this agent in a real application?</p>
+    <div class="chk-group mt8 mb8" style="font-size:9pt;">
+      <label class="chk"><input type="checkbox"> Step budget</label>
+      <label class="chk"><input type="checkbox"> Missing tool</label>
+      <label class="chk"><input type="checkbox"> Poor tool selection</label>
+      <label class="chk"><input type="checkbox"> Repeated actions</label>
+      <label class="chk"><input type="checkbox"> Other: <span class="blank" style="min-width:100px;"></span></label>
+    </div>
+    <p><strong>Explain:</strong></p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 17</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK F — Five-Level Taxonomy
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>F. Five-Level Taxonomy</h1>
+    <p>Use the checklist below to support your classification. For each characteristic, select Yes or No and provide brief evidence.</p>
+
+    <table class="ag-tbl">
+      <thead><tr><th>Characteristic</th><th>Yes</th><th>No</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Can the model choose among multiple actions?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Can it execute those actions against an external environment?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Can it observe the result of an action?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Can an observation change its next action?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Can it perform multiple actions toward one goal?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Does it maintain persistent memory across runs?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Does it coordinate with other agents?</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>My Classification</h3>
+    <div class="chk-group mt8 mb12">
+      <label class="chk"><input type="checkbox"> Level 0</label>
+      <label class="chk"><input type="checkbox"> Level 1</label>
+      <label class="chk"><input type="checkbox"> Level 2</label>
+      <label class="chk"><input type="checkbox"> Level 3</label>
+      <label class="chk"><input type="checkbox"> Level 4</label>
+      <label class="chk"><input type="checkbox"> Level 5</label>
+    </div>
+    <p><strong>Defend your classification in 4–6 sentences, referencing specific implementation behavior:</strong></p>
+    <div class="write-box"></div>
+
+    <h2 class="mt16">One Level Higher</h2>
+    <p>What capability would need to be added to move the system one level higher? Do not simply name a technology — describe the new capability or behavior.</p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 18</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK G — Chapter 2 Analysis
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>G. Chapter 2 Analysis</h1>
+    <p>Ground each answer in your actual implementation rather than an idealized agent.</p>
+
+    <h3>1. Agent Function</h3>
+    <p>In your own words, describe how your implementation maps what the agent currently knows or observes to an action.</p>
+    <div class="write-box write-sm mb16"></div>
+
+    <h3>2. Goal-Based Behavior</h3>
+    <p>How does the user's goal affect the actions your agent selects? Why is this different from a fixed condition–action workflow?</p>
+    <div class="write-box write-sm mb16"></div>
+
+    <h3>3. Partial Observability</h3>
+    <p>What information does your agent <em>not</em> have access to? How could incomplete or inaccurate observations affect its decisions?</p>
+    <div class="write-box write-sm mb16"></div>
+
+    <h3>4. Rationality and Performance</h3>
+    <p>What would a "good" agent do when uncertain whether a tool result is reliable? Name one performance criterion that should influence its behavior.</p>
+    <div class="write-box write-sm mb16"></div>
+
+    <h3>5. Environment</h3>
+    <p>Is the agent's environment fully observable or partially observable? Deterministic or nondeterministic?</p>
+    <div class="chk-group mt8 mb8">
+      <label class="chk"><input type="checkbox"> Fully observable</label>
+      <label class="chk"><input type="checkbox"> Partially observable</label>
+    </div>
+    <div class="chk-group mt8 mb8">
+      <label class="chk"><input type="checkbox"> Deterministic</label>
+      <label class="chk"><input type="checkbox"> Nondeterministic</label>
+    </div>
+    <p><strong>Defend each choice with an example from your testing:</strong></p>
+    <div class="write-box"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 19</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WORKBOOK H — Final Lab Reflection
+═══════════════════════════════════════════════════ -->
+<div class="doc-page" style="margin-bottom:24px;">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 2 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>H. Final Lab Reflection</h1>
+    <p>Answer the following questions. Keep each response to 2–4 sentences unless otherwise indicated.</p>
+
+    <h3>1. What changed between your Lab 1 chatbot and your Lab 2 agent?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>2. Why does adding a tool not automatically make a system a goal-directed agent?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>3. What is the most important role of the Observation in the ReAct loop?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>4. What is one situation where a scripted workflow would be preferable to an agent?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>5. What is one engineering risk introduced by giving an LLM the ability to choose its own actions?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>6. In one sentence, define the difference between a chatbot and an agent based on what you observed in this lab.</h3>
+    <div class="write-box write-sm mt8 mb16"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">Final Thought</span>
+      The purpose of this lab is not to prove that agents are always better. It is to understand what changes when software is allowed to select and execute actions dynamically — and what new engineering responsibilities come with that capability.
+    </div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>University of Montana &nbsp;|&nbsp; CSCI 391 — Agentic Artificial Intelligence &nbsp;|&nbsp; Lab 2</span></div>
+</div>
+
+</body>
+</html>
