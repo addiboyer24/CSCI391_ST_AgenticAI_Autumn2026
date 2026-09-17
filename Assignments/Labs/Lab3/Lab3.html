@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — Lab 3: Hardening the Agent</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif; font-size:10.5pt; line-height:1.65; color:#1e1e1e; background:#d8d8d8; }
+  .doc-page { background:#fff; width:816px; min-height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; }
+  .cover-page { background:#fff; width:816px; height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; overflow:hidden; }
+  .pg-hdr { display:flex; justify-content:space-between; padding:13px 48px 9px; border-bottom:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; }
+  .pg-ftr { display:flex; justify-content:space-between; padding:9px 48px 13px; border-top:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; margin-top:auto; }
+  .pg-body { flex:1; padding:26px 48px 20px; }
+
+  .cv-topbar { background:#6B0F1A; padding:17px 48px; display:flex; justify-content:space-between; color:white; font-size:8.5pt; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+  .cv-body { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 64px; }
+  .cv-univ { font-size:12.5pt; font-weight:700; color:#6B0F1A; letter-spacing:.1em; text-transform:uppercase; }
+  .cv-rule { width:56px; height:3px; background:#6B0F1A; margin:18px auto 22px; }
+  .cv-course { font-size:11.5pt; color:#333; margin-bottom:4px; }
+  .cv-sem { font-size:10pt; color:#666; margin-bottom:52px; }
+  .cv-tag { font-size:8.5pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#6B0F1A; margin-bottom:10px; }
+  .cv-num { font-size:38pt; font-weight:700; color:#1e1e1e; line-height:1; }
+  .cv-title { font-size:19pt; font-weight:400; color:#333; margin-bottom:12px; line-height:1.3; }
+  .cv-subtitle { font-size:10.5pt; color:#666; margin-bottom:28px; }
+  .cv-meta { font-size:9.5pt; color:#666; }
+  .cv-ftr { padding:15px 48px; border-top:1px solid #ddd; display:flex; justify-content:space-between; font-size:8.5pt; color:#666; }
+
+  h1 { font-size:14pt; font-weight:700; color:#6B0F1A; padding-bottom:6px; border-bottom:1.5px solid #6B0F1A; margin:22px 0 11px; line-height:1.3; }
+  h1:first-child { margin-top:0; }
+  h2 { font-size:12pt; font-weight:700; color:#6B0F1A; padding-bottom:5px; border-bottom:1.5px solid #6B0F1A; margin:20px 0 9px; line-height:1.3; }
+  h3 { font-size:11pt; font-weight:700; color:#2a2a2a; margin:15px 0 6px; }
+  p { margin-bottom:9px; }
+  ol,ul { margin:7px 0 11px; padding-left:26px; }
+  li { margin-bottom:5px; line-height:1.55; }
+  ul { list-style-type:disc; }
+  code { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:8.8pt; background:#f0f0f0; padding:1px 5px; border-radius:3px; color:#2a2a2a; }
+
+  .cb { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f2f2f2; border:1px solid #d0d0d0; border-radius:4px; padding:9px 16px; margin:9px 0 11px; color:#1a1a1a; white-space:pre-wrap; line-height:1.5; }
+  .callout { padding:9px 14px 9px 16px; border-radius:3px; margin:11px 0; font-size:10pt; line-height:1.55; }
+  .callout-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+  .warn { background:#fff4f0; border-left:4px solid #b71c1c; } .warn .callout-lbl { color:#b71c1c; }
+  .note { background:#f0f4ff; border-left:4px solid #1a4fa8; } .note .callout-lbl { color:#1a4fa8; }
+  .tip { background:#f0faf4; border-left:4px solid #1a7a3c; } .tip .callout-lbl { color:#1a7a3c; }
+  .doc-ref { background:#f8f6ff; border:1px solid #c9bfee; border-left:4px solid #5c35b5; border-radius:3px; padding:9px 14px; margin:9px 0 13px; font-size:9.5pt; line-height:1.6; }
+  .doc-ref .doc-ref-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; color:#5c35b5; margin-bottom:5px; }
+  .doc-ref a { color:#5c35b5; text-decoration:none; font-weight:500; }
+  .step-list { counter-reset:steps; list-style:none; padding-left:0; margin:10px 0 13px; }
+  .step-list li { counter-increment:steps; display:flex; gap:13px; margin-bottom:9px; align-items:flex-start; }
+  .step-list li::before { content:counter(steps); min-width:22px; height:22px; background:#6B0F1A; color:white; border-radius:50%; font-size:8.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  .flow { border:1px solid #ccc; background:#fafafa; padding:12px 16px; margin:10px 0 13px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:9pt; line-height:1.9; }
+  .flow strong { color:#6B0F1A; }
+  .taxonomy { width:100%; border-collapse:collapse; margin:8px 0 12px; font-size:9.4pt; }
+  .taxonomy th { background:#6B0F1A; color:white; padding:7px 9px; text-align:left; }
+  .taxonomy td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .taxonomy td:first-child { background:#f4f4f4; font-weight:700; width:22%; }
+  .obs-tbl { width:100%; border-collapse:collapse; margin:8px 0 10px; font-size:9.7pt; }
+  .obs-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; }
+  .obs-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:top; }
+  .obs-tbl td:first-child { background:#f4f4f4; font-weight:600; width:31%; }
+  .cmp-tbl { width:100%; border-collapse:collapse; margin:7px 0 9px; font-size:9.6pt; }
+  .cmp-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .cmp-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .cmp-tbl td:first-child { background:#f4f4f4; font-weight:600; width:34%; }
+  .chk-group { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .chk { display:inline-flex; align-items:center; gap:4px; font-size:9.5pt; white-space:nowrap; }
+  .chk input { width:13px; height:13px; accent-color:#6B0F1A; }
+  .write-box { display:block; width:100%; min-height:70px; border:1px solid #bbb; border-radius:3px; padding:7px 10px; margin-top:5px; color:#bbb; }
+  .write-sm { min-height:42px; }
+  .prompt { background:#fafafa; border:1px solid #ddd; border-left:4px solid #6B0F1A; padding:7px 14px; margin:5px 0 9px; font-style:italic; font-size:10pt; color:#333; }
+  .blank { display:inline-block; border-bottom:1px solid #aaa; min-width:120px; height:17px; vertical-align:bottom; }
+  .blank-full { display:block; width:100%; border-bottom:1px solid #aaa; min-height:20px; margin-top:3px; }
+  .src-hdr { background:#2e2e2e; color:#e8e8e8; font-family:'JetBrains Mono',monospace; font-size:8pt; font-weight:600; padding:6px 16px; border-radius:4px 4px 0 0; margin-top:14px; display:flex; justify-content:space-between; }
+  .cb-src { font-family:'JetBrains Mono',Consolas,monospace; font-size:7.5pt; background:#fcfcfc; border:1px solid #ccc; border-top:2px solid #6B0F1A; border-radius:0 0 4px 4px; padding:12px 16px; margin-bottom:14px; white-space:pre-wrap; line-height:1.52; }
+  .tc { color:#b05000; font-weight:600; }
+  .cm { color:#707070; }
+  .rubric { width:100%; border-collapse:collapse; margin:7px 0 12px; font-size:9.3pt; }
+  .rubric th { background:#3a3a3a; color:white; padding:7px 9px; text-align:left; }
+  .rubric td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .rubric td:first-child { width:26%; font-weight:600; background:#f4f4f4; }
+  .page-break { page-break-before:always; }
+
+  .focus-note { font-size:8.8pt; color:#666; font-style:italic; margin-bottom:5px; }
+  .ag-tbl { width:100%; border-collapse:collapse; margin:8px 0 11px; font-size:9.6pt; }
+  .ag-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .ag-tbl td { padding:6px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .ag-tbl td:first-child { background:#f4f4f4; font-weight:500; width:46%; }
+  .ag-tbl td:nth-child(2), .ag-tbl td:nth-child(3) { width:8%; text-align:center; }
+  .ag-tbl td:last-child { width:38%; }
+  a.dl { color:#6B0F1A; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(107,15,26,.4); }
+  .mt0  { margin-top:0 !important; }
+  .mt8  { margin-top:8px !important; }
+  .mt12 { margin-top:12px !important; }
+  .mt16 { margin-top:16px !important; }
+  .mt20 { margin-top:20px !important; }
+  .mb8  { margin-bottom:8px !important; }
+  .mb12 { margin-bottom:12px !important; }
+  .mb16 { margin-bottom:16px !important; }
+  @media print {
+    body { background:white; }
+    .doc-page,.cover-page { box-shadow:none; margin:0; width:100%; page-break-after:always; }
+    @page { size:letter; margin:.55in .75in .6in; }
+    h1,h2,h3 { page-break-after:avoid; }
+    .cb,.cb-src,table,.flow { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-page">
+  <div class="cv-topbar"><span>University of Montana</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-course">CSCI 391 — ST: Agentic Artificial Intelligence</div>
+    <div class="cv-sem">Autumn Semester 2026</div>
+    <div class="cv-tag">Implementation Lab • Week 3</div>
+    <div class="cv-num">Lab 3</div>
+    <div class="cv-title">Hardening the Agent</div>
+    <div class="cv-subtitle">Reliability, Observability, and Drift in Production-Grade ReAct Agents</div>
+    <div class="cv-meta">CSCI 391 — ST: Agentic Artificial Intelligence &nbsp;•&nbsp; Autumn Semester 2026</div>
+  </div>
+  <div class="cv-ftr"><span>University of Montana — Autumn 2026</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+</div>
+
+<!-- PAGE 2: Prerequisites / Overview / Objectives -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Prerequisites</h1>
+    <p><strong>Before beginning this lab, you must read Chapter 5, "LLMs as Reasoning Engines," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell.</strong></p>
+
+    <div class="callout note">
+      <span class="callout-lbl">📖 Required Reading</span>
+      <strong>The Agentic AI Bible</strong> — Thomas R. Caldwell — Chapter 5: "LLMs as Reasoning Engines." Focus on the tiered-reasoning pattern (fast classification model → reasoning/synthesis model) and why routing every step through the largest available model is not automatically the safest design choice. This lab's model-tiering and version-drift material builds directly on that chapter.
+    </div>
+
+    <h3>Lab Readiness Checklist</h3>
+    <ul>
+      <li>☐ I can explain the tiered-reasoning pattern from Chapter 5 (fast classification model → reasoning/synthesis model).</li>
+      <li>☐ I can explain why a bigger model in every loop step is not the same as a more reliable agent.</li>
+      <li>☐ I understand why pinning a model version in configuration does not guarantee it is the model actually being called.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why This Lab Goes Further</span>
+      Lab 2 asked "does the loop work?" This lab asks a harder question: "does the loop keep working as the conversation gets long, the tools get more numerous, and the underlying model quietly changes out from under you?" The seven failure modes below are introduced in this lab document itself — no additional reading is required beyond Chapter 5.
+    </div>
+
+    <h1>Lab Overview</h1>
+    <p>In Lab 2, you built a bounded ReAct loop that could select tools, observe results, and decide what to do next. That agent was correct on short tasks with a small step budget. In this lab, you will stress it: longer tasks, more tool calls, a wider step budget, and more places for things to quietly go wrong.</p>
+    <p>You will extend your Lab 2 agent into a <strong>hardened research agent</strong> that defends against seven specific, well-documented failure modes rather than simply "working most of the time."</p>
+    <div class="flow">SMALL, CORRECT AGENT (Lab 2)<br>↓<br><strong>+ RELIABILITY ENGINEERING</strong><br>↓<br>AGENT THAT STAYS CORRECT AS IT SCALES (Lab 3)</div>
+
+    <h1>Learning Objectives</h1>
+    <p>Upon successful completion of this lab, students will be able to:</p>
+    <ul>
+      <li>Identify context saturation ("Lost in the Middle") and implement windowed summarization to bound context growth.</li>
+      <li>Identify instruction drift and implement persistent constraint reinjection to keep critical rules from decaying.</li>
+      <li>Reduce confident confabulation by enforcing structured output schemas on tool call arguments, both online (OpenRouter) and offline (local llama.cpp).</li>
+      <li>Design tools that fail loudly and explicitly rather than silently returning ambiguous empty results.</li>
+      <li>Instrument an agent with structured, per-tool-call observability logging.</li>
+      <li>Write tool schemas — names, descriptions, and optional parameters — that a junior engineer (or a small model) could follow correctly on the first try.</li>
+      <li>Detect drift between a pinned model configuration and the model actually in use at runtime.</li>
+      <li>Measure and compare latency, token cost, and run-to-run accuracy variance for the same agent and the same prompt.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Connection to Labs 1 and 2</span>
+      You will extend your Lab 2 <code>agent.py</code>, not rewrite it from scratch. This lab also introduces two things Labs 1 and 2 did not use: running against a local model server as an <strong>offline</strong> alternative to OpenRouter, and <strong>model tiering</strong> — a cheap model and an expensive model configured side by side instead of one model for everything. Part 0 walks through setting both up and validating that they work before you touch the agent code.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE 3: Part 0 — Environment Setup (concepts, .env, models.ini) -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 0 — Environment Setup &amp; Validation</h1>
+    <p>This lab introduces two concepts you have not used in Labs 1 or 2. Read both before touching any code.</p>
+
+    <h3>New Concept: Online vs. Offline Mode</h3>
+    <p>So far, every lab has talked to exactly one place: OpenRouter. Starting in this lab, your agent can run in either of two modes against the identical OpenAI-compatible request format:</p>
+    <table class="cmp-tbl">
+      <thead><tr><th>Mode</th><th>What It Talks To</th></tr></thead>
+      <tbody>
+        <tr><td><strong>online</strong></td><td>OpenRouter, exactly as in Labs 1 and 2.</td></tr>
+        <tr><td><strong>offline</strong></td><td>A local model server (llama.cpp) running on your own machine at <code>http://127.0.0.1:8080</code>, serving open-weight models you download yourself.</td></tr>
+      </tbody>
+    </table>
+    <p>Because both expose the same <code>/v1/chat/completions</code> endpoint shape, your agent code can accept a <code>mode</code> argument and reuse identical request-building logic for either one.</p>
+
+    <h3>New Concept: Model Tiering</h3>
+    <p>Instead of one model string doing every job, this lab configures two per mode: a <strong>cheap</strong> model that drives the mechanical, repetitive parts of the ReAct loop (tool selection), and an <strong>expensive</strong> model that is invoked once, only to synthesize <code>final_answer</code>. This is the tiered-reasoning pattern from your Chapter 5 reading, applied to agent tool-calling rather than classification.</p>
+
+    <h3>Step 1 — Install llama.cpp</h3>
+    <p>If you plan to run offline, you need the <code>llama.cpp</code> tools (<code>llama-server</code> / <code>llama serve</code>) installed on your own machine.</p>
+    <p><strong>Windows (PowerShell):</strong></p>
+    <div class="cb">winget install llama.cpp</div>
+    <p><strong>Mac (Terminal):</strong></p>
+    <div class="cb">brew install llama.cpp</div>
+
+    <h3>Step 2 — Confirm the Installation With a Single Model</h3>
+    <p>Before configuring tiering, prove llama.cpp itself is installed and can serve a model. Start a server with one model directly by its Hugging Face repo id:</p>
+    <div class="cb">llama serve -hf Qwen/Qwen3-4B-GGUF:Q4_K_M</div>
+    <p>If the server starts and reports it is listening on <code>http://127.0.0.1:8080</code>, llama.cpp is installed correctly. Leave it running for a moment and then stop it (<code>Ctrl+C</code>) — you will restart it differently in Step 5 once tiering is configured.</p>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ This Step Does Not Prove Tiering Works</span>
+      <code>llama serve -hf &lt;model&gt;</code> loads exactly one model and answers every request with it, regardless of which model name a request asks for. It is only useful for confirming the tool itself is installed. Genuine tiering — routing to two different local models by name — requires the <code>models.ini</code> multi-preset router in Step 4, not this single-model form.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE 4: Part 0 continued — .env and models.ini -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 0 (continued) — Configuration Files</h1>
+
+    <h3>Step 3 — Create <code>.env</code></h3>
+    <p>A single-model smoke test would use a simple two-variable <code>.env</code> like this:</p>
+    <div class="cb">OPENROUTER_API_KEY=&lt;your api key here&gt;
+OPENROUTER_MODEL=cohere/north-mini-code:free
+LOCAL_LLM_URL=http://127.0.0.1:8080/v1/chat/completions
+LOCAL_LLM_MODEL=Qwen/Qwen3-4B-GGUF:Q4_K_M</div>
+    <p>That form is fine for a single-model script, but this lab needs two models per mode — a cheap tier and an expensive tier — so <code>OPENROUTER_MODEL</code> and <code>LOCAL_LLM_MODEL</code> are not enough on their own. Use the four-variable tiered form below for the rest of this lab:</p>
+    <div class="cb">OPENROUTER_API_KEY=&lt;your api key here&gt;
+# Online Models (OpenRouter)
+OPENROUTER_URL=https://openrouter.ai/api/v1/chat/completions
+OPENROUTER_MODEL_CHEAP=cohere/north-mini-code:free
+OPENROUTER_MODEL_EXPENSIVE=meta-llama/llama-3.1-70b-instruct:free
+
+# Offline Models (Local llama.cpp router)
+LOCAL_LLM_URL=http://127.0.0.1:8080/v1/chat/completions
+LOCAL_LLM_MODEL_CHEAP=Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M
+LOCAL_LLM_MODEL_EXPENSIVE=Qwen/Qwen3-4B-GGUF:Q4_K_M</div>
+    <p>Four new variable names appear here for the first time: <code>OPENROUTER_MODEL_CHEAP</code>, <code>OPENROUTER_MODEL_EXPENSIVE</code>, <code>LOCAL_LLM_MODEL_CHEAP</code>, and <code>LOCAL_LLM_MODEL_EXPENSIVE</code>. Your agent code reads whichever pair matches the mode it was launched with.</p>
+
+    <h3>Step 4 — Create <code>models.ini</code> (offline mode only)</h3>
+    <p>If you plan to run offline, you also need a local llama.cpp server capable of switching between your cheap and expensive models by name. Create <code>models.ini</code> in the same folder:</p>
+    <div class="cb-src"># ============================================================================
+# Global Server Configuration
+# Shared options applied across all initialized model routes
+# ============================================================================
+[*]
+ctx-size = 4096
+jinja = true
+
+# ============================================================================
+# Model Presets
+# Section names map directly to the model strings passed by your script
+# ============================================================================
+
+[Qwen/Qwen3-4B-GGUF:Q4_K_M]
+hf = Qwen/Qwen3-4B-GGUF:Q4_K_M
+
+[Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M]
+hf = Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M
+
+<span class="cm"># Coder variant: NOT recommended as the cheap tier. Qwen2.5-Coder</span>
+<span class="cm"># models have a documented quirk where they default to ```json code</span>
+<span class="cm"># fences instead of the &lt;tool_call&gt; tags llama.cpp's parser expects,</span>
+<span class="cm"># even with jinja templating on. Kept here for reference only.</span>
+[Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q4_K_M]
+hf = Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q4_K_M
+
+<span class="cm"># Kept for reference / fallback. This model is unreliable at emitting</span>
+<span class="cm"># well-formed tool calls (see the peg-native parse errors) and is not</span>
+<span class="cm"># used as the cheap tier by default -- see .env.</span>
+[unsloth/Llama-3.2-1B-Instruct-GGUF:Q4_K_M]
+hf = unsloth/Llama-3.2-1B-Instruct-GGUF:Q4_K_M</div>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why the Extra Presets?</span>
+      This file deliberately keeps two models around that are <em>not</em> used by default, with comments explaining why each was rejected as a cheap-tier candidate. Reading configuration that documents a rejected option is itself a useful habit — it tells the next person (including future you) not to "helpfully" switch back to it.
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ <code>jinja = true</code> Is Not Optional</span>
+      Without <code>jinja = true</code>, llama.cpp falls back to a generic chat template instead of the model's own — including its tool-call format — and tool calls will silently fail to parse. This single setting is responsible for most "the model won't call any tools" reports in offline mode.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE 5: Part 0 continued — launch + tiering_test.py validation -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 0 (continued) — Validate Before You Build</h1>
+
+    <h3>Step 5 — Start the Local Model Server (offline mode)</h3>
+    <p>From the folder containing <code>models.ini</code>, run:</p>
+    <div class="cb">llama serve --models-preset .\models.ini</div>
+    <p>This starts one server that can route requests to either model preset by name, switching models on demand as your agent requests <code>LOCAL_LLM_MODEL_CHEAP</code> or <code>LOCAL_LLM_MODEL_EXPENSIVE</code>.</p>
+
+    <h3>Step 6 — Run the Provided Validation Script</h3>
+    <p>Before writing a single line of agent code, confirm your setup actually works using the provided <code>tiering_test.py</code>. Do not skip this — every failure mode in this lab assumes a working tiered setup underneath it, and debugging seven failure modes at once with a broken environment is not a productive use of your time.</p>
+
+    <div class="src-hdr">tiering_test.py <span>provided — do not modify</span></div>
+    <div class="cb-src">"""
+tiering_test.py
+
+Super simple sanity check with two parts:
+
+1. Prove that model tiering actually routes to two different models,
+   cheap vs expensive, for online and offline modes.
+
+2. Prove that the cheap tier reliably emits a well-formed tool call.
+   The key fix here is `parallel_tool_calls: false` -- small models
+   (especially local ones) are much less reliable when asked to
+   produce multiple tool calls in one turn, and tend to emit malformed
+   pseudo-JSON instead of proper OpenAI-style tool_calls. Forcing one
+   call at a time avoids that failure mode entirely.
+
+Run:
+
+    python tiering_test.py online
+    python tiering_test.py offline
+"""
+
+import argparse
+import json
+import os
+
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OPENROUTER_URL = os.getenv("OPENROUTER_URL", "https://openrouter.ai/api/v1/chat/completions")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_MODEL_CHEAP = os.getenv("OPENROUTER_MODEL_CHEAP")
+OPENROUTER_MODEL_EXPENSIVE = os.getenv("OPENROUTER_MODEL_EXPENSIVE")
+
+LOCAL_LLM_URL = os.getenv("LOCAL_LLM_URL", "http://127.0.0.1:8080/v1/chat/completions")
+LOCAL_LLM_MODEL_CHEAP = os.getenv("LOCAL_LLM_MODEL_CHEAP")
+LOCAL_LLM_MODEL_EXPENSIVE = os.getenv("LOCAL_LLM_MODEL_EXPENSIVE")
+
+<span class="cm"># A single simple tool, standing in for something like add_to_order.</span>
+ADD_TO_ORDER_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "add_to_order",
+        "description": "Add an item to the user's coffee shop order.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "item": {"type": "string"},
+                "quantity": {"type": "integer"},
+            },
+            "required": ["item", "quantity"],
+        },
+    },
+}
+
+
+def request(url, headers, payload):
+    response = requests.post(url, headers=headers, json=payload, timeout=60)
+    response.raise_for_status()
+    return response.json()
+
+
+def headers_for(mode):
+    if mode == "online":
+        return {"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json"}
+    return {"Content-Type": "application/json"}
+
+
+def url_for(mode):
+    return OPENROUTER_URL if mode == "online" else LOCAL_LLM_URL
+
+
+def ask(model, mode, prompt):
+    <span class="cm">"""Plain-text chat call, no tools."""</span>
+    data = request(url_for(mode), headers_for(mode), {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 100,
+        "temperature": 0,
+    })
+    return data["choices"][0]["message"]["content"]
+
+
+def ask_with_tool(model, mode, prompt):
+    <span class="cm">"""Tool-call chat call, one call at a time (parallel_tool_calls: False)."""</span>
+    data = request(url_for(mode), headers_for(mode), {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 200,
+        "temperature": 0,
+        "tools": [ADD_TO_ORDER_TOOL],
+        "tool_choice": "auto",
+        "parallel_tool_calls": False,
+    })
+    return data["choices"][0]["message"]
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mode", choices=["online", "offline"])
+    args = parser.parse_args()
+
+    cheap_model = OPENROUTER_MODEL_CHEAP if args.mode == "online" else LOCAL_LLM_MODEL_CHEAP
+    expensive_model = OPENROUTER_MODEL_EXPENSIVE if args.mode == "online" else LOCAL_LLM_MODEL_EXPENSIVE
+
+    print(f"[CHEAP TIER] model = {cheap_model}")
+    print(f"Response: {ask(cheap_model, args.mode, 'In one sentence, what model are you?')}")
+
+    print(f"[EXPENSIVE TIER] model = {expensive_model}")
+    print(f"Response: {ask(expensive_model, args.mode, 'In one sentence, what model are you?')}")
+
+    print("OK" if cheap_model != expensive_model else "WARNING: same model in both tiers")
+
+    message = ask_with_tool(cheap_model, args.mode, "Add 2 muffins to my order.")
+    tool_calls = message.get("tool_calls") or []
+    if not tool_calls:
+        print("FAIL: no tool_calls in response.")
+    else:
+        call = tool_calls[0]
+        try:
+            arguments = json.loads(call["function"]["arguments"])
+            print(f"OK: emitted a well-formed tool call -> {call['function']['name']}(**{arguments})")
+        except json.JSONDecodeError:
+            print("FAIL: tool call arguments were not valid JSON.")</div>
+
+    <h3>Run It</h3>
+    <div class="cb">python tiering_test.py online
+python tiering_test.py offline</div>
+
+    <h3>Pass Criteria</h3>
+    <table class="obs-tbl">
+      <tr><td>Routing check</td><td>Prints <code>OK</code> confirming the cheap and expensive tiers resolved to two different model names.</td></tr>
+      <tr><td>Tool-call check</td><td>Prints <code>OK: emitted a well-formed tool call -&gt; add_to_order(...)</code> with correctly parsed arguments.</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Do Not Proceed on a FAIL</span>
+      If either mode you plan to use prints <code>FAIL</code> or <code>WARNING</code>, stop and fix your environment before continuing to Part 1. Likely causes: a missing/incorrect <code>.env</code> value, <code>jinja = true</code> missing from <code>models.ini</code>, or the local server not running. Every later part of this lab assumes this validation passes.
+    </div>
+
+    <h3>Looking Ahead: Your Agent Will Use the Same Mode Switch</h3>
+    <p>Once your validation passes, the hardened agent you build starting in Part 11 will accept the identical <code>mode</code> argument you just tested:</p>
+    <div class="cb">python hardened_agent.py online    # uses the OpenRouter models
+python hardened_agent.py offline   # uses your local llama.cpp models</div>
+    <p>If <code>tiering_test.py</code> passed for a mode above, your agent will work in that mode too — they read the exact same <code>.env</code> variables.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE 6: Part 1 — Seven Failure Modes -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 1 — Seven Failure Modes</h1>
+    <p>Every mitigation you build in this lab exists because of a specific, observable failure mode. Before writing code, study the table below — you will refer back to it throughout the lab.</p>
+
+    <table class="taxonomy">
+      <thead><tr><th>Failure Mode</th><th>What Actually Happens</th><th>Mitigation You Will Build</th></tr></thead>
+      <tbody>
+        <tr><td>Context Saturation</td><td>As more tool call / result pairs pile up, relevant information buried mid-transcript gets ignored ("Lost in the Middle").</td><td>Windowed summarization of steps <em>current − x</em> through <em>current</em>.</td></tr>
+        <tr><td>Instruction Drift</td><td>Critical rules stated once in the system prompt lose influence as the conversation grows.</td><td>Persistent reinjection of critical constraints at every step.</td></tr>
+        <tr><td>Confident Confabulation</td><td>The model supplies a plausible-looking but invented value for a tool argument or a final field.</td><td>Structured output schemas enforced on every tool call's arguments.</td></tr>
+        <tr><td>Silent Tool Failure</td><td>A tool receives an out-of-range or unresolvable input and returns an empty/ambiguous result instead of an error.</td><td>Tools that return explicit, structured error signals.</td></tr>
+        <tr><td>Invisible Execution</td><td>Tool calls and results are not logged in a way that lets you reconstruct what happened after the fact.</td><td>Structured observability logging of every tool call and result.</td></tr>
+        <tr><td>Inconsistent Schema Adherence</td><td>Vague tool names/descriptions and ambiguous "optional" parameters cause the model to call tools incorrectly or inconsistently.</td><td>Schema-design discipline: distinctive names, junior-engineer-legible descriptions, truly optional parameters.</td></tr>
+        <tr><td>Model Version Drift</td><td>A pinned model in <code>.env</code> silently diverges from the model actually invoked in code, or a provider updates a model's behavior underneath a fixed name.</td><td>A startup check that compares pinned vs. runtime model identifiers.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Classify These Scenarios</h3>
+    <p>For each scenario, name the failure mode from the table above.</p>
+
+    <div class="prompt">By turn 11 of a 14-step research task, the agent stops citing sources even though the system prompt said "always cite your sources" in turn 1.</div>
+    <p>Failure mode: <span class="blank" style="min-width:220px;"></span></p>
+
+    <div class="prompt">A <code>lookup_price(sku)</code> tool receives a SKU that doesn't exist and returns <code>[]</code>. The model then tells the user "the price is currently unavailable due to high demand."</div>
+    <p>Failure mode: <span class="blank" style="min-width:220px;"></span></p>
+
+    <div class="prompt">A tool named <code>process(data)</code> with the description "processes the input" is called with wildly inconsistent argument shapes across otherwise-identical runs.</div>
+    <p>Failure mode: <span class="blank" style="min-width:220px;"></span></p>
+
+    <div class="prompt">On step 9 of a long-running task, the model needs a fact that was returned by a tool on step 2. The transcript never explicitly repeats it, and the model gets it wrong.</div>
+    <p>Failure mode: <span class="blank" style="min-width:220px;"></span></p>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Lab Focus</span>
+      None of these failure modes require a "bad" model to occur. All seven can happen with a highly capable model. That is the point: reliability is an engineering property of the system around the model, not solely a property of the model itself.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE 4: Part 2 — Robustness Spec + Part 3 intro (agent + tools) -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 2 — Specify Your Robustness Requirements</h1>
+    <p>Before implementation, describe the failure surface of the agent you are about to build — not its goal (you already know how to write that from Lab 2), but the conditions under which it is most likely to break.</p>
+
+    <table class="obs-tbl">
+      <tr><td>Expected step count</td><td>Roughly how many ReAct steps will a typical task require? What is your hard step ceiling?</td></tr>
+      <tr><td>Context growth risk</td><td>Which part of the transcript grows fastest — tool arguments, tool results, or model reasoning text?</td></tr>
+      <tr><td>Highest-stakes instruction</td><td>Which single rule, if forgotten mid-task, would most damage the final answer?</td></tr>
+      <tr><td>Riskiest tool argument</td><td>Which tool argument is most likely to be confabulated rather than grounded in an observation?</td></tr>
+      <tr><td>Cost ceiling</td><td>Roughly how many tokens (prompt + completion, summed across all steps) is "acceptable" for one task?</td></tr>
+      <tr><td>Latency ceiling</td><td>How long can a user reasonably wait for a final answer?</td></tr>
+    </table>
+
+    <h1>Part 3 — The Agent: Multi-Ticker Momentum Research Agent</h1>
+    <p>For this lab, every student implements the same agent so that failure-mode behavior is comparable across the class. You will build a research agent that compares several stock tickers and reports which one shows the strongest short-term momentum.</p>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why This Task</span>
+      A single-ticker lookup finishes in 2–3 steps — too short to observe context saturation or instruction drift. A four-ticker comparison, where each ticker requires a structured data lookup <em>and</em> a news search, naturally produces <strong>10–15 ReAct steps</strong> on a correct run — long enough to make every failure mode in Part 1 observable, and short enough to stay debuggable. Set <code>MAX_STEPS = 15</code>.
+    </div>
+
+    <h3>Required Tools</h3>
+    <table class="obs-tbl">
+      <tr><td><code>get_stock_snapshot(ticker)</code></td><td>Returns simulated price, day-change percentage, and volume for a fixed set of tickers. Not real market data — a deterministic fixture so that results are comparable across runs and students.</td></tr>
+      <tr><td><code>search_web(query)</code></td><td>Your Lab 1/2 Tavily-backed search tool, reused as-is.</td></tr>
+      <tr><td><code>calculator(expression)</code></td><td>Your Lab 2 sandboxed calculator tool, reused as-is.</td></tr>
+      <tr><td><code>final_answer(...)</code></td><td>Terminal tool. Its arguments are schema-constrained — see Part 4.</td></tr>
+    </table>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Design Principle: final_answer Is a Tool Call, Not an Absence of One</span>
+      In Lab 2, the loop ended whenever the model stopped requesting a tool — its plain-text reply <em>was</em> the final answer. This lab uses the pattern recommended by Caldwell in <em>The Agentic AI Bible</em>: <strong>the final answer is itself a schema-constrained tool call</strong>, exactly like every other action in the loop, rather than something inferred from silence. Concretely: a model choosing not to call a tool is only ever a <em>signal to move toward finalizing</em> — it is never treated as the answer itself. The actual answer is only accepted once <code>final_answer</code> is explicitly invoked with arguments that pass its schema. This keeps termination machine-checkable (you know the agent is done because a specific named event happened, not because nothing else happened) and keeps the answer itself subject to the same structured-output enforcement as any other tool argument — closing the one gap where a "plain text" response could otherwise slip past every mitigation in Part 6.
+    </div>
+
+    <h3>Required Test Prompt</h3>
+    <div class="prompt">Compare NVDA, AMD, INTC, and QCOM. For each one, get its current stock snapshot and find one recent news headline. Then tell me which one shows the strongest momentum right now, and why.</div>
+    <p>This is the prompt you will use for every experiment and benchmark in this lab unless a section says otherwise, so that your results are directly comparable across sections.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE 5: Tool schema discipline + explicit error signals -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 4 — Tool Schema Discipline</h1>
+    <p>Inconsistent schema adherence is rarely a model failure. It is usually a specification failure: an ambiguous name, a vague description, or an "optional" parameter the model can't tell whether it's supposed to fill in.</p>
+
+    <h3>Write Descriptions for a Junior Engineer</h3>
+    <p>Compare these two descriptions for the same tool:</p>
+    <div class="cb">"Gets stock info."</div>
+    <p>versus:</p>
+    <div class="cb">"Returns a structured price snapshot for one publicly traded ticker symbol
+from a fixed lookup table. Use this whenever the user asks about a
+specific ticker's current price, day change, or volume. Do not use
+this for company news or qualitative information — use search_web
+for that instead. If the ticker is not in the lookup table, this
+tool returns an explicit error object rather than a price."</div>
+    <p>The second description does three things the first does not: it says <em>when</em> to use the tool, it says <em>when not to</em> (disambiguating it from <code>search_web</code>), and it tells the model what to expect on failure.</p>
+
+    <h3>Rules for Every Tool You Ship in This Lab</h3>
+    <ol>
+      <li><strong>Distinctive names.</strong> No two tools should have names a skimming reader could confuse (<code>get_data</code> and <code>fetch_data</code> is a failure; <code>get_stock_snapshot</code> and <code>search_web</code> is not).</li>
+      <li><strong>Truly optional parameters.</strong> If a parameter is marked optional in the JSON Schema, the tool must behave sensibly when it is omitted. Do not mark a parameter optional because you don't want to think about validating it.</li>
+      <li><strong>Say when <em>not</em> to use the tool</strong> whenever a plausible mix-up exists with another tool in the same toolset.</li>
+      <li><strong>Document the failure shape.</strong> The description should tell the model what an error response looks like, not just what success looks like.</li>
+    </ol>
+
+    <h1>Part 5 — Explicit Error Signals</h1>
+    <p>A tool that silently returns an empty result on invalid input is training the model to guess. Compare these two implementations of a lookup tool:</p>
+
+    <div class="cb-src">def get_stock_snapshot_BAD(ticker):
+    <span class="cm"># Silent failure: an unknown ticker looks identical to</span>
+    <span class="cm"># "this stock currently has no data," which invites the model</span>
+    <span class="cm"># to fill the gap with a plausible-sounding guess.</span>
+    return MOCK_MARKET_DATA.get(ticker.upper(), {})
+
+
+def get_stock_snapshot_GOOD(ticker):
+    key = ticker.upper().strip()
+    if key not in MOCK_MARKET_DATA:
+        <span class="cm"># Explicit, structured, unambiguous. The model cannot mistake</span>
+        <span class="cm"># this for a valid (if boring) snapshot.</span>
+        return {
+            "error": "TICKER_NOT_FOUND",
+            "message": f"'{key}' is not in the simulated market data set.",
+            "valid_tickers": sorted(MOCK_MARKET_DATA.keys()),
+        }
+    return MOCK_MARKET_DATA[key]</div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Design Requirement</span>
+      Every tool you write in this lab must return a structured error object — with a machine-readable <code>error</code> code and a human-readable <code>message</code> — for every input outside its valid range. Returning <code>None</code>, <code>[]</code>, <code>""</code>, or a bare exception traceback does not satisfy this requirement.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 8</span></div>
+</div>
+
+<!-- PAGE 6: Structured outputs -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 6 — Structured Outputs Against Confabulation</h1>
+    <p>A tool's <code>parameters</code> object is already a JSON Schema. Whether that schema is actually <em>enforced</em> — versus treated as a suggestion the model can ignore — depends on which backend you're calling and how you configure the request. This is the single most direct lever you have against confident confabulation: a model cannot invent a field that a grammar-constrained decoder will not let it emit.</p>
+
+    <table class="cmp-tbl">
+      <thead><tr><th>Path</th><th>Online — OpenRouter</th><th>Offline — Local llama.cpp</th></tr></thead>
+      <tbody>
+        <tr><td>Mechanism</td><td>Provider-dependent. For providers that implement it, <code>response_format: {"type": "json_schema", ...}</code> is enforced at the provider's decoding layer.</td><td>Your schema is converted to a <strong>GBNF grammar</strong> and handed to the sampler — invalid tokens are simply disallowed, not merely discouraged.</td></tr>
+        <tr><td>Enabling it</td><td>Set <code>response_format.type = "json_schema"</code> with <code>strict: true</code>. For tool calls specifically, the same <code>tools[].function.parameters</code> schema applies.</td><td>Requires <code>--jinja</code> so the model's own chat template (including its tool-call format) is rendered rather than a generic fallback.</td></tr>
+        <tr><td>Caveat</td><td>Only "select models" support it — check per-model support, or set <code>require_parameters: true</code> in provider routing.</td><td><code>response_format.json_schema</code> and a raw <code>grammar</code> field are mutually exclusive in the same request.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>OpenRouter — Structured Outputs</strong><br>
+      <a href="https://openrouter.ai/docs/guides/features/structured-outputs" target="_blank">Structured Outputs — OpenRouter Documentation ↗</a><br>
+      <strong>OpenRouter — Tool / Function Calling</strong> (from Lab 2)<br>
+      <a href="https://openrouter.ai/docs/guides/features/tool-calling" target="_blank">Client Tools — OpenRouter Documentation ↗</a>
+      <br><br>
+      <strong>llama.cpp — Server, Structured Output &amp; Model Presets</strong><br>
+      <a href="https://github.com/ggml-org/llama.cpp/tree/master/tools/server" target="_blank">tools/server — llama.cpp OpenAI-compatible server ↗</a><br>
+      <a href="https://github.com/ggml-org/llama.cpp/tree/master/tools/server#model-presets" target="_blank">Model Presets (<code>--models-preset</code>) — llama.cpp ↗</a><br>
+      <a href="https://github.com/ggml-org/llama.cpp/tree/master/grammars" target="_blank">GBNF Grammars — llama.cpp ↗</a>
+      <br><br>
+      <strong>JSON Schema Specification</strong><br>
+      <a href="https://json-schema.org/specification" target="_blank">JSON Schema — Official Specification ↗</a>
+    </div>
+
+    <h3>Apply This to <code>final_answer</code></h3>
+    <p>Your <code>final_answer</code> tool's schema must require a <code>comparison_table</code> field — an array of objects, one per ticker, each with <code>ticker</code>, <code>price</code>, <code>day_change_pct</code>, and a <code>momentum_score</code> the model computed via <code>calculator</code> — plus a <code>winner</code> field and a <code>confidence</code> field. A model that has to fill in a typed array of four structured records is far less able to hand-wave its comparison than one that just writes a paragraph.</p>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Local Fallback</span>
+      If your local model's chat template doesn't reliably emit native tool calls, you have a second, more direct route: skip the <code>tools</code>/<code>tool_choice</code> parameters and instead prompt the model to emit a single JSON object matching your schema via plain <code>response_format: {"type": "json_schema", ...}</code>, then parse <code>message.content</code> yourself. This bypasses tool-call template matching entirely and is worth knowing as a fallback for smaller local models. Even here, treat the parsed object as the same terminal event a <code>final_answer</code> tool call would be — do not let this fallback reopen the "plain text equals done" ambiguity the tool-call pattern exists to close.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 9</span></div>
+</div>
+
+<!-- PAGE 7: Observability -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 7 — Observability: Log Every Tool Call</h1>
+    <p>Console printing (Lab 2) is enough to watch one run. It is not enough to compare five runs, debug a failure that happened yesterday, or feed a benchmark script. Every tool call and every tool result must also be written to a structured, append-only log.</p>
+
+    <h3>Minimum Log Record</h3>
+    <table class="obs-tbl">
+      <tr><td><code>timestamp</code></td><td>ISO-8601 timestamp of the tool call.</td></tr>
+      <tr><td><code>step</code></td><td>The ReAct step number this call occurred on.</td></tr>
+      <tr><td><code>tool_name</code></td><td>Which tool was invoked.</td></tr>
+      <tr><td><code>arguments</code></td><td>The exact arguments the model supplied.</td></tr>
+      <tr><td><code>result</code></td><td>What the tool returned — including error objects.</td></tr>
+      <tr><td><code>latency_ms</code></td><td>Wall-clock time the tool call took to execute.</td></tr>
+    </table>
+
+    <h3>What Is a JSONL File?</h3>
+    <p>A <code>.jsonl</code> ("JSON Lines") file is plain text where <strong>each line is one complete, independent JSON value</strong> — not one big JSON array spanning the whole file. That distinction is exactly why it's the right format for an append-only log: adding a new record means opening the file in append mode and writing one more line, with no need to read, parse, and rewrite everything that came before.</p>
+    <div class="cb">{"step": 1, "tool_name": "get_stock_snapshot", "arguments": {"ticker": "NVDA"}, "result": {"ticker": "NVDA", "price": 187.42}, "latency_ms": 142.3}
+{"step": 1, "tool_name": "search_web", "arguments": {"query": "NVDA news"}, "result": "...", "latency_ms": 890.1}
+{"step": 2, "tool_name": "get_stock_snapshot", "arguments": {"ticker": "AMD"}, "result": {"ticker": "AMD", "price": 152.08}, "latency_ms": 138.7}</div>
+
+    <div class="cb">import json
+
+<span class="cm"># Write one record -- each call appends exactly one line:</span>
+with open("agent_trace.jsonl", "a") as f:
+    f.write(json.dumps(record) + "\n")
+
+<span class="cm"># Read every record back, oldest first:</span>
+with open("agent_trace.jsonl") as f:
+    records = [json.loads(line) for line in f if line.strip()]</div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ A Common Gotcha</span>
+      <code>json.dumps()</code> cannot serialize a Python <code>datetime</code> object directly — it raises <code>TypeError: Object of type datetime is not JSON serializable</code>. Convert timestamps to strings first with <code>datetime.now(timezone.utc).isoformat()</code> before building your record, rather than storing the raw <code>datetime</code> object in it.
+    </div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>JSON Lines — Format Specification</strong><br>
+      <a href="https://jsonlines.org/" target="_blank">jsonlines.org ↗</a>
+      <br><br>
+      <strong>Python — <code>json</code> Module</strong><br>
+      <a href="https://docs.python.org/3/library/json.html" target="_blank">json — JSON encoder and decoder (Python Standard Library) ↗</a>
+    </div>
+
+    <div class="cb-src">import json, time
+from datetime import datetime, timezone
+
+def log_tool_call(step, tool_name, arguments, result, latency_ms, log_path="agent_trace.jsonl"):
+    <span class="cm"># TODO 1: Build one JSON-serializable record with every field</span>
+    <span class="cm"># from the table above. Convert the timestamp with .isoformat()</span>
+    <span class="cm"># first -- see the gotcha above.</span>
+    record = None
+
+    <span class="cm"># TODO 2: Append it as one line of JSON to log_path.</span>
+    <span class="cm"># Use "a" mode so successive runs accumulate rather than overwrite.</span>
+    pass
+
+
+<span class="cm"># In your main loop, wrap every tool execution:</span>
+<span class="cm">#     start = time.perf_counter()</span>
+<span class="cm">#     tool_result = tool_fn(**arguments)</span>
+<span class="cm">#     latency_ms = (time.perf_counter() - start) * 1000</span>
+<span class="cm">#     log_tool_call(step, function_name, arguments, tool_result, latency_ms)</span></div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>The <code>content</code> Property on Reasoning Models</strong> (from Lab 2)<br>
+      <a href="https://openrouter.ai/docs/guides/best-practices/reasoning-tokens" target="_blank">Reasoning Tokens — OpenRouter Documentation ↗</a><br>
+      Your log's THOUGHT-equivalent field should handle a missing or empty <code>content</code> exactly as your Lab 2 agent already does.
+    </div>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why JSON Lines</span>
+      One JSON object per line (<code>.jsonl</code>) rather than one big JSON array means you can append safely without re-parsing the whole file, and you can process the log with simple line-oriented tools later (including in your benchmark script in Part 10).
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 10</span></div>
+</div>
+
+<!-- PAGE 8: Context saturation / windowing -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 8 — Context Saturation &amp; Windowed Summarization</h1>
+    <p>Liu et al. (2023/2024) showed that language models exhibit a U-shaped performance curve over long inputs: information at the very beginning or very end of the context is used reliably, while information buried in the middle is frequently ignored — regardless of whether the model's context window is technically large enough to hold it.</p>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>Liu, Lin, Hewitt, Paranjape, Bevilacqua, Petroni &amp; Liang (2024)</strong><br>
+      "Lost in the Middle: How Language Models Use Long Contexts." <em>Transactions of the Association for Computational Linguistics</em>, 12:157–173.<br>
+      <a href="https://arxiv.org/abs/2307.03172" target="_blank">arXiv:2307.03172 ↗</a> &nbsp;|&nbsp; <a href="https://aclanthology.org/2024.tacl-1.9/" target="_blank">ACL Anthology ↗</a>
+    </div>
+
+    <p>An unbounded ReAct transcript — every tool call and every tool result appended forever — is exactly the shape this paper warns about: by step 12 of a 15-step task, the observation from step 2 is buried in the middle of a growing transcript, competing with everything since for the model's attention.</p>
+
+    <h3>The Windowing Rule</h3>
+    <p>Instead of appending every tool call/result pair verbatim forever, keep only the most recent <code>WINDOW_SIZE</code> steps in full. Anything older is folded into a single rolling summary message that sits where those steps used to be.</p>
+
+    <div class="flow">
+      STEP 1 … STEP (n − x) &nbsp;→&nbsp; <strong>ROLLING SUMMARY</strong><br>
+      STEP (n − x + 1) … STEP n &nbsp;→&nbsp; <strong>KEPT VERBATIM</strong><br>
+      ↓<br>
+      Both are sent to the model together — a short, fresh summary plus a small, recent, fully-detailed tail.
+    </div>
+
+    <div class="cb-src">WINDOW_SIZE = 4  <span class="cm"># steps kept verbatim; tune during Experiment A</span>
+
+def build_windowed_context(all_steps, rolling_summary):
+    <span class="cm"># all_steps: the full list of {role, content, ...} messages generated</span>
+    <span class="cm"># so far, grouped by ReAct step.</span>
+
+    <span class="cm"># TODO 3: If len(all_steps) <= WINDOW_SIZE, no windowing is needed yet.</span>
+    <span class="cm"># Return all_steps unchanged.</span>
+
+    <span class="cm"># TODO 4: Otherwise, split into steps_to_summarize and steps_to_keep,</span>
+    <span class="cm"># where steps_to_keep is the last WINDOW_SIZE steps.</span>
+
+    <span class="cm"># TODO 5: Fold steps_to_summarize into rolling_summary. You may do this</span>
+    <span class="cm"># with a cheap-tier model call ("summarize these tool results in 2-3</span>
+    <span class="cm"># sentences, preserving concrete numbers and ticker symbols exactly")</span>
+    <span class="cm"># or with a deterministic Python summarizer that extracts key fields</span>
+    <span class="cm"># (ticker, price, headline) without calling the model at all.</span>
+
+    <span class="cm"># TODO 6: Return [system_prompt, rolling_summary_message] + steps_to_keep.</span>
+    pass</div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Preserve Concrete Values</span>
+      A summary that says "gathered data on several tickers" has destroyed the exact numbers your <code>final_answer</code> needs. Your summarizer must preserve specific ticker symbols, prices, and percentages verbatim — summarize the <em>narrative</em>, not the <em>data</em>.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 11</span></div>
+</div>
+
+<!-- PAGE 9: Instruction drift -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 9 — Instruction Drift &amp; Persistent Reinjection</h1>
+    <p>A system prompt is not a contract the model consults on every turn — it is one message among many, and its relative influence shrinks as the conversation grows around it. Treating the system prompt as <strong>write-once</strong> is the anti-pattern; treating your most critical constraints as <strong>repeating obligations</strong> is the fix.</p>
+
+    <h3>The Reinjection Pattern</h3>
+    <p>Identify the 2–3 rules whose violation would most damage the final answer (you already named the highest-stakes one in Part 2). Re-send a short reminder message containing exactly those rules on every step — not the whole system prompt, just the load-bearing constraints — placed at the end of the message list, immediately before the model's turn.</p>
+
+    <div class="cb-src">PERSISTENT_CONSTRAINTS = """
+REMINDER — these constraints apply on every step, not just the first:
+1. Never state a ticker's price or day-change unless it came from a
+   get_stock_snapshot() observation in this conversation.
+2. If a tool result is an error object, tell the user what failed —
+   do not treat the error object as if it were valid data.
+3. final_answer's comparison_table must include all four requested
+   tickers, each backed by an actual get_stock_snapshot() observation.
+"""
+
+def build_messages(history, mode):
+    <span class="cm"># TODO 7: Return history + [{"role": "system", "content": PERSISTENT_CONSTRAINTS}]</span>
+    <span class="cm"># so the reminder is always the last thing the model reads before</span>
+    <span class="cm"># choosing its next action, regardless of how long history has grown.</span>
+    pass</div>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Beginning, End, or Both?</span>
+      Recall Part 8's "Lost in the Middle" curve: the beginning and end of a context are where models pay the most attention. That is not a coincidence — it is why reinjecting at the <em>end</em> of the message list is the highest-leverage placement, and why some teams reinject at both ends for their single most critical rule.
+    </div>
+
+    <h3>Test This Directly</h3>
+    <p>Run your required test prompt with reinjection enabled, then again with it disabled (Experiment C in Part 11). Compare whether the model still enforces "only report numbers from a tool observation" by step 12–14 in both conditions.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 12</span></div>
+</div>
+
+<!-- PAGE 10: Model tiering + version drift -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 10 — Model Tiering &amp; Version Drift Detection</h1>
+    <p>"Use the biggest model for every step in the loop" is an easy default and a real cost/latency liability: most steps in your ReAct loop are mechanical tool selection, and only <code>final_answer</code> synthesis benefits meaningfully from a stronger model. Apply the tiered pattern you set up and validated in Part 0: a cheap model drives the loop, an expensive model is reserved for synthesis.</p>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>Running a Tiered Local Setup</strong><br>
+      <code>models.ini</code> — one <code>[*]</code> section of shared server options (set <code>jinja = true</code> so tool-call templates render correctly), plus one <code>[Model Name]</code> section per model you route to.<br>
+      Start the router with: <code>llama serve --models-preset .\models.ini</code><br>
+      <a href="https://github.com/ggml-org/llama.cpp/tree/master/tools/server#model-presets" target="_blank">Model Presets — llama.cpp Server Documentation ↗</a>
+    </div>
+
+    <p>Your <code>.env</code>, created in Part 0, already defines:</p>
+    <div class="cb">OPENROUTER_MODEL_CHEAP=...
+OPENROUTER_MODEL_EXPENSIVE=...
+LOCAL_LLM_MODEL_CHEAP=...
+LOCAL_LLM_MODEL_EXPENSIVE=...</div>
+
+    <h3>The Drift Check</h3>
+    <p>A pinned model string in <code>.env</code> is only useful if it's actually what's running. Add a startup check that compares the model your agent is about to call against what <code>.env</code> says it should be — catching the case where a teammate (or you, at 1 a.m.) hardcoded an override that was never written back to <code>.env</code>.</p>
+
+    <div class="cb-src">def check_model_drift(mode, tier, runtime_model):
+    pinned = os.environ.get(
+        f"{'OPENROUTER' if mode == 'online' else 'LOCAL_LLM'}_MODEL_{tier.upper()}"
+    )
+
+    <span class="cm"># TODO 8: If pinned is None, warn that .env has no pin for this</span>
+    <span class="cm"># tier at all -- there is nothing to drift-check against.</span>
+
+    <span class="cm"># TODO 9: If pinned != runtime_model, print a loud WARNING naming</span>
+    <span class="cm"># both values. Do not silently proceed as if they matched.</span>
+
+    <span class="cm"># TODO 10: Call this once per tier, at startup, before the first</span>
+    <span class="cm"># model request is made.</span>
+    pass</div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Why This Matters Beyond Typos</span>
+      Even when the string matches exactly, a provider-hosted model name (especially a <code>:free</code> OpenRouter alias) can be quietly repointed to an updated checkpoint by the provider. Capability is not guaranteed stable across time just because the identifier didn't change — treat pinned model behavior as something to periodically re-verify, not something to assume once and forget.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 13</span></div>
+</div>
+
+<!-- PAGE 11: Starter implementation -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 11 — Starter Implementation</h1>
+    <p>Create <code>hardened_agent_starter.py</code> in your Lab3 folder. Complete every <code>TODO</code>, integrating the code fragments from Parts 7–10 above. Your implementation should extend the structure of your Lab 2 <code>agent.py</code>.</p>
+
+    <div class="src-hdr">hardened_agent_starter.py <span>complete every TODO before running</span></div>
+    <div class="cb-src">import os, sys, json, time, math
+import requests
+from datetime import datetime, timezone
+from dotenv import load_dotenv
+from tavily import TavilyClient
+
+MAX_STEPS = 15
+WINDOW_SIZE = 4
+
+MOCK_MARKET_DATA = {
+    "NVDA": {"ticker": "NVDA", "price": 187.42, "day_change_pct": 2.1, "volume": 41200000},
+    "AMD":  {"ticker": "AMD",  "price": 152.08, "day_change_pct": -0.8, "volume": 28950000},
+    "INTC": {"ticker": "INTC", "price": 24.63,  "day_change_pct": 1.4, "volume": 55310000},
+    "QCOM": {"ticker": "QCOM", "price": 168.91, "day_change_pct": 0.3, "volume": 9870000},
+}
+
+def get_stock_snapshot(ticker):
+    <span class="tc"># TODO 11: Implement using the explicit-error pattern from Part 5.</span>
+    pass
+
+def calculator(expression):
+    <span class="tc"># TODO 12: Reuse your Lab 2 sandboxed calculator implementation.</span>
+    pass
+
+def search_web(query):
+    <span class="tc"># TODO 13: Reuse your Lab 1/2 Tavily implementation.</span>
+    pass
+
+def final_answer(answer, comparison_table, winner, confidence):
+    <span class="tc"># TODO 14: This IS a tool, exactly like the three above -- not a</span>
+    <span class="tc"># plain-text response the model happens to give when it's "done."</span>
+    <span class="tc"># Build and return the structured result dict (answer, comparison_table,</span>
+    <span class="tc"># winner, confidence). The main loop must only ever accept a finished</span>
+    <span class="tc"># task by receiving a call to THIS function -- never by treating the</span>
+    <span class="tc"># model's plain-text content as the answer (see the design-principle</span>
+    <span class="tc"># note in Part 3).</span>
+    pass
+
+<span class="tc"># TODO 15: Define log_tool_call() from Part 7.</span>
+
+<span class="tc"># TODO 16: Define build_windowed_context() from Part 8.</span>
+
+<span class="tc"># TODO 17: Define PERSISTENT_CONSTRAINTS and build_messages() from Part 9.</span>
+
+<span class="tc"># TODO 18: Define check_model_drift() from Part 10.</span>
+
+<span class="tc"># TODO 19: Define the JSON Schemas for get_stock_snapshot, calculator,</span>
+<span class="tc"># search_web, and final_answer, following the schema-discipline rules</span>
+<span class="tc"># in Part 4 and the structured comparison_table requirement in Part 6.</span>
+tools = []
+
+def main(args):
+    load_dotenv()
+    mode = args[0] if args else "online"  <span class="cm"># "online" or "offline"</span>
+
+    <span class="tc"># TODO 20: Resolve cheap/expensive model strings for this mode.</span>
+    <span class="tc"># TODO 21: Call check_model_drift() for both tiers before proceeding.</span>
+
+    all_steps = []
+    rolling_summary = {"role": "system", "content": "(no steps summarized yet)"}
+
+    user_input = input("What would you like me to research?\n")
+    all_steps.append({"role": "user", "content": user_input})
+
+    for step in range(1, MAX_STEPS + 1):
+        print(f"\n--- STEP {step} ---")
+
+        <span class="tc"># TODO 22: windowed = build_windowed_context(all_steps, rolling_summary)</span>
+        <span class="tc"># TODO 23: messages = build_messages(windowed, mode)</span>
+        <span class="tc"># TODO 24: Send messages to the cheap-tier model with tools.</span>
+
+        <span class="tc"># TODO 25: If no tool call was requested, treat this as a signal to</span>
+        <span class="tc"># finalize -- re-ask with the EXPENSIVE tier, forced to call</span>
+        <span class="tc"># final_answer (same tiering pattern from Part 0/Part 10).</span>
+
+        <span class="tc"># TODO 26: Execute each requested tool call, timing it, logging it</span>
+        <span class="tc"># via log_tool_call(), and appending the observation to all_steps.</span>
+
+    else:
+        print("\nAgent stopped: maximum step budget reached.")
+
+if __name__ == "__main__":
+    main(sys.argv[1:])</div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 14</span></div>
+</div>
+
+<!-- PAGE 12: Benchmark -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 12 — Benchmark: Latency, Cost, and Accuracy</h1>
+    <p>A single successful run tells you the agent <em>can</em> work. Repeated runs of the identical prompt tell you how <em>reliably</em> it works — and whether your mitigations from Parts 6–10 actually reduce variance, not just look reasonable on paper.</p>
+
+    <h3>Procedure</h3>
+    <ol>
+      <li>Run your required test prompt <strong>5 times</strong> with your fully hardened agent, offline mode, tiering enabled.</li>
+      <li>For each run, record: total wall-clock latency, total tokens (sum of prompt + completion tokens across every step — your <code>usage</code> field in each response has this), and the reported <strong>winner</strong> ticker.</li>
+      <li>Repeat the same 5 runs with tiering disabled (expensive model used for every step) and record the same three metrics.</li>
+    </ol>
+
+    <table class="cmp-tbl">
+      <thead><tr><th>Metric</th><th>Tiered (cheap + expensive)</th><th>Untiered (expensive only)</th></tr></thead>
+      <tbody>
+        <tr><td>Mean latency (5 runs)</td><td></td><td></td></tr>
+        <tr><td>Mean total tokens (5 runs)</td><td></td><td></td></tr>
+        <tr><td>Winner consistency (same winner in how many of 5 runs?)</td><td></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Tokens as a Cost Proxy</span>
+      Total tokens is a fair proxy for cost even on free-tier models, because it is exactly what determines cost the moment you (or your employer) move to a paid model, and it is directly comparable across the tiered and untiered conditions regardless of price.
+    </div>
+
+    <p><strong>Did tiering measurably change accuracy (winner consistency), not just cost?</strong> Explain any surprising result.</p>
+    <div class="write-box"></div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 15</span></div>
+</div>
+
+<!-- PAGE 13: Break your agent -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 13 — Break Your Agent</h1>
+    <p>Each mitigation in this lab exists to prevent a specific failure. Prove it, by temporarily removing the mitigation and reproducing the failure it was built for.</p>
+
+    <h3>Experiment A — Disable Windowing</h3>
+    <p>Set <code>WINDOW_SIZE</code> to a number larger than <code>MAX_STEPS</code> (effectively disabling it) and rerun the required prompt. Does the final <code>comparison_table</code> still contain accurate values for the <em>first</em> ticker gathered?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment B — Disable Persistent Reinjection</h3>
+    <p>Remove the reinjected reminder message and rerun. By step 12+, does the model ever report a number that didn't come from a tool observation?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment C — Disable Structured Output Enforcement</h3>
+    <p>Remove <code>strict</code>/schema enforcement on <code>final_answer</code> (or, offline, drop <code>--jinja</code>) and rerun several times. Does <code>comparison_table</code> ever contain a ticker that was never looked up, or a fabricated price?</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment D — Feed a Tool an Invalid Input</h3>
+    <p>Ask about a ticker not in <code>MOCK_MARKET_DATA</code> (e.g., "and also check ZZZZ"). Confirm the tool returns your structured error object, and describe what the model did with it.</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment E — Introduce Model Drift</h3>
+    <p>Change the model string used in code without updating <code>.env</code> (or vice versa). Confirm your drift check fires a warning at startup.</p>
+    <div class="write-box write-sm"></div>
+
+    <h3>Experiment F — Reduce the Step Budget</h3>
+    <p>Set <code>MAX_STEPS = 6</code> and rerun the four-ticker prompt. Does the agent produce a partial, clearly-labeled answer, or does it silently fail?</p>
+    <div class="write-box write-sm"></div>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Engineering Lesson</span>
+      Every one of these experiments should make the agent visibly worse. If disabling a mitigation doesn't change anything you can observe, either the mitigation wasn't doing real work, or your test prompt isn't stressing the failure mode it targets.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 16</span></div>
+</div>
+
+<!-- PAGE 14: Submission -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body">
+    <h1>Part 14 — Submission Requirements</h1>
+    <p>Submit the completed Student Observation Workbook together with your source code, log files, and required screenshots. Your submission must include:</p>
+    <ul>
+      <li>Completed <code>hardened_agent.py</code> implementation.</li>
+      <li>A sample <code>agent_trace.jsonl</code> log from one full run of the required prompt.</li>
+      <li>Console screenshot(s) showing a full 10–15 step trace, including at least one windowing event and one reinjected reminder.</li>
+      <li>Results from the benchmark in Part 12 (tiered vs. untiered).</li>
+      <li>Results from all six failure-mode experiments in Part 13.</li>
+      <li>Your seven-failure-mode classification answers from Part 1.</li>
+      <li>A short final reflection comparing the Lab 2 agent with the Lab 3 hardened agent.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Security Reminder</span>
+      Never include your OpenRouter or Tavily API keys in screenshots, your submitted document, source control, or any other shared course material.
+    </div>
+
+    <h2>Implementation Requirements</h2>
+    <table class="rubric">
+      <thead><tr><th>Requirement</th><th>Minimum Standard</th></tr></thead>
+      <tbody>
+        <tr><td>Windowing</td><td>Steps older than <code>WINDOW_SIZE</code> are folded into a rolling summary that preserves concrete values.</td></tr>
+        <tr><td>Reinjection</td><td>Critical constraints are resent on every step, not stated once.</td></tr>
+        <tr><td>Structured outputs</td><td><code>final_answer</code>'s <code>comparison_table</code> is schema-enforced, online and offline.</td></tr>
+        <tr><td>Explicit errors</td><td>Every tool returns a structured <code>error</code> object for out-of-range input — never a silent empty result.</td></tr>
+        <tr><td>Observability</td><td>Every tool call and result is written to <code>agent_trace.jsonl</code> with timing.</td></tr>
+        <tr><td>Schema discipline</td><td>Tool names and descriptions are unambiguous; optional parameters behave correctly when omitted.</td></tr>
+        <tr><td>Model tiering + drift check</td><td>Cheap model drives the loop; expensive model finalizes; a startup check flags <code>.env</code>/runtime model mismatches.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Preparation for Next Lecture</h2>
+    <p>Please read Chapter 5, "LLMs as Reasoning Engines," and Chapter 6, "Tool Use and Function Calling," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell, in preparation for lecture next week.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 17</span></div>
+</div>
+
+<!-- WORKBOOK DIVIDER -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Hardening the Agent</span></div>
+  <div class="pg-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:800px;">
+    <div style="text-align:center;max-width:480px;">
+      <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6B0F1A;margin-bottom:14px;">Lab 3 — Autumn 2026</div>
+      <div style="font-size:30pt;font-weight:700;color:#1e1e1e;line-height:1.15;margin-bottom:20px;">Student Observation<br>Workbook</div>
+      <div style="width:60px;height:3px;background:#6B0F1A;margin:0 auto 24px;"></div>
+      <div style="font-size:11pt;color:#444;line-height:1.7;">Use this section to record the results of your experiments and benchmarks. Complete the checkboxes, ratings, and short evidence prompts rather than writing open-ended essays.</div>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 18</span></div>
+</div>
+
+<!-- WORKBOOK A/B -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <p><strong>Name:</strong> <span class="blank" style="min-width:220px;"></span> &nbsp;&nbsp; <strong>Date:</strong> <span class="blank" style="min-width:140px;"></span></p>
+
+    <h1 class="mt12">A. Failure Mode Classification</h1>
+    <p>Match each scenario from Part 1 to its failure mode.</p>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:60%">Scenario</th><th>Failure Mode</th></tr></thead>
+      <tbody>
+        <tr><td>Drops citation rule by step 11</td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Unknown SKU returns empty list → model guesses</td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Vague <code>process(data)</code> tool called inconsistently</td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Step-2 fact lost by step 9</td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+    <h1 class="mt20">B. Agent Specification</h1>
+    <table class="obs-tbl">
+      <tr><td>Expected step count</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Fastest-growing context element</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Highest-stakes instruction</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Riskiest tool argument</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Cost ceiling (tokens)</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Latency ceiling</td><td><span class="blank-full"></span></td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 19</span></div>
+</div>
+
+<!-- WORKBOOK C -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>C. Tool &amp; Schema Design Evidence</h1>
+
+    <h2>Schema Self-Review</h2>
+    <table class="ag-tbl">
+      <thead><tr><th>Tool</th><th>Distinctive Name?</th><th>Says When Not to Use?</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>get_stock_snapshot</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>search_web</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>calculator</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>final_answer</td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><input type="checkbox" style="accent-color:#6B0F1A;width:14px;height:14px;"></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="mt16">Explicit Error Signal Test (Experiment D)</h2>
+    <div class="focus-note">Prompt included a ticker not in MOCK_MARKET_DATA.</div>
+    <table class="obs-tbl">
+      <tr><td>Error object returned?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>What did the model do with the error?</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Did the model ever fabricate a value instead?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 20</span></div>
+</div>
+
+<!-- WORKBOOK D -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>D. Observability &amp; Context Window Trace</h1>
+
+    <h2>Log Excerpt</h2>
+    <p>Paste one representative line from <code>agent_trace.jsonl</code>:</p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Windowing Test (Experiment A)</h2>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>WINDOW_SIZE = 4</th><th>Windowing Disabled</th></tr></thead>
+      <tbody>
+        <tr><td>First ticker's data still accurate in final answer?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Total prompt tokens (final step)</td><td><span class="blank" style="min-width:80px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Did the rolling summary preserve concrete values, or drift into vague narrative?</strong></p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 21</span></div>
+</div>
+
+<!-- WORKBOOK E -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>E. Instruction Drift &amp; Model Drift Tests</h1>
+
+    <h2>Instruction Drift (Experiment B)</h2>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Reinjection Enabled</th><th>Reinjection Disabled</th></tr></thead>
+      <tbody>
+        <tr><td>Rule still followed at step 12+?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Describe the specific step where drift first appeared (if any):</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Structured Output Test (Experiment C)</h2>
+    <p><strong>With schema enforcement removed, did any run fabricate a ticker or price?</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h2 class="mt16">Model Drift Check (Experiment E)</h2>
+    <table class="obs-tbl">
+      <tr><td>Mismatch introduced</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Warning fired correctly?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+    </table>
+
+    <h2 class="mt16">Step Budget (Experiment F)</h2>
+    <p><strong>With MAX_STEPS = 6, did the agent degrade gracefully or fail silently?</strong></p>
+    <div class="write-box write-sm"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 22</span></div>
+</div>
+
+<!-- WORKBOOK F -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>F. Benchmark Results</h1>
+    <p>Copy your Part 12 results here.</p>
+
+    <table class="cmp-tbl">
+      <thead><tr><th>Metric</th><th>Tiered</th><th>Untiered</th></tr></thead>
+      <tbody>
+        <tr><td>Mean latency (5 runs)</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Mean total tokens (5 runs)</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Winner consistency (x / 5)</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Which mitigation gave the best reliability-per-token tradeoff? Defend your answer in 3–5 sentences.</strong></p>
+    <div class="write-box"></div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 23</span></div>
+</div>
+
+<!-- WORKBOOK G — Final Reflection -->
+<div class="doc-page" style="margin-bottom:24px;">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 3 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>G. Final Lab Reflection</h1>
+    <p>Answer the following questions. Keep each response to 2–4 sentences unless otherwise indicated.</p>
+
+    <h3>1. What changed between your Lab 2 agent and your Lab 3 hardened agent?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>2. Which single failure mode do you think was most likely to occur silently — that is, without an explicit test, would you have noticed it at all?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>3. Why doesn't "use the biggest model everywhere" solve confident confabulation?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>4. What is one situation where windowed summarization could itself introduce a new failure mode?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>5. In one sentence, define the difference between an agent that "works" and an agent that is "reliable," based on what you observed in this lab.</h3>
+    <div class="write-box write-sm mt8 mb16"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">Final Thought</span>
+      Nothing in this lab made your agent smarter. Every mitigation you built makes the same underlying model behave more predictably under load. That distinction — capability versus reliability — is the central engineering lesson of production agent design.
+    </div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>University of Montana &nbsp;|&nbsp; CSCI 391 — Agentic Artificial Intelligence &nbsp;|&nbsp; Lab 3</span></div>
+</div>
+
+</body>
+</html>
