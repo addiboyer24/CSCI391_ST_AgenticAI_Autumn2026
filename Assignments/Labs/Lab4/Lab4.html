@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — Lab 4: Tool Routing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif; font-size:10.5pt; line-height:1.65; color:#1e1e1e; background:#d8d8d8; }
+  .doc-page { background:#fff; width:816px; min-height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; }
+  .cover-page { background:#fff; width:816px; height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; overflow:hidden; }
+  .pg-hdr { display:flex; justify-content:space-between; padding:13px 48px 9px; border-bottom:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; }
+  .pg-ftr { display:flex; justify-content:space-between; padding:9px 48px 13px; border-top:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; margin-top:auto; }
+  .pg-body { flex:1; padding:26px 48px 20px; }
+
+  .cv-topbar { background:#6B0F1A; padding:17px 48px; display:flex; justify-content:space-between; color:white; font-size:8.5pt; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+  .cv-body { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 64px; }
+  .cv-univ { font-size:12.5pt; font-weight:700; color:#6B0F1A; letter-spacing:.1em; text-transform:uppercase; }
+  .cv-rule { width:56px; height:3px; background:#6B0F1A; margin:18px auto 22px; }
+  .cv-course { font-size:11.5pt; color:#333; margin-bottom:4px; }
+  .cv-sem { font-size:10pt; color:#666; margin-bottom:52px; }
+  .cv-tag { font-size:8.5pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#6B0F1A; margin-bottom:10px; }
+  .cv-num { font-size:38pt; font-weight:700; color:#1e1e1e; line-height:1; }
+  .cv-title { font-size:19pt; font-weight:400; color:#333; margin-bottom:12px; line-height:1.3; }
+  .cv-subtitle { font-size:10.5pt; color:#666; margin-bottom:28px; }
+  .cv-meta { font-size:9.5pt; color:#666; }
+  .cv-ftr { padding:15px 48px; border-top:1px solid #ddd; display:flex; justify-content:space-between; font-size:8.5pt; color:#666; }
+
+  h1 { font-size:14pt; font-weight:700; color:#6B0F1A; padding-bottom:6px; border-bottom:1.5px solid #6B0F1A; margin:22px 0 11px; line-height:1.3; }
+  h1:first-child { margin-top:0; }
+  h2 { font-size:12pt; font-weight:700; color:#6B0F1A; padding-bottom:5px; border-bottom:1.5px solid #6B0F1A; margin:20px 0 9px; line-height:1.3; }
+  h3 { font-size:11pt; font-weight:700; color:#2a2a2a; margin:15px 0 6px; }
+  p { margin-bottom:9px; }
+  ol,ul { margin:7px 0 11px; padding-left:26px; }
+  li { margin-bottom:5px; line-height:1.55; }
+  ul { list-style-type:disc; }
+  code { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:8.8pt; background:#f0f0f0; padding:1px 5px; border-radius:3px; color:#2a2a2a; }
+
+  .cb { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f2f2f2; border:1px solid #d0d0d0; border-radius:4px; padding:9px 16px; margin:9px 0 11px; color:#1a1a1a; white-space:pre-wrap; line-height:1.5; }
+  .callout { padding:9px 14px 9px 16px; border-radius:3px; margin:11px 0; font-size:10pt; line-height:1.55; }
+  .callout-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+  .warn { background:#fff4f0; border-left:4px solid #b71c1c; } .warn .callout-lbl { color:#b71c1c; }
+  .note { background:#f0f4ff; border-left:4px solid #1a4fa8; } .note .callout-lbl { color:#1a4fa8; }
+  .tip { background:#f0faf4; border-left:4px solid #1a7a3c; } .tip .callout-lbl { color:#1a7a3c; }
+  .doc-ref { background:#f8f6ff; border:1px solid #c9bfee; border-left:4px solid #5c35b5; border-radius:3px; padding:9px 14px; margin:9px 0 13px; font-size:9.5pt; line-height:1.6; }
+  .doc-ref .doc-ref-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; color:#5c35b5; margin-bottom:5px; }
+  .doc-ref a { color:#5c35b5; text-decoration:none; font-weight:500; }
+  .step-list { counter-reset:steps; list-style:none; padding-left:0; margin:10px 0 13px; }
+  .step-list li { counter-increment:steps; display:flex; gap:13px; margin-bottom:9px; align-items:flex-start; }
+  .step-list li::before { content:counter(steps); min-width:22px; height:22px; background:#6B0F1A; color:white; border-radius:50%; font-size:8.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  .flow { border:1px solid #ccc; background:#fafafa; padding:12px 16px; margin:10px 0 13px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:9pt; line-height:1.9; }
+  .flow strong { color:#6B0F1A; }
+  .taxonomy { width:100%; border-collapse:collapse; margin:8px 0 12px; font-size:9.4pt; }
+  .taxonomy th { background:#6B0F1A; color:white; padding:7px 9px; text-align:left; }
+  .taxonomy td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .taxonomy td:first-child { background:#f4f4f4; font-weight:700; width:22%; }
+  .obs-tbl { width:100%; border-collapse:collapse; margin:8px 0 10px; font-size:9.7pt; }
+  .obs-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; }
+  .obs-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:top; }
+  .obs-tbl td:first-child { background:#f4f4f4; font-weight:600; width:31%; }
+  .cmp-tbl { width:100%; border-collapse:collapse; margin:7px 0 9px; font-size:9.6pt; }
+  .cmp-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .cmp-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .cmp-tbl td:first-child { background:#f4f4f4; font-weight:600; width:34%; }
+  .chk-group { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .chk { display:inline-flex; align-items:center; gap:4px; font-size:9.5pt; white-space:nowrap; }
+  .chk input { width:13px; height:13px; accent-color:#6B0F1A; }
+  .write-box { display:block; width:100%; min-height:70px; border:1px solid #bbb; border-radius:3px; padding:7px 10px; margin-top:5px; color:#bbb; }
+  .write-sm { min-height:42px; }
+  .prompt { background:#fafafa; border:1px solid #ddd; border-left:4px solid #6B0F1A; padding:7px 14px; margin:5px 0 9px; font-style:italic; font-size:10pt; color:#333; }
+  .blank { display:inline-block; border-bottom:1px solid #aaa; min-width:120px; height:17px; vertical-align:bottom; }
+  .blank-full { display:block; width:100%; border-bottom:1px solid #aaa; min-height:20px; margin-top:3px; }
+  .src-hdr { background:#2e2e2e; color:#e8e8e8; font-family:'JetBrains Mono',monospace; font-size:8pt; font-weight:600; padding:6px 16px; border-radius:4px 4px 0 0; margin-top:14px; display:flex; justify-content:space-between; }
+  .cb-src { font-family:'JetBrains Mono',Consolas,monospace; font-size:7.5pt; background:#fcfcfc; border:1px solid #ccc; border-top:2px solid #6B0F1A; border-radius:0 0 4px 4px; padding:12px 16px; margin-bottom:14px; white-space:pre-wrap; line-height:1.52; }
+  .tc { color:#b05000; font-weight:600; }
+  .cm { color:#707070; }
+  .rubric { width:100%; border-collapse:collapse; margin:7px 0 12px; font-size:9.3pt; }
+  .rubric th { background:#3a3a3a; color:white; padding:7px 9px; text-align:left; }
+  .rubric td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .rubric td:first-child { width:26%; font-weight:600; background:#f4f4f4; }
+  .page-break { page-break-before:always; }
+
+  .focus-note { font-size:8.8pt; color:#666; font-style:italic; margin-bottom:5px; }
+  .ag-tbl { width:100%; border-collapse:collapse; margin:8px 0 11px; font-size:9.6pt; }
+  .ag-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .ag-tbl td { padding:6px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .ag-tbl td:first-child { background:#f4f4f4; font-weight:500; width:46%; }
+  .ag-tbl td:nth-child(2), .ag-tbl td:nth-child(3) { width:8%; text-align:center; }
+  .ag-tbl td:last-child { width:38%; }
+  a.dl { color:#6B0F1A; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(107,15,26,.4); }
+  .mt0  { margin-top:0 !important; }
+  .mt8  { margin-top:8px !important; }
+  .mt12 { margin-top:12px !important; }
+  .mt16 { margin-top:16px !important; }
+  .mt20 { margin-top:20px !important; }
+  .mb8  { margin-bottom:8px !important; }
+  .mb12 { margin-bottom:12px !important; }
+  .mb16 { margin-bottom:16px !important; }
+  @media print {
+    body { background:white; }
+    .doc-page,.cover-page { box-shadow:none; margin:0; width:100%; page-break-after:always; }
+    @page { size:letter; margin:.55in .75in .6in; }
+    h1,h2,h3 { page-break-after:avoid; }
+    .cb,.cb-src,table,.flow { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-page">
+  <div class="cv-topbar"><span>University of Montana</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-course">CSCI 391 — ST: Agentic Artificial Intelligence</div>
+    <div class="cv-sem">Autumn Semester 2026</div>
+    <div class="cv-tag">Implementation Lab • Week 4</div>
+    <div class="cv-num">Lab 4</div>
+    <div class="cv-title">Tool Routing</div>
+    <div class="cv-subtitle">A Meta Tool That Picks the Toolset Before the Agent Runs</div>
+    <div class="cv-meta">CSCI 391 — ST: Agentic Artificial Intelligence &nbsp;•&nbsp; Autumn Semester 2026</div>
+  </div>
+  <div class="cv-ftr"><span>University of Montana — Autumn 2026</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+</div>
+
+<!-- PAGE: Prerequisites / Overview / Objectives -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Prerequisites</h1>
+    <p><strong>Before beginning this lab, you must read Chapter 6, "Tool Use and Function Calling," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell.</strong></p>
+
+    <div class="callout note">
+      <span class="callout-lbl">📖 Required Reading</span>
+      <strong>The Agentic AI Bible</strong> — Thomas R. Caldwell — Chapter 6: "Tool Use and Function Calling." Focus on how tool schemas are presented to the model and why the <em>shape</em> of a schema constrains what the model can return.
+    </div>
+
+    <h3>Lab Readiness Checklist</h3>
+    <ul>
+      <li>☐ I can explain why sending every tool on every call costs tokens and invites wrong tool picks.</li>
+      <li>☐ I can explain the difference between a JSON Schema <code>enum</code> and a <code>description</code> that lists valid values.</li>
+      <li>☐ My Lab 3 <code>.env</code> and llama.cpp setup still work.</li>
+    </ul>
+
+    <h1>Lab Overview</h1>
+    <p>As an agent gains tools, every call carries every tool definition, and the model has more ways to pick the wrong one. A common fix is a <strong>routing step</strong>: before the main agent runs, a cheap model reads the request and decides which group of tools it needs. The agent then sees only that group.</p>
+    <p>In this lab you will build that routing step as a <strong>meta tool</strong> called <code>get_available_tools()</code>. It does no work on the user's behalf; it only decides which tools the real work will need. It is not connected to an agent loop yet.</p>
+    <div class="flow">USER PROMPT<br>↓<br><strong>get_available_tools()</strong> &nbsp;(cheap model)<br>↓<br>{"domains": [...], "tools": [...]}</div>
+
+    <h1>Learning Objectives</h1>
+    <p>Upon successful completion of this lab, students will be able to:</p>
+    <ul>
+      <li>Explain why tool routing reduces cost and tool-selection errors.</li>
+      <li>Constrain model output with a JSON Schema <code>enum</code> instead of free-form text.</li>
+      <li>Force a structured classification with <code>tool_choice</code>.</li>
+      <li>Validate model output in code and fall back safely when it is invalid.</li>
+    </ul>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE: Part 0 setup + Part 1 toolsets -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 0 — Setup</h1>
+    <p>Reuse your Lab 3 environment. The router only needs the <strong>cheap</strong> tier, in either mode:</p>
+    <table class="cmp-tbl">
+      <thead><tr><th>Mode</th><th>Uses (.env)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>online</strong></td><td>OpenRouter — <code>OPENROUTER_API_KEY</code>, <code>OPENROUTER_MODEL_CHEAP</code></td></tr>
+        <tr><td><strong>offline</strong></td><td>llama.cpp — <code>LOCAL_LLM_URL</code>, <code>LOCAL_LLM_MODEL_CHEAP</code></td></tr>
+      </tbody>
+    </table>
+    <p>This lab adds one package:</p>
+    <div class="cb">pip install jsonschema</div>
+    <div class="cb">python router.py &lt;mode&gt;             # mode is online or offline
+python router.py &lt;mode&gt; --test      # run the five test prompts</div>
+
+    <h1>Part 1 — The Toolsets</h1>
+    <p>The router chooses from four toolset domains, plus <code>none</code> for requests that need no tools:</p>
+    <table class="taxonomy">
+      <thead><tr><th>Domain</th><th>Tools</th></tr></thead>
+      <tbody>
+        <tr><td>calendar</td><td><code>create_event</code>, <code>list_events</code>, <code>cancel_event</code></td></tr>
+        <tr><td>email</td><td><code>send_email</code>, <code>search_inbox</code>, <code>draft_reply</code></td></tr>
+        <tr><td>files</td><td><code>read_file</code>, <code>write_file</code>, <code>search_files</code></td></tr>
+        <tr><td>billing</td><td><code>get_invoice</code>, <code>refund_payment</code>, <code>update_card</code></td></tr>
+        <tr><td>none</td><td>(no tools)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE: Part 2 enum -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 2 — Enums, Not Descriptions</h1>
+    <p>Complete <code>CLASSIFIER_SCHEMA</code> by adding one required property, <code>domains</code>: an <strong>array</strong> of strings restricted by a JSON Schema <code>enum</code>. An array is needed because one prompt can touch several domains.</p>
+
+    <h3>How <code>enum</code> Works</h3>
+    <p>The <code>enum</code> keyword restricts a value to a fixed list. A value is valid only if it exactly equals one of the listed elements — case, spelling, and type all count. The list should have at least one element, and its elements should be unique. <code>enum</code> can stand alone or sit beside <code>type</code>; for an array of choices, put it on <code>items</code> so it applies to every element:</p>
+    <div class="cb">"domains": {
+    "type": "array",
+    "items": {"type": "string", "enum": ["calendar", "email", "files", "billing", "none"]},
+    "description": "Every toolset domain the request needs."
+}</div>
+    <table class="cmp-tbl">
+      <thead><tr><th>Value of <code>domains</code></th><th>Valid?</th></tr></thead>
+      <tbody>
+        <tr><td><code>["email", "billing"]</code></td><td>Yes</td></tr>
+        <tr><td><code>["Email"]</code></td><td>No — case differs</td></tr>
+        <tr><td><code>["weather"]</code></td><td>No — not in the list</td></tr>
+        <tr><td><code>"email"</code></td><td>No — a string, not an array</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Not Acceptable — valid values only in the description</span>
+      <code>"items": {"type": "string"}, "description": "Valid values are calendar, email, files, billing, or none."</code>
+    </div>
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why It Matters</span>
+      A description is a hint the model may ignore. An enum is part of the schema: backends that enforce schemas can constrain output to it, and your code can check against it. The <code>final_answer.confidence</code> field in the Chapter 3 coffee agent uses the unacceptable pattern — nothing stops the model from returning "pretty sure."
+    </div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>JSON Schema — Enumerated Values</strong><br>
+      <a href="https://json-schema.org/understanding-json-schema/reference/enum" target="_blank">enum — Understanding JSON Schema ↗</a><br>
+      <strong>JSON Schema — Arrays and <code>items</code></strong><br>
+      <a href="https://json-schema.org/understanding-json-schema/reference/array" target="_blank">array — Understanding JSON Schema ↗</a>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE: Part 3 implement -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 3 — Implement the Router</h1>
+    <p>Create <code>router_starter.py</code> in your Lab4 folder from the listing in Part 4. Complete every <code>TODO</code>, then save the finished file as <code>router.py</code> — that is the file you run in Parts 5 and 6 and submit in Part 7.</p>
+    <ol class="step-list">
+      <li><div><strong>Schema (TODO 1).</strong> Add the <code>domains</code> property from Part 2 to the <code>parameters</code> of <code>CLASSIFIER_SCHEMA</code> (the <code>classify_intent</code> function) and list it in <code>required</code>.</div></li>
+      <li><div><strong>Classify (TODO 2).</strong> In <code>get_available_tools()</code>, call <code>chat(prompt, mode, [CLASSIFIER_SCHEMA], FORCE_CLASSIFIER)</code>. <code>FORCE_CLASSIFIER</code> is a <code>tool_choice</code> that makes the model call <code>classify_intent</code> instead of replying in prose.</div></li>
+      <li><div><strong>Parse.</strong> The arguments are a JSON <em>string</em> at <code>message["tool_calls"][0]["function"]["arguments"]</code>. Decode it with <code>json.loads()</code> and read <code>domains</code>.</div></li>
+      <li><div><strong>Validate.</strong> Use the <code>jsonschema</code> library (next page) to check the decoded arguments against the schema you gave the model. If the arguments can't be decoded, fail validation, or contain no domains, fall back to every domain except <code>none</code>.</div></li>
+      <li><div><strong>Return</strong> the domains and the tool names in their toolsets. <code>none</code> contributes no tools.</div></li>
+    </ol>
+    <div class="cb">{"domains": ["email", "billing"],
+ "tools": ["send_email", "search_inbox", "draft_reply",
+           "get_invoice", "refund_payment", "update_card"]}</div>
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Validate Anyway</span>
+      An enum in the schema does not guarantee an enum in the output. Some backends treat the schema as a hint, and small local models are the most likely to drift. Your Python validation is the only check that always runs.
+    </div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>OpenRouter — Tool / Function Calling</strong> (from Lab 2)<br>
+      <a href="https://openrouter.ai/docs/guides/features/tool-calling" target="_blank">Client Tools — OpenRouter Documentation ↗</a>
+      <br><br>
+      <strong>llama.cpp — Server</strong> (start it with <code style="white-space:nowrap">--jinja</code>, as in Lab 3, so tool calls render correctly)<br>
+      <a href="https://github.com/ggml-org/llama.cpp/tree/master/tools/server" target="_blank">tools/server — llama.cpp OpenAI-compatible server ↗</a>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE: Part 3 continued — validating JSON -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h2 class="mt0">Validating JSON Against a Schema</h2>
+    <p>The same JSON Schema you send the model can also check what comes back. The <code>jsonschema</code> library does this with one function:</p>
+    <ul>
+      <li><code>jsonschema.validate(instance, schema)</code> returns <code>None</code> if the already-decoded data satisfies the schema; otherwise it raises <code>jsonschema.ValidationError</code>, whose <code>.message</code> says why.</li>
+      <li><code>jsonschema.SchemaError</code> means the <em>schema itself</em> is malformed — a bug in your code, not the model's.</li>
+      <li><code>json.loads()</code> raises <code>json.JSONDecodeError</code> before validation ever runs if the model's string isn't JSON at all.</li>
+    </ul>
+
+    <p><strong>Example.</strong> This validates t-shirt orders, not routing results — applying the pattern to <code>classify_intent</code> is your job.</p>
+    <div class="cb">import jsonschema
+
+ORDER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "sizes": {"type": "array", "items": {"type": "string", "enum": ["S", "M", "L"]}},
+    },
+    "required": ["sizes"],
+}
+
+for order in [{"sizes": ["S", "L"]}, {"sizes": ["XL"]}, {"sizes": "M"}, {}]:
+    try:
+        jsonschema.validate(instance=order, schema=ORDER_SCHEMA)
+        print(order, "valid")
+    except jsonschema.ValidationError as err:
+        print(order, "invalid:", err.message)</div>
+    <div class="cb">{'sizes': ['S', 'L']} valid
+{'sizes': ['XL']} invalid: 'XL' is not one of ['S', 'M', 'L']
+{'sizes': 'M'} invalid: 'M' is not of type 'array'
+{} invalid: 'sizes' is a required property</div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Try This</span>
+      Add <code>{"sizes": []}</code> to the list. Does it pass? Decide whether an empty <code>domains</code> list should be caught by your schema or by your own code — the JSON Schema array reference in Part 2 has a keyword for it.
+    </div>
+
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>jsonschema — Python Library</strong><br>
+      <a href="https://python-jsonschema.readthedocs.io/en/stable/validate/" target="_blank">Schema Validation — jsonschema ↗</a><br>
+      <a href="https://python-jsonschema.readthedocs.io/en/stable/errors/" target="_blank">Handling Validation Errors — jsonschema ↗</a><br>
+      <a href="https://python-jsonschema.readthedocs.io/en/stable/api/jsonschema/exceptions/" target="_blank">jsonschema.exceptions — API Reference ↗</a>
+
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE: Part 4 starter 1 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 4 — Starter Implementation</h1>
+    <div class="src-hdr">router_starter.py <span>complete every TODO before running</span></div>
+    <div class="cb-src">import argparse
+import json
+import os
+
+import jsonschema
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+OPENROUTER_URL = os.getenv("OPENROUTER_URL", "https://openrouter.ai/api/v1/chat/completions")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL_CHEAP", "cohere/north-mini-code:free")
+
+LOCAL_LLM_URL = os.getenv("LOCAL_LLM_URL", "http://127.0.0.1:8080/v1/chat/completions")
+LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL_CHEAP", "Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M")
+
+TOOLSETS = {
+    "calendar": ["create_event", "list_events", "cancel_event"],
+    "email": ["send_email", "search_inbox", "draft_reply"],
+    "files": ["read_file", "write_file", "search_files"],
+    "billing": ["get_invoice", "refund_payment", "update_card"],
+    "none": [],
+}
+
+DOMAINS = list(TOOLSETS)
+
+ROUTER_PROMPT = """
+You are a request router. Call classify_intent with every toolset
+domain the user's request needs. A request may need more than one.
+
+- calendar: scheduling, meetings, events
+- email: sending, searching, or replying to email
+- files: reading, writing, or finding documents
+- billing: invoices, refunds, payment cards
+- none: no tools needed (general knowledge, small talk)
+
+Do not answer the request. Only classify it.
+"""
+
+CLASSIFIER_SCHEMA = {
+    "type": "function",
+    "function": {
+        "name": "classify_intent",
+        "description": "Report which toolset domains the request needs.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                <span class="tc"># TODO 1: add the "domains" property (Part 2)</span>
+            },
+            "required": [],  <span class="tc"># TODO 1</span>
+        },
+    },
+}</div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE: Part 4 starter 2 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <div class="src-hdr">router_starter.py (continued) <span>complete every TODO before running</span></div>
+    <div class="cb-src">FORCE_CLASSIFIER = {"type": "function", "function": {"name": "classify_intent"}}
+
+
+def chat(prompt, mode, tools, tool_choice):
+    if mode == "online":
+        url, model = OPENROUTER_URL, OPENROUTER_MODEL
+        headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+    else:
+        url, model = LOCAL_LLM_URL, LOCAL_LLM_MODEL
+        headers = {}
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json={
+            "model": model,
+            "messages": [
+                {"role": "system", "content": ROUTER_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            "tools": tools,
+            "tool_choice": tool_choice,
+            "temperature": 0,
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]
+
+
+def get_available_tools(prompt, mode):
+    <span class="tc"># TODO 2: classify, validate, and return the domains and tools (Part 3)</span>
+    raise NotImplementedError
+
+
+TEST_PROMPTS = [
+    "Move my 3pm with Dana to Friday",
+    "Email the Q3 invoice to accounting",
+    "Refund order #4471",
+    "Find the contract PDF and summarize it",
+    "What's the capital of Peru?",
+]
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mode", choices=["online", "offline"])
+    parser.add_argument("--test", action="store_true")
+    args = parser.parse_args()
+
+    prompts = TEST_PROMPTS if args.test else [input("Prompt: ")]
+
+    for prompt in prompts:
+        print(f"\n&gt; {prompt}")
+        print(json.dumps(get_available_tools(prompt, args.mode), indent=2))</div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 8</span></div>
+</div>
+
+<!-- PAGE: Part 5 test + Part 6 break -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 5 — Test the Router</h1>
+    <p>Run <code>python router.py online --test</code> or <code>python router.py offline --test</code>. Your results should match:</p>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:62%">Prompt</th><th>Expected Domains</th></tr></thead>
+      <tbody>
+        <tr><td>Move my 3pm with Dana to Friday</td><td><code>calendar</code></td></tr>
+        <tr><td>Email the Q3 invoice to accounting</td><td><code>email</code>, <code>billing</code></td></tr>
+        <tr><td>Refund order #4471</td><td><code>billing</code></td></tr>
+        <tr><td>Find the contract PDF and summarize it</td><td><code>files</code></td></tr>
+        <tr><td>What's the capital of Peru?</td><td><code>none</code> (empty tool list)</td></tr>
+      </tbody>
+    </table>
+
+    <h1>Part 6 — Break the Router</h1>
+    <p>Replace your enum with the unacceptable description-only version from Part 2. Using either mode, run the five test prompts plus five prompts of your own. Count how many results contain a value outside <code>DOMAINS</code>, then restore the enum and repeat.</p>
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Lab Focus</span>
+      If the description-only schema never drifts, try vaguer prompts ("sort out my Tuesday", "the Acme thing") — ambiguity is where free-form values appear.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 9</span></div>
+</div>
+
+<!-- PAGE: Submission -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body">
+    <h1>Part 7 — Submission Requirements</h1>
+    <p>Submit the completed Student Observation Workbook together with:</p>
+    <ul>
+      <li>Your completed <code>router.py</code>.</li>
+      <li>A console screenshot of the <code>--test</code> output.</li>
+    </ul>
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ Security Reminder</span>
+      Never include your OpenRouter API key in screenshots, your submitted document, or source control.
+    </div>
+
+    <h2>Implementation Requirements</h2>
+    <table class="rubric">
+      <thead><tr><th>Requirement</th><th>Minimum Standard</th></tr></thead>
+      <tbody>
+        <tr><td>Enum schema</td><td><code>domains</code> is a required array whose <code>items</code> are constrained by an <code>enum</code>; no valid values appear only in a description.</td></tr>
+        <tr><td>Forced classification</td><td>The classifier is called with <code>tool_choice</code> forcing <code>classify_intent</code>, and its arguments are decoded.</td></tr>
+        <tr><td>Validation + fallback</td><td>Decoded output is checked with <code>jsonschema</code>; undecodable, invalid, or empty output falls back to every toolset.</td></tr>
+        <tr><td>Correct routing</td><td>All five test prompts return reasonable domains and their tool names.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Preparation for Next Lecture</h2>
+    <p>Please read Chapter 7, "Memory: Short-term, Long-term, Episodic, Semantic," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell, in preparation for lecture next week.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 10</span></div>
+</div>
+
+<!-- WORKBOOK DIVIDER -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Tool Routing</span></div>
+  <div class="pg-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:800px;">
+    <div style="text-align:center;max-width:480px;">
+      <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6B0F1A;margin-bottom:14px;">Lab 4 — Autumn 2026</div>
+      <div style="font-size:30pt;font-weight:700;color:#1e1e1e;line-height:1.15;margin-bottom:20px;">Student Observation<br>Workbook</div>
+      <div style="width:60px;height:3px;background:#6B0F1A;margin:0 auto 24px;"></div>
+      <div style="font-size:11pt;color:#444;line-height:1.7;">Use this section to record the results of your tests and experiment. Complete the checkboxes and short evidence prompts rather than writing open-ended essays.</div>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 11</span></div>
+</div>
+
+<!-- WORKBOOK A/B -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <p><strong>Name:</strong> <span class="blank" style="min-width:220px;"></span> &nbsp;&nbsp; <strong>Date:</strong> <span class="blank" style="min-width:140px;"></span></p>
+
+    <h1 class="mt12">A. Routing Results</h1>
+    <p>Mode used: &nbsp;<span class="chk-group" style="display:inline-flex;"><label class="chk"><input type="checkbox"> online</label><label class="chk"><input type="checkbox"> offline</label></span></p>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:42%">Prompt</th><th>Domains Returned</th><th style="width:22%">Correct?</th></tr></thead>
+      <tbody>
+        <tr><td>Move my 3pm with Dana to Friday</td><td><span class="blank-full"></span></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Email the Q3 invoice to accounting</td><td><span class="blank-full"></span></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Refund order #4471</td><td><span class="blank-full"></span></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>Find the contract PDF and summarize it</td><td><span class="blank-full"></span></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td>What's the capital of Peru?</td><td><span class="blank-full"></span></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <p><strong>For any incorrect result, what did the model return and why do you think it chose that?</strong></p>
+    <div class="write-box write-sm"></div>
+
+    <h1 class="mt20">B. Enum vs. Description (Part 6)</h1>
+    <table class="cmp-tbl">
+      <thead><tr><th>Observation</th><th>Enum Schema</th><th>Description Only</th></tr></thead>
+      <tbody>
+        <tr><td>Out-of-set results (x / 10)</td><td><span class="blank" style="min-width:80px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
+        <tr><td>Fallback triggered (x / 10)</td><td><span class="blank" style="min-width:80px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
+      </tbody>
+    </table>
+    <table class="obs-tbl">
+      <tr><td>Example invalid value returned</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Prompt that produced it</td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Caught by <code>jsonschema</code> validation?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      <tr><td>The <code>ValidationError</code> message</td><td><span class="blank-full"></span></td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 12</span></div>
+</div>
+
+<!-- WORKBOOK C — Final Reflection -->
+<div class="doc-page" style="margin-bottom:24px;">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 4 — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>C. Final Lab Reflection</h1>
+    <p>Answer the following questions. Keep each response to 2–4 sentences unless otherwise indicated.</p>
+
+    <h3>1. Why is an <code>enum</code> more reliable than listing the valid values in a <code>description</code>?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>2. If the router returned a domain your code didn't expect, what would break downstream? How does your validation prevent it?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>3. Why is the fallback "every toolset" rather than "no tools"?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>4. In one sentence, why is a cheap model a good fit for routing?</h3>
+    <div class="write-box write-sm mt8 mb16"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">Final Thought</span>
+      The router never does the user's work — it only narrows the choices. Constraining a model's output to a fixed set of values is one of the simplest, highest-leverage reliability tools you have, and you will use it again every time an agent has to pick from a menu.
+    </div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>University of Montana &nbsp;|&nbsp; CSCI 391 — Agentic Artificial Intelligence &nbsp;|&nbsp; Lab 4</span></div>
+</div>
+
+</body>
+
+</html>
