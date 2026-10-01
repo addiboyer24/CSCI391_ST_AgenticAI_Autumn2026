@@ -140,7 +140,7 @@
 <p><strong>Before starting, read Chapter 7, "Memory: Short-term, Long-term, Episodic, Semantic," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell.</strong> This project also builds directly on Chapters 5 and 6 and on your code from Labs 2–4: the bounded ReAct loop, the Lab 3 hardening work (windowed summarization, constraint reinjection, structured outputs, observability, model tiering, online/offline modes), and the Lab 4 tool router.</p>
 <div class="callout note">
   <span class="callout-lbl">📖 Required Reading</span>
-  <strong>The Agentic AI Bible</strong> — Chapter 7, "Memory: Short-term, Long-term, Episodic, Semantic." The Chapter 7 code examples (<code>ch07_02_retrieve_episodic.py</code>, <code>ch07_03_chromadb_memory.py</code>) are good starting points for your episodic and semantic stores.
+  <strong>The Agentic AI Bible</strong> — Chapter 7, "Memory: Short-term, Long-term, Episodic, Semantic." The starter's <code>memory_examples/</code> folder has a short, runnable example of each store: <code>ch07_05_chroma_simple.py</code> (episodic and semantic collections), <code>ch07_06_sqlite_hot_store.py</code> (hot state), <code>ch07_07_chunking_experiment.py</code> and <code>ch07_08_embed_pdf.py</code> (chunking and retrieval evaluation), and <code>ch07_04_neo4j_simple.py</code> (graph bonus). Its <code>docs/</code> guides cover ChromaDB, embeddings and retrieval, Neo4j, and hot state; start with <code>memory_examples/README.md</code>.
 </div>
 <h3>Project Readiness Checklist</h3>
 <ul>
@@ -551,7 +551,7 @@ working memory over budget? → <strong>compress</strong> old turns with the che
 <h3>Evaluate retrieval before building on it</h3>
 <ol class="step-list">
   <li><div><strong>An evaluation set.</strong> At least 20 questions with the chunk or section that answers each one. For example: "How do I connect Spotify?", "What does the lb-radio mode parameter do?", "What does X-RateLimit-Reset-In mean?"</div></li>
-  <li><div><strong>Compare two chunking strategies</strong> on the same corpus and questions, for example fixed 512-token chunks with 50-token overlap versus section-based splitting that keeps each API entry together. Report the <strong>top-3 recall</strong> for each (the share of evaluation questions whose answering chunk appears in the top 3 results) and choose.</div></li>
+  <li><div><strong>Compare two chunking strategies</strong> on the same corpus and questions, for example fixed 256-token chunks with 32-token overlap versus section-based splitting that keeps each API entry together. Keep every chunk within your embedding model's token limit (256 for Chroma's default); <code>memory_examples/ch07_07_chunking_experiment.py</code> shows how to check it and measure recall. Report the <strong>top-3 recall</strong> for each (the share of evaluation questions whose answering chunk appears in the top 3 results) and choose.</div></li>
   <li><div><strong>Add one improvement and measure it:</strong> hybrid search (BM25 keyword scores combined with vector similarity) or contextual prefixes (a cheap model writes one sentence per chunk saying where it fits in the document before embedding).</div></li>
 </ol>
 <div class="callout tip">
@@ -559,7 +559,9 @@ working memory over budget? → <strong>compress</strong> old turns with the che
   Lecture's example was a CVE number that a vector-only index can't find. Encore's version is an identifier like an MBID or an endpoint path such as <code>/1/explore/lb-radio</code>: exact strings an embedding model may not represent well, and exactly what keyword search catches.
 </div>
 <h3>Graph store (bonus)</h3>
-<p>"Who has this drummer played with?" is a relationship question, not a similarity question. For bonus credit, load artist membership and collaboration relationships from MusicBrainz into Neo4j (already in the course requirements) and add a <code>query_artist_graph</code> tool whose description tells the agent when to use it instead of the vector stores. Justify the operational cost in your write-up.</p>
+<p>"Who has this drummer played with?" is a relationship question, not a similarity question. For bonus credit, load artist membership and collaboration relationships from MusicBrainz into Neo4j (already in the course requirements) and add a <code>query_artist_graph</code> tool whose description tells the agent when to use it instead of the vector stores. Justify the operational cost in your write-up. <code>memory_examples/docs/neo4j.md</code> and <code>NEO4J_SETUP.md</code> cover running Neo4j, Cypher, and loading MusicBrainz relationships.</p>
+<h3>Your own embedding model (bonus)</h3>
+<p>Chroma embeds with all-MiniLM-L6-v2 unless you choose otherwise. For bonus credit, plug a different embedding model into Chroma through an embedding function (for example a <code>sentence-transformers</code> model such as <code>BAAI/bge-small-en-v1.5</code>), keep every chunk within its token limit, record its name and version in metadata, and report top-3 recall for both models on the same corpus, chunks, and questions. Say in your README whether the gain was worth the cost in size and speed. See <code>memory_examples/docs/embeddings_and_retrieval.md</code>.</p>
 
   </div>
   <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 15</span></div>
@@ -659,7 +661,7 @@ memory_reads, peak_tokens_in, total_tokens_in, total_tokens_out, est_cost_usd, l
   <div class="pg-body">
 
 <h1>Part 8 — Starter Implementation</h1>
-<p>The starter folder (<code>encore_starter.zip</code>) contains <code>encore.py</code> with the code below, a <code>tests/</code> folder, <code>prompts/</code>, <code>.env.example</code>, and <code>requirements.txt</code>. Two tools are complete as worked examples of the tool contract; complete every <code>TODO</code>. The listing is here for reading; start from <code>encore.py</code> in the zip rather than copying code out of this document.</p>
+<p>The starter folder (<code>encore_starter.zip</code>) contains <code>encore.py</code> with the code below, a <code>tests/</code> folder, <code>prompts/</code>, <code>memory_examples/</code> (runnable examples and guides for each memory store), <code>.env.example</code>, and <code>requirements.txt</code>. Two tools are complete as worked examples of the tool contract; complete every <code>TODO</code>. The listing is here for reading; start from <code>encore.py</code> in the zip rather than copying code out of this document.</p>
 <div class="src-hdr">encore.py <span>complete every TODO</span></div>
 <div class="cb-src">"""
 Encore -- a ListenBrainz music agent that remembers.   (CSCI 391 midterm starter)
@@ -957,6 +959,7 @@ def forget_user(user_id: str) -&gt; None:
     <tr><td>Workbook, README, code quality</td><td>5</td><td>Complete, specific answers that cite trace lines; clear README; readable code.</td></tr>
     <tr><td>Bonus: graph store</td><td>+3</td><td>Neo4j artist-relationship graph with a routed tool and a written cost justification.</td></tr>
     <tr><td>Bonus: both retrieval improvements</td><td>+2</td><td>Hybrid search <em>and</em> contextual prefixes, each measured separately.</td></tr>
+    <tr><td>Bonus: your own embedding model</td><td>+2</td><td>A non-default embedding model in Chroma, compared with the default on the same evaluation set, with chunks within its token limit and the model recorded in metadata.</td></tr>
   </tbody>
 </table>
 
@@ -1037,6 +1040,7 @@ def forget_user(user_id: str) -&gt; None:
     <tr><td>Chunking strategy A: <span class="blank" style="min-width:150px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
     <tr><td>Chunking strategy B: <span class="blank" style="min-width:150px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
     <tr><td>Chosen strategy + improvement: <span class="blank" style="min-width:110px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
+    <tr><td>Own embedding model (bonus): <span class="blank" style="min-width:110px;"></span></td><td><span class="blank" style="min-width:60px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
   </tbody>
 </table>
 <p><strong>1. Paste one stored episodic summary. Is it signal or recounting? What would you change in your summarization prompt?</strong></p>
