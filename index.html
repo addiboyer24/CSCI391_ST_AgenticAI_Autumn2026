@@ -14,10 +14,10 @@
     font-size: 10.5pt;
     line-height: 1.65;
     color: #1e1e1e;
-    background: #d8d8d8;
+    background: #EFE8D4;
   }
 
-  a { color: #6B0F1A; }
+  a { color: #70002e; }
 
   .doc-page {
     background: white;
@@ -43,23 +43,28 @@
 
   /* ── COVER ─────────────────────────────────────────── */
   .cv-topbar {
-    background: #6B0F1A; padding: 17px 48px;
+    background: #70002e; padding: 17px 48px;
     display: flex; justify-content: space-between; gap: 12px;
     color: white; font-size: 8.5pt; font-weight: 600;
     letter-spacing: .05em; text-transform: uppercase;
   }
-  .cv-body { text-align: center; padding: 52px 64px 44px; }
-  .cv-univ  { font-size: 12.5pt; font-weight: 700; color: #6B0F1A; letter-spacing: .1em; text-transform: uppercase; }
-  .cv-rule  { width: 56px; height: 3px; background: #6B0F1A; margin: 18px auto 22px; }
-  .cv-tag   { font-size: 8.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #6B0F1A; margin-bottom: 10px; }
+  .cv-body {
+    text-align: center; padding: 40px 64px 0; position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 35%, #BBDDE6 100%);   /* UM Snowbowl Silver */
+  }
+  .cv-logo { display: block; height: 64px; width: auto; margin: 0 auto 18px; }
+  .cv-mtns { display: block; width: calc(100% + 128px); height: 120px; margin: 30px -64px 0; }
+  .cv-univ  { font-size: 12.5pt; font-weight: 700; color: #70002e; letter-spacing: .1em; text-transform: uppercase; }
+  .cv-rule  { width: 56px; height: 3px; background: #70002e; margin: 18px auto 22px; }
+  .cv-tag   { font-size: 8.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #70002e; margin-bottom: 10px; }
   .cv-num   { font-size: 34pt; font-weight: 700; color: #1e1e1e; line-height: 1.05; }
   .cv-title { font-size: 19pt; font-weight: 400; color: #333; margin: 6px 0 14px; line-height: 1.3; }
   .cv-meta  { font-size: 9.5pt; color: #666; }
 
   /* ── HEADINGS ──────────────────────────────────────── */
   h1 {
-    font-size: 14pt; font-weight: 700; color: #6B0F1A;
-    padding-bottom: 6px; border-bottom: 1.5px solid #6B0F1A;
+    font-size: 14pt; font-weight: 700; color: #70002e;
+    padding-bottom: 6px; border-bottom: 1.5px solid #70002e;
     margin: 26px 0 11px; line-height: 1.3;
   }
   h1:first-child { margin-top: 0; }
@@ -73,12 +78,12 @@
   .callout-lbl { display: block; font-weight: 700; font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
   .note { background: #f0f4ff; border-left: 4px solid #1a4fa8; }
   .note .callout-lbl { color: #1a4fa8; }
-  .def  { background: #fafafa; border: 1px solid #ddd; border-left: 4px solid #6B0F1A; }
-  .def .callout-lbl { color: #6B0F1A; }
+  .def  { background: #fafafa; border: 1px solid #ddd; border-left: 4px solid #70002e; }
+  .def .callout-lbl { color: #70002e; }
 
   /* ── INFO TABLE ────────────────────────────────────── */
   .info-tbl { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.7pt; }
-  .info-tbl th { background: #6B0F1A; color: white; padding: 7px 10px; text-align: left; font-weight: 600; }
+  .info-tbl th { background: #70002e; color: white; padding: 7px 10px; text-align: left; font-weight: 600; }
   .info-tbl td { padding: 6px 10px; border: 1px solid #c0c0c0; vertical-align: top; overflow-wrap: anywhere; }
   .info-tbl td:first-child { background: #f4f4f4; font-weight: 600; width: 34%; }
   .info-tbl td.num { text-align: right; font-weight: 600; width: 20%; }
@@ -96,47 +101,73 @@
     width: 38px; flex-shrink: 0; display: flex; justify-content: center; padding-top: 9px; position: relative; z-index: 1;
   }
   .tl-dot span {
-    width: 24px; height: 24px; border-radius: 50%; background: #6B0F1A; color: white;
+    width: 24px; height: 24px; border-radius: 50%; background: #70002e; color: white;
     font-size: 8.5pt; font-weight: 700; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0 0 4px white;
   }
   .tl-card {
     flex: 1; display: block; text-decoration: none; color: inherit;
-    border: 1px solid #d0d0d0; border-left: 4px solid #6B0F1A; border-radius: 3px;
+    border: 1px solid #d0d0d0; border-left: 4px solid #70002e; border-radius: 3px;
     padding: 10px 16px 11px; background: white;
     transition: background .15s ease, box-shadow .15s ease;
   }
-  a.tl-card:hover { background: #fbf6f6; box-shadow: 0 2px 10px rgba(107,15,26,.12); }
-  .tl-tag { font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #6B0F1A; }
+  a.tl-card:hover { background: #fbf6f6; box-shadow: 0 2px 10px rgba(112,0,46,.12); }
+  .tl-tag { font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #70002e; }
   .tl-title { font-size: 12pt; font-weight: 700; color: #1e1e1e; line-height: 1.35; margin: 1px 0 2px; }
   .tl-sub { font-size: 9.5pt; color: #555; margin-bottom: 6px; }
   .tl-links { font-size: 8.8pt; color: #666; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-  .tl-links a { color: #6B0F1A; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(107,15,26,.4); }
+  .tl-links a { color: #70002e; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(112,0,46,.4); }
 
   .tl-phase { display: flex; align-items: center; margin: 4px 0 14px; }
   .tl-phase .tl-date { padding-top: 0; }
   .tl-phase .tl-dot { padding-top: 0; }
-  .tl-phase .tl-dot span { width: 12px; height: 12px; background: white; border: 2px solid #6B0F1A; }
+  .tl-phase .tl-dot span { width: 12px; height: 12px; background: white; border: 2px solid #70002e; }
   .tl-phase-lbl {
     font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
     color: #555; background: #f0f0f0; padding: 3px 10px; border-radius: 3px;
   }
 
-  .tl-item.major .tl-dot span { width: 30px; height: 30px; background: #1e1e1e; font-size: 9pt; }
-  .tl-item.major .tl-card { border-left-color: #1e1e1e; background: #fafafa; }
+  .tl-item.major .tl-dot span { width: 30px; height: 30px; background: #1D3C34; font-size: 9pt; }
+  .tl-item.major .tl-card { border-left-color: #1D3C34; background: #f7f4ea; }
+  .tl-item.major .tl-tag { color: #1D3C34; }
+  .tl-item.major .badge { background: #1D3C34; }
   .badge {
     display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 10px;
-    background: #6B0F1A; color: white; font-size: 7.5pt; letter-spacing: .05em; vertical-align: 1px;
+    background: #70002e; color: white; font-size: 7.5pt; letter-spacing: .05em; vertical-align: 1px;
   }
 
   .tl-item.future .tl-dot span { background: white; border: 2px dashed #b9a0a4; color: #b9a0a4; }
+
+  /* ── ASSIGNMENT TYPE SYMBOLS ───────────────────────── */
+  .ico { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .tl-item.major .ico { width: 15px; height: 15px; }
+  .t-lab   { --c: #70002e; }
+  .t-quiz  { --c: #ED8B00; }   /* UM Copper Climb  */
+  .t-mid   { --c: #1D3C34; }   /* UM Lubrecht Green */
+  .t-cap   { --c: #F9423A; }   /* UM Sunset Red    */
+  .tl-item.t-quiz .tl-dot span { background: #ED8B00; }
+  .tl-item.t-quiz .tl-card { border-left-color: #ED8B00; padding-top: 8px; padding-bottom: 9px; }
+  .tl-item.t-quiz .tl-tag { color: #a85f00; }
+  .tl-item.t-quiz .tl-title { font-size: 11pt; }
+  .tl-item.t-quiz .tl-links a { color: #a85f00; border-bottom-color: rgba(237,139,0,.5); }
+  .tl-item.t-quiz .badge { background: #ED8B00; }
+  .type-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--c); color: white;
+    vertical-align: middle; margin-right: 9px; flex-shrink: 0;
+  }
+  .type-chip.dashed { background: white; color: var(--c); border: 2px dashed var(--c); }
+  .info-tbl td .type-row { display: flex; align-items: center; }
   .tl-item.future .tl-card { border: 1px dashed #c8c8c8; border-left: 4px solid #d6b9bd; color: #888; font-size: 9.5pt; }
+  .tl-item.future .tl-card .ico-inline { display: inline-flex; vertical-align: -3px; margin: 0 2px; }
+  .tl-item.future .tl-card .ico-inline .ico { width: 14px; height: 14px; }
 
   @media (max-width: 640px) {
     .pg-body { padding: 20px 18px; }
     .pg-hdr, .pg-ftr, .cv-topbar { padding-left: 18px; padding-right: 18px; }
     .pg-hdr span:last-child, .pg-ftr span:last-child, .cv-topbar span:last-child { display: none; }
-    .cv-body { padding: 36px 20px 30px; }
+    .cv-body { padding: 30px 20px 0; }
+    .cv-mtns { width: calc(100% + 40px); height: 80px; margin: 24px -20px 0; }
     .tl::before { left: 15px; }
     .tl-date { display: none; }
     .tl-dot { width: 32px; }
@@ -152,6 +183,14 @@
 </head>
 <body>
 
+<!-- Assignment-type symbols (same icons used on the timeline and in the grading table) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-lab" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.6A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-2.9L14 9.5V3M7.2 15.5h9.6"/></symbol>
+  <symbol id="i-quiz" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9zM8.5 13.5l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-mid" viewBox="0 0 24 24"><path d="M5 21.5V3.5M5 4h12l-2.5 4.5L17 13H5"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9.5 12 4.5l10 5-10 5zM6 11.5v5c0 1.6 2.7 3 6 3s6-1.4 6-3v-5M22 9.5V15"/></symbol>
+</svg>
+
 <!-- ═══════════════════════════════════════════════
      COVER + COURSE OVERVIEW
 ═══════════════════════════════════════════════════ -->
@@ -161,15 +200,23 @@
     <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
   </div>
   <div class="cv-body">
+    <!-- Official UM logo: download from https://www.umt.edu/brand/university_marks/ and save as assets/um-logo.svg (hidden until the file exists) -->
+    <img class="cv-logo" src="assets/um-logo.svg" alt="University of Montana" onerror="this.style.display='none'">
     <div class="cv-univ">University of Montana</div>
     <div class="cv-rule"></div>
     <div class="cv-tag">Course Index &bull; Autumn Semester 2026</div>
     <div class="cv-num">CSCI 391</div>
     <div class="cv-title">ST: Agentic Artificial Intelligence</div>
     <div class="cv-meta">Addison Boyer &nbsp;&bull;&nbsp; CRN 74616 &nbsp;&bull;&nbsp; 3 Credits &nbsp;&bull;&nbsp; August 24 &ndash; December 11, 2026</div>
+    <svg class="cv-mtns" viewBox="0 0 816 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 120V70l58-28 46 20 70-46 52 30 40-12 64 38 58-34 44 18 66-44 48 30 52-10 60 36 50-26 46 22 62-30V120z" fill="#d9b2c0"/>
+      <path d="M159 26L174 16L191 26L182 23L175 28L167 23ZM483 22L498 12L514 22L505 19L498 24L490 19Z" fill="#ffffff" opacity=".9"/>
+      <path d="M0 120V88l70-24 54 18 76-36 58 26 52-14 66 32 74-30 52 16 80-36 58 28 48-8 60 26 68-28V120z" fill="#a24d70"/>
+      <path d="M0 120v-18l90-16 70 12 100-22 80 18 90-14 110 20 92-18 84 12 100-16V120z" fill="#70002e"/>
+    </svg>
   </div>
 
-  <div class="pg-body" style="border-top: 1px solid #ddd;">
+  <div class="pg-body">
 
     <h1>Course Overview</h1>
     <p>This course explores the rapidly evolving field of Agentic Artificial Intelligence: AI systems capable of reasoning, planning, retrieving information, using tools, and autonomously completing tasks. Throughout the semester, you will learn how modern AI agents are designed and implemented using large language models (LLMs), orchestration frameworks, retrieval systems, memory architectures, and external APIs.</p>
@@ -185,7 +232,7 @@
       <strong>The Agentic AI Bible</strong> &mdash; Thomas R. Caldwell &mdash; <em>Building Autonomous AI Systems with Large Language Models, Tools, Memory, and Context.</em> Revised &amp; Expanded Edition, 2026.
     </div>
 
-    <h1>Labs &amp; Projects Timeline</h1>
+    <h1>Labs, Quizzes &amp; Projects Timeline</h1>
     <p>Open each assignment document from its card below, then submit your work through the matching Canvas assignment.</p>
 
     <ol class="tl">
@@ -196,9 +243,9 @@
         <div class="tl-phase-lbl">Foundations and Mindset</div>
       </li>
 
-      <li class="tl-item">
+      <li class="tl-item t-lab">
         <div class="tl-date"><strong>Thu 08/27</strong>Week 1</div>
-        <div class="tl-dot"><span>1</span></div>
+        <div class="tl-dot"><span title="Weekly Lab"><svg class="ico"><use href="#i-lab"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 08/27 &bull; Week 1</span>
           <div class="tl-tag">Implementation Lab</div>
@@ -211,9 +258,22 @@
         </div>
       </li>
 
-      <li class="tl-item">
+      <li class="tl-item t-quiz">
+        <div class="tl-date"><strong>Thu 09/03</strong>Week 2</div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 09/03 &bull; Week 2</span>
+          <div class="tl-tag">Quiz 1</div>
+          <div class="tl-title">What Is an AI Agent?</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/415307">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item t-lab">
         <div class="tl-date"><strong>Thu 09/03</strong>Weeks 2&ndash;3</div>
-        <div class="tl-dot"><span>2</span></div>
+        <div class="tl-dot"><span title="Weekly Lab"><svg class="ico"><use href="#i-lab"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 09/03 &bull; Weeks 2&ndash;3</span>
           <div class="tl-tag">Implementation Lab</div>
@@ -233,9 +293,22 @@
         <div class="tl-phase-lbl">Core Capabilities</div>
       </li>
 
-      <li class="tl-item">
+      <li class="tl-item t-quiz">
         <div class="tl-date"><strong>Thu 09/17</strong>Week 4</div>
-        <div class="tl-dot"><span>3</span></div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 09/17 &bull; Week 4</span>
+          <div class="tl-tag">Quiz 2</div>
+          <div class="tl-title">The Anatomy of an Agent</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/417246">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item t-lab">
+        <div class="tl-date"><strong>Thu 09/17</strong>Week 4</div>
+        <div class="tl-dot"><span title="Weekly Lab"><svg class="ico"><use href="#i-lab"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 09/17 &bull; Week 4</span>
           <div class="tl-tag">Implementation Lab</div>
@@ -248,9 +321,9 @@
         </div>
       </li>
 
-      <li class="tl-item">
+      <li class="tl-item t-lab">
         <div class="tl-date"><strong>Thu 09/24</strong>Week 5</div>
-        <div class="tl-dot"><span>4</span></div>
+        <div class="tl-dot"><span title="Weekly Lab"><svg class="ico"><use href="#i-lab"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 09/24 &bull; Week 5</span>
           <div class="tl-tag">Implementation Lab</div>
@@ -264,9 +337,22 @@
         </div>
       </li>
 
-      <li class="tl-item major">
+      <li class="tl-item t-quiz">
+        <div class="tl-date"><strong>Thu 10/01</strong>Week 6</div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 10/01 &bull; Week 6</span>
+          <div class="tl-tag">Quiz 3 <span class="badge">Today</span></div>
+          <div class="tl-title">Models, Tools, and Memory</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/419202">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item major t-mid">
         <div class="tl-date"><strong>Thu 10/01</strong>Weeks 6&ndash;11</div>
-        <div class="tl-dot"><span>M</span></div>
+        <div class="tl-dot"><span title="Midterm Project"><svg class="ico"><use href="#i-mid"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 10/01 &bull; Weeks 6&ndash;11</span>
           <div class="tl-tag">Midterm Project <span class="badge">Current</span></div>
@@ -283,7 +369,7 @@
       <li class="tl-item future">
         <div class="tl-date"><strong>Coming Up</strong></div>
         <div class="tl-dot"><span>&hellip;</span></div>
-        <div class="tl-card">More labs and the Final Capstone Project will be added as the semester progresses.</div>
+        <div class="tl-card">More <span class="ico-inline" style="color:#70002e"><svg class="ico"><use href="#i-lab"/></svg></span> labs, <span class="ico-inline" style="color:#a85f00"><svg class="ico"><use href="#i-quiz"/></svg></span> quizzes, and the <span class="ico-inline" style="color:#F9423A"><svg class="ico"><use href="#i-cap"/></svg></span> Final Capstone Project will be added as the semester progresses.</div>
       </li>
 
     </ol>
@@ -298,12 +384,13 @@
     </table>
 
     <h3>Grading Breakdown</h3>
+    <p style="font-size:9.5pt;color:#555;">Each symbol matches the assignment type on the timeline above.</p>
     <table class="info-tbl">
       <tr><th>Component</th><th style="text-align:right;">Weight</th></tr>
-      <tr><td>Weekly Labs &amp; Assignments</td><td class="num">35%</td></tr>
-      <tr><td>Quizzes</td><td class="num">20%</td></tr>
-      <tr><td>Midterm Project</td><td class="num">20%</td></tr>
-      <tr><td>Final Capstone Project</td><td class="num">25%</td></tr>
+      <tr><td><span class="type-row t-lab"><span class="type-chip"><svg class="ico"><use href="#i-lab"/></svg></span>Weekly Labs &amp; Assignments</span></td><td class="num">35%</td></tr>
+      <tr><td><span class="type-row t-quiz"><span class="type-chip"><svg class="ico"><use href="#i-quiz"/></svg></span>Quizzes</span></td><td class="num">20%</td></tr>
+      <tr><td><span class="type-row t-mid"><span class="type-chip"><svg class="ico"><use href="#i-mid"/></svg></span>Midterm Project</span></td><td class="num">20%</td></tr>
+      <tr><td><span class="type-row t-cap"><span class="type-chip"><svg class="ico"><use href="#i-cap"/></svg></span>Final Capstone Project</span></td><td class="num">25%</td></tr>
     </table>
 
   </div>
