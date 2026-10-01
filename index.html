@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — ST: Agentic Artificial Intelligence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: #1e1e1e;
+    background: #d8d8d8;
+  }
+
+  a { color: #6B0F1A; }
+
+  .doc-page {
+    background: white;
+    width: 816px;
+    max-width: calc(100% - 24px);
+    margin: 20px auto;
+    box-shadow: 0 3px 18px rgba(0,0,0,.20);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pg-hdr {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 13px 48px 9px; border-bottom: 1px solid #aaa;
+    font-size: 8pt; color: #555;
+  }
+  .pg-ftr {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 9px 48px 13px; border-top: 1px solid #aaa;
+    font-size: 8pt; color: #555; margin-top: auto;
+  }
+  .pg-body { flex: 1; padding: 26px 48px 24px; }
+
+  /* ── COVER ─────────────────────────────────────────── */
+  .cv-topbar {
+    background: #6B0F1A; padding: 17px 48px;
+    display: flex; justify-content: space-between; gap: 12px;
+    color: white; font-size: 8.5pt; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+  .cv-body { text-align: center; padding: 52px 64px 44px; }
+  .cv-univ  { font-size: 12.5pt; font-weight: 700; color: #6B0F1A; letter-spacing: .1em; text-transform: uppercase; }
+  .cv-rule  { width: 56px; height: 3px; background: #6B0F1A; margin: 18px auto 22px; }
+  .cv-tag   { font-size: 8.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #6B0F1A; margin-bottom: 10px; }
+  .cv-num   { font-size: 34pt; font-weight: 700; color: #1e1e1e; line-height: 1.05; }
+  .cv-title { font-size: 19pt; font-weight: 400; color: #333; margin: 6px 0 14px; line-height: 1.3; }
+  .cv-meta  { font-size: 9.5pt; color: #666; }
+
+  /* ── HEADINGS ──────────────────────────────────────── */
+  h1 {
+    font-size: 14pt; font-weight: 700; color: #6B0F1A;
+    padding-bottom: 6px; border-bottom: 1.5px solid #6B0F1A;
+    margin: 26px 0 11px; line-height: 1.3;
+  }
+  h1:first-child { margin-top: 0; }
+  h3 { font-size: 11pt; font-weight: 700; color: #2a2a2a; margin: 15px 0 6px; }
+  p { margin-bottom: 9px; }
+  ul { margin: 7px 0 11px; padding-left: 26px; }
+  li { margin-bottom: 5px; line-height: 1.55; }
+
+  /* ── CALLOUTS ──────────────────────────────────────── */
+  .callout { padding: 9px 14px 9px 16px; border-radius: 3px; margin: 11px 0; font-size: 10pt; line-height: 1.55; }
+  .callout-lbl { display: block; font-weight: 700; font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .note { background: #f0f4ff; border-left: 4px solid #1a4fa8; }
+  .note .callout-lbl { color: #1a4fa8; }
+  .def  { background: #fafafa; border: 1px solid #ddd; border-left: 4px solid #6B0F1A; }
+  .def .callout-lbl { color: #6B0F1A; }
+
+  /* ── INFO TABLE ────────────────────────────────────── */
+  .info-tbl { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.7pt; }
+  .info-tbl th { background: #6B0F1A; color: white; padding: 7px 10px; text-align: left; font-weight: 600; }
+  .info-tbl td { padding: 6px 10px; border: 1px solid #c0c0c0; vertical-align: top; overflow-wrap: anywhere; }
+  .info-tbl td:first-child { background: #f4f4f4; font-weight: 600; width: 34%; }
+  .info-tbl td.num { text-align: right; font-weight: 600; width: 20%; }
+
+  /* ── TIMELINE ──────────────────────────────────────── */
+  .tl { list-style: none; padding: 0; margin: 16px 0 6px; position: relative; }
+  .tl::before {
+    content: ""; position: absolute; top: 6px; bottom: 6px; left: 118px;
+    width: 2px; background: #d6b9bd;
+  }
+  .tl-item { display: flex; align-items: flex-start; margin-bottom: 16px; position: relative; }
+  .tl-date { width: 100px; flex-shrink: 0; text-align: right; padding-top: 10px; font-size: 8.5pt; color: #666; line-height: 1.4; }
+  .tl-date strong { display: block; font-size: 9.5pt; color: #1e1e1e; }
+  .tl-dot {
+    width: 38px; flex-shrink: 0; display: flex; justify-content: center; padding-top: 9px; position: relative; z-index: 1;
+  }
+  .tl-dot span {
+    width: 24px; height: 24px; border-radius: 50%; background: #6B0F1A; color: white;
+    font-size: 8.5pt; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 4px white;
+  }
+  .tl-card {
+    flex: 1; display: block; text-decoration: none; color: inherit;
+    border: 1px solid #d0d0d0; border-left: 4px solid #6B0F1A; border-radius: 3px;
+    padding: 10px 16px 11px; background: white;
+    transition: background .15s ease, box-shadow .15s ease;
+  }
+  a.tl-card:hover { background: #fbf6f6; box-shadow: 0 2px 10px rgba(107,15,26,.12); }
+  .tl-tag { font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #6B0F1A; }
+  .tl-title { font-size: 12pt; font-weight: 700; color: #1e1e1e; line-height: 1.35; margin: 1px 0 2px; }
+  .tl-sub { font-size: 9.5pt; color: #555; margin-bottom: 6px; }
+  .tl-links { font-size: 8.8pt; color: #666; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .tl-links a { color: #6B0F1A; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(107,15,26,.4); }
+
+  .tl-phase { display: flex; align-items: center; margin: 4px 0 14px; }
+  .tl-phase .tl-date { padding-top: 0; }
+  .tl-phase .tl-dot { padding-top: 0; }
+  .tl-phase .tl-dot span { width: 12px; height: 12px; background: white; border: 2px solid #6B0F1A; }
+  .tl-phase-lbl {
+    font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: #555; background: #f0f0f0; padding: 3px 10px; border-radius: 3px;
+  }
+
+  .tl-item.major .tl-dot span { width: 30px; height: 30px; background: #1e1e1e; font-size: 9pt; }
+  .tl-item.major .tl-card { border-left-color: #1e1e1e; background: #fafafa; }
+  .badge {
+    display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 10px;
+    background: #6B0F1A; color: white; font-size: 7.5pt; letter-spacing: .05em; vertical-align: 1px;
+  }
+
+  .tl-item.future .tl-dot span { background: white; border: 2px dashed #b9a0a4; color: #b9a0a4; }
+  .tl-item.future .tl-card { border: 1px dashed #c8c8c8; border-left: 4px solid #d6b9bd; color: #888; font-size: 9.5pt; }
+
+  @media (max-width: 640px) {
+    .pg-body { padding: 20px 18px; }
+    .pg-hdr, .pg-ftr, .cv-topbar { padding-left: 18px; padding-right: 18px; }
+    .pg-hdr span:last-child, .pg-ftr span:last-child, .cv-topbar span:last-child { display: none; }
+    .cv-body { padding: 36px 20px 30px; }
+    .tl::before { left: 15px; }
+    .tl-date { display: none; }
+    .tl-dot { width: 32px; }
+    .tl-mobile-date { display: block !important; }
+  }
+  .tl-mobile-date { display: none; font-size: 8.5pt; color: #666; }
+
+  @media print {
+    body { background: white; }
+    .doc-page { box-shadow: none; margin: 0; width: 100%; max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     COVER + COURSE OVERVIEW
+═══════════════════════════════════════════════════ -->
+<div class="doc-page">
+  <div class="cv-topbar">
+    <span>University of Montana</span>
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+  </div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-tag">Course Index &bull; Autumn Semester 2026</div>
+    <div class="cv-num">CSCI 391</div>
+    <div class="cv-title">ST: Agentic Artificial Intelligence</div>
+    <div class="cv-meta">Addison Boyer &nbsp;&bull;&nbsp; CRN 74616 &nbsp;&bull;&nbsp; 3 Credits &nbsp;&bull;&nbsp; August 24 &ndash; December 11, 2026</div>
+  </div>
+
+  <div class="pg-body" style="border-top: 1px solid #ddd;">
+
+    <h1>Course Overview</h1>
+    <p>This course explores the rapidly evolving field of Agentic Artificial Intelligence: AI systems capable of reasoning, planning, retrieving information, using tools, and autonomously completing tasks. Throughout the semester, you will learn how modern AI agents are designed and implemented using large language models (LLMs), orchestration frameworks, retrieval systems, memory architectures, and external APIs.</p>
+    <p>The course emphasizes practical engineering and hands-on development. <strong>Tuesdays</strong> cover concepts and architecture: agent architectures, LLM fundamentals, orchestration patterns, system design, ethics, and industry case studies. <strong>Thursdays</strong> are guided implementation labs: hands-on coding, debugging workshops, and collaborative engineering.</p>
+
+    <div class="callout def">
+      <span class="callout-lbl">Working Definition</span>
+      An <strong>Agentic AI System</strong> is software that, given a goal expressed in natural language, chooses its own next action from a set of tools, executes that action against an external environment, observes the result, and repeats the cycle until it judges the goal to be met or gives up.
+    </div>
+
+    <div class="callout note">
+      <span class="callout-lbl">📖 Required Textbook</span>
+      <strong>The Agentic AI Bible</strong> &mdash; Thomas R. Caldwell &mdash; <em>Building Autonomous AI Systems with Large Language Models, Tools, Memory, and Context.</em> Revised &amp; Expanded Edition, 2026.
+    </div>
+
+    <h1>Labs &amp; Projects Timeline</h1>
+    <p>Open each assignment document from its card below, then submit your work through the matching Canvas assignment.</p>
+
+    <ol class="tl">
+
+      <li class="tl-phase">
+        <div class="tl-date"></div>
+        <div class="tl-dot"><span></span></div>
+        <div class="tl-phase-lbl">Foundations and Mindset</div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-date"><strong>Thu 08/27</strong>Week 1</div>
+        <div class="tl-dot"><span>1</span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 08/27 &bull; Week 1</span>
+          <div class="tl-tag">Implementation Lab</div>
+          <div class="tl-title">Lab 1 &mdash; Environment Setup &amp; First Chatbot</div>
+          <div class="tl-sub">Configure the course environment, build a bare-bones chatbot with OpenRouter, then extend it with Tavily web search.</div>
+          <div class="tl-links">
+            <a href="Assignments/Labs/Lab1/Lab1.html">Open Lab 1 &rarr;</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/413443">Submit on Canvas</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-date"><strong>Thu 09/03</strong>Week 2</div>
+        <div class="tl-dot"><span>2</span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 09/03 &bull; Week 2</span>
+          <div class="tl-tag">Implementation Lab</div>
+          <div class="tl-title">Lab 2 &mdash; Agent Anatomy &amp; Automation</div>
+          <div class="tl-sub">Building a Minimum Viable ReAct Agent. Continued 09/10 with the Coffee Shop Agent example.</div>
+          <div class="tl-links">
+            <a href="Assignments/Labs/Lab2/Lab2.html">Open Lab 2 &rarr;</a>
+            <a href="09_10_2026/coffee_shop_agent.py">Coffee Shop Agent</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/415059">Submit on Canvas</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-phase">
+        <div class="tl-date"></div>
+        <div class="tl-dot"><span></span></div>
+        <div class="tl-phase-lbl">Core Capabilities</div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-date"><strong>Thu 09/17</strong>Week 3</div>
+        <div class="tl-dot"><span>3</span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 09/17 &bull; Week 3</span>
+          <div class="tl-tag">Implementation Lab</div>
+          <div class="tl-title">Lab 3 &mdash; Hardening the Agent</div>
+          <div class="tl-sub">Reliability, Observability, and Drift in Production-Grade ReAct Agents.</div>
+          <div class="tl-links">
+            <a href="Assignments/Labs/Lab3/Lab3.html">Open Lab 3 &rarr;</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/417355">Submit on Canvas</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-date"><strong>Thu 09/24</strong>Week 4</div>
+        <div class="tl-dot"><span>4</span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 09/24 &bull; Week 4</span>
+          <div class="tl-tag">Implementation Lab</div>
+          <div class="tl-title">Lab 4 &mdash; Tool Routing</div>
+          <div class="tl-sub">A Meta Tool That Picks the Toolset Before the Agent Runs.</div>
+          <div class="tl-links">
+            <a href="Assignments/Labs/Lab4/Lab4.html">Open Lab 4 &rarr;</a>
+            <a href="Assignments/Labs/Lab4/schema_example.py">Schema Example</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/418385">Submit on Canvas</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item major">
+        <div class="tl-date"><strong>Thu 10/01</strong>Weeks 6&ndash;11</div>
+        <div class="tl-dot"><span>M</span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 10/01 &bull; Weeks 6&ndash;11</span>
+          <div class="tl-tag">Midterm Project <span class="badge">Current</span></div>
+          <div class="tl-title">Encore &mdash; A ListenBrainz Music Agent That Remembers 🤘</div>
+          <div class="tl-sub">Tools, Reliability, and Working, Episodic, Semantic, and Procedural Memory &mdash; with a Final Presentation.</div>
+          <div class="tl-links">
+            <a href="Assignments/Midterm/Midterm.html">Open Midterm &rarr;</a>
+            <a href="Assignments/Midterm/encore_starter.zip">Starter Code (.zip)</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/419218">Submit on Canvas</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item future">
+        <div class="tl-date"><strong>Coming Up</strong></div>
+        <div class="tl-dot"><span>&hellip;</span></div>
+        <div class="tl-card">More labs and the Final Capstone Project will be added as the semester progresses.</div>
+      </li>
+
+    </ol>
+
+    <h1>Course Information</h1>
+    <table class="info-tbl">
+      <tr><td>Instructor</td><td>Addison Boyer &mdash; <a href="mailto:addison.boyer@mso.umt.edu">addison.boyer@mso.umt.edu</a></td></tr>
+      <tr><td>Office &amp; Hours</td><td>Social Science 410 &mdash; Monday &amp; Friday, 11:00 a.m. &ndash; 12:00 p.m., or by appointment</td></tr>
+      <tr><td>Lecture / Lab</td><td>Tuesday &amp; Thursday, 3:30 &ndash; 4:50 p.m., Social Science 362</td></tr>
+      <tr><td>Syllabus</td><td><a href="CSCI391_ST_Agentic_AI_Syllabus_Autumn2026.docx">CSCI391_ST_Agentic_AI_Syllabus_Autumn2026.docx</a></td></tr>
+      <tr><td>Repository</td><td><a href="https://github.com/addiboyer24/CSCI391_ST_AgenticAI_Autumn2026">github.com/addiboyer24/CSCI391_ST_AgenticAI_Autumn2026</a></td></tr>
+    </table>
+
+    <h3>Grading Breakdown</h3>
+    <table class="info-tbl">
+      <tr><th>Component</th><th style="text-align:right;">Weight</th></tr>
+      <tr><td>Weekly Labs &amp; Assignments</td><td class="num">35%</td></tr>
+      <tr><td>Quizzes</td><td class="num">20%</td></tr>
+      <tr><td>Midterm Project</td><td class="num">20%</td></tr>
+      <tr><td>Final Capstone Project</td><td class="num">25%</td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr">
+    <span>University of Montana &mdash; Autumn 2026</span>
+    <span>CSCI 391 &mdash; Agentic Artificial Intelligence</span>
+  </div>
+</div>
+
+</body>
+</html>
