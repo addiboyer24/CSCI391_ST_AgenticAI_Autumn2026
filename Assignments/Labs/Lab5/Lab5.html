@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSCI 391 — Lab 5 (Extra Credit): Model Context Protocol</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif; font-size:10.5pt; line-height:1.65; color:#1e1e1e; background:#d8d8d8; }
+  .doc-page { background:#fff; width:816px; min-height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; }
+  .cover-page { background:#fff; width:816px; height:1056px; margin:20px auto; box-shadow:0 3px 18px rgba(0,0,0,.20); display:flex; flex-direction:column; overflow:hidden; }
+  .pg-hdr { display:flex; justify-content:space-between; padding:13px 48px 9px; border-bottom:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; }
+  .pg-ftr { display:flex; justify-content:space-between; padding:9px 48px 13px; border-top:1px solid #aaa; font-size:8pt; color:#555; flex-shrink:0; margin-top:auto; }
+  .pg-body { flex:1; padding:26px 48px 20px; }
+
+  .cv-topbar { background:#6B0F1A; padding:17px 48px; display:flex; justify-content:space-between; color:white; font-size:8.5pt; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+  .cv-body { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 64px; }
+  .cv-univ { font-size:12.5pt; font-weight:700; color:#6B0F1A; letter-spacing:.1em; text-transform:uppercase; }
+  .cv-rule { width:56px; height:3px; background:#6B0F1A; margin:18px auto 22px; }
+  .cv-course { font-size:11.5pt; color:#333; margin-bottom:4px; }
+  .cv-sem { font-size:10pt; color:#666; margin-bottom:52px; }
+  .cv-tag { font-size:8.5pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#6B0F1A; margin-bottom:10px; }
+  .cv-num { font-size:38pt; font-weight:700; color:#1e1e1e; line-height:1; }
+  .cv-title { font-size:19pt; font-weight:400; color:#333; margin-bottom:12px; line-height:1.3; }
+  .cv-subtitle { font-size:10.5pt; color:#666; margin-bottom:28px; }
+  .cv-meta { font-size:9.5pt; color:#666; }
+  .cv-ftr { padding:15px 48px; border-top:1px solid #ddd; display:flex; justify-content:space-between; font-size:8.5pt; color:#666; }
+
+  h1 { font-size:14pt; font-weight:700; color:#6B0F1A; padding-bottom:6px; border-bottom:1.5px solid #6B0F1A; margin:22px 0 11px; line-height:1.3; }
+  h1:first-child { margin-top:0; }
+  h2 { font-size:12pt; font-weight:700; color:#6B0F1A; padding-bottom:5px; border-bottom:1.5px solid #6B0F1A; margin:20px 0 9px; line-height:1.3; }
+  h3 { font-size:11pt; font-weight:700; color:#2a2a2a; margin:15px 0 6px; }
+  p { margin-bottom:9px; }
+  ol,ul { margin:7px 0 11px; padding-left:26px; }
+  li { margin-bottom:5px; line-height:1.55; }
+  ul { list-style-type:disc; }
+  code { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:8.8pt; background:#f0f0f0; padding:1px 5px; border-radius:3px; color:#2a2a2a; }
+
+  .cb { font-family:'JetBrains Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f2f2f2; border:1px solid #d0d0d0; border-radius:4px; padding:9px 16px; margin:9px 0 11px; color:#1a1a1a; white-space:pre-wrap; line-height:1.5; }
+  .callout { padding:9px 14px 9px 16px; border-radius:3px; margin:11px 0; font-size:10pt; line-height:1.55; }
+  .callout-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+  .warn { background:#fff4f0; border-left:4px solid #b71c1c; } .warn .callout-lbl { color:#b71c1c; }
+  .note { background:#f0f4ff; border-left:4px solid #1a4fa8; } .note .callout-lbl { color:#1a4fa8; }
+  .tip { background:#f0faf4; border-left:4px solid #1a7a3c; } .tip .callout-lbl { color:#1a7a3c; }
+  .doc-ref { background:#f8f6ff; border:1px solid #c9bfee; border-left:4px solid #5c35b5; border-radius:3px; padding:9px 14px; margin:9px 0 13px; font-size:9.5pt; line-height:1.6; }
+  .doc-ref .doc-ref-lbl { display:block; font-weight:700; font-size:8pt; text-transform:uppercase; letter-spacing:.06em; color:#5c35b5; margin-bottom:5px; }
+  .doc-ref a { color:#5c35b5; text-decoration:none; font-weight:500; }
+  .step-list { counter-reset:steps; list-style:none; padding-left:0; margin:10px 0 13px; }
+  .step-list li { counter-increment:steps; display:flex; gap:13px; margin-bottom:9px; align-items:flex-start; }
+  .step-list li::before { content:counter(steps); min-width:22px; height:22px; background:#6B0F1A; color:white; border-radius:50%; font-size:8.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  .flow { border:1px solid #ccc; background:#fafafa; padding:12px 16px; margin:10px 0 13px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:9pt; line-height:1.9; }
+  .flow strong { color:#6B0F1A; }
+  .taxonomy { width:100%; border-collapse:collapse; margin:8px 0 12px; font-size:9.4pt; }
+  .taxonomy th { background:#6B0F1A; color:white; padding:7px 9px; text-align:left; }
+  .taxonomy td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .taxonomy td:first-child { background:#f4f4f4; font-weight:700; width:22%; }
+  .obs-tbl { width:100%; border-collapse:collapse; margin:8px 0 10px; font-size:9.7pt; }
+  .obs-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; }
+  .obs-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:top; }
+  .obs-tbl td:first-child { background:#f4f4f4; font-weight:600; width:31%; }
+  .cmp-tbl { width:100%; border-collapse:collapse; margin:7px 0 9px; font-size:9.6pt; }
+  .cmp-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .cmp-tbl td { padding:7px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .cmp-tbl td:first-child { background:#f4f4f4; font-weight:600; width:34%; }
+  .chk-group { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .chk { display:inline-flex; align-items:center; gap:4px; font-size:9.5pt; white-space:nowrap; }
+  .chk input { width:13px; height:13px; accent-color:#6B0F1A; }
+  .write-box { display:block; width:100%; min-height:70px; border:1px solid #bbb; border-radius:3px; padding:7px 10px; margin-top:5px; color:#bbb; }
+  .write-sm { min-height:42px; }
+  .prompt { background:#fafafa; border:1px solid #ddd; border-left:4px solid #6B0F1A; padding:7px 14px; margin:5px 0 9px; font-style:italic; font-size:10pt; color:#333; }
+  .blank { display:inline-block; border-bottom:1px solid #aaa; min-width:120px; height:17px; vertical-align:bottom; }
+  .blank-full { display:block; width:100%; border-bottom:1px solid #aaa; min-height:20px; margin-top:3px; }
+  .src-hdr { background:#2e2e2e; color:#e8e8e8; font-family:'JetBrains Mono',monospace; font-size:8pt; font-weight:600; padding:6px 16px; border-radius:4px 4px 0 0; margin-top:14px; display:flex; justify-content:space-between; }
+  .cb-src { font-family:'JetBrains Mono',Consolas,monospace; font-size:7.5pt; background:#fcfcfc; border:1px solid #ccc; border-top:2px solid #6B0F1A; border-radius:0 0 4px 4px; padding:12px 16px; margin-bottom:14px; white-space:pre-wrap; line-height:1.52; }
+  .tc { color:#b05000; font-weight:600; }
+  .cm { color:#707070; }
+  .rubric { width:100%; border-collapse:collapse; margin:7px 0 12px; font-size:9.3pt; }
+  .rubric th { background:#3a3a3a; color:white; padding:7px 9px; text-align:left; }
+  .rubric td { border:1px solid #c0c0c0; padding:6px 9px; vertical-align:top; }
+  .rubric td:first-child { width:26%; font-weight:600; background:#f4f4f4; }
+  .page-break { page-break-before:always; }
+
+  .focus-note { font-size:8.8pt; color:#666; font-style:italic; margin-bottom:5px; }
+  .ag-tbl { width:100%; border-collapse:collapse; margin:8px 0 11px; font-size:9.6pt; }
+  .ag-tbl th { background:#6B0F1A; color:white; padding:7px 10px; text-align:left; font-weight:600; }
+  .ag-tbl td { padding:6px 10px; border:1px solid #c0c0c0; vertical-align:middle; }
+  .ag-tbl td:first-child { background:#f4f4f4; font-weight:500; width:46%; }
+  .ag-tbl td:nth-child(2), .ag-tbl td:nth-child(3) { width:8%; text-align:center; }
+  .ag-tbl td:last-child { width:38%; }
+  a.dl { color:#6B0F1A; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(107,15,26,.4); }
+  .mt0  { margin-top:0 !important; }
+  .mt8  { margin-top:8px !important; }
+  .mt12 { margin-top:12px !important; }
+  .mt16 { margin-top:16px !important; }
+  .mt20 { margin-top:20px !important; }
+  .mb8  { margin-bottom:8px !important; }
+  .mb12 { margin-bottom:12px !important; }
+  .mb16 { margin-bottom:16px !important; }
+  @media print {
+    body { background:white; }
+    .doc-page,.cover-page { box-shadow:none; margin:0; width:100%; page-break-after:always; }
+    @page { size:letter; margin:.55in .75in .6in; }
+    h1,h2,h3 { page-break-after:avoid; }
+    .cb,.cb-src,table,.flow { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-page">
+  <div class="cv-topbar"><span>University of Montana</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+  <div class="cv-body">
+    <div class="cv-univ">University of Montana</div>
+    <div class="cv-rule"></div>
+    <div class="cv-course">CSCI 391 — ST: Agentic Artificial Intelligence</div>
+    <div class="cv-sem">Autumn Semester 2026</div>
+    <div class="cv-tag">Extra Credit Lab • Week 5</div>
+    <div class="cv-num">Lab 5</div>
+    <div class="cv-title">Model Context Protocol</div>
+    <div class="cv-subtitle">Build an MCP Server with Gradio and Connect It to an Off-the-Shelf Client</div>
+    <div class="cv-meta">CSCI 391 — ST: Agentic Artificial Intelligence &nbsp;•&nbsp; Autumn Semester 2026</div>
+  </div>
+  <div class="cv-ftr"><span>University of Montana — Autumn 2026</span><span>CSCI 391 — Agentic Artificial Intelligence</span></div>
+</div>
+
+<!-- PAGE: Extra credit / Prerequisites / Overview -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <div class="callout tip mt0">
+      <span class="callout-lbl">★ Extra Credit</span>
+      This lab is optional. It takes about an hour, and Lab 6 does not depend on it. Everything runs on your own machine plus a web browser — no Node.js, no API keys, and no deployment.
+    </div>
+
+    <h1>Prerequisites</h1>
+    <p><strong>Read Chapter 9, "Model Context Protocol," from <em>The Agentic AI Bible</em> by Thomas R. Caldwell.</strong> Focus on the three connection phases (initialization, discovery, invocation) and on what MCP standardizes (the envelope) versus what it leaves to you (what each tool means).</p>
+
+    <h1>Lab Overview</h1>
+    <p>In Labs 2–4 every tool lived inside your agent's script, with schemas you typed by hand. MCP moves tools into a <strong>server</strong>. Any MCP <strong>client</strong> connects, asks what the server offers (<code>tools/list</code>), and calls what it needs (<code>tools/call</code>). The client learns the tools at runtime, not when you write the code.</p>
+    <p>You will build a small <strong>Review Toolkit</strong> server with Gradio, following the Hugging Face MCP Course, and connect it to the <strong>MCPJam</strong> web app, an MCP client with a built-in LLM chat. You write no client code.</p>
+    <div class="flow">MCPJam web app (client + LLM)<br>↓ &nbsp;JSON-RPC 2.0 over HTTPS&nbsp; ↓<br>Gradio share link &nbsp;(https://xxxx.gradio.live)<br>↓<br><strong>your app.py</strong> &nbsp;→&nbsp; sentiment_analysis() · text_statistics() · rank_sentences()</div>
+
+    <h1>Learning Objectives</h1>
+    <ul>
+      <li>Expose Python functions as MCP tools with Gradio's <code>mcp_server=True</code>.</li>
+      <li>Explain how docstrings, type hints, and input components become a tool's JSON Schema.</li>
+      <li>Call MCP tools by hand and through an LLM, and explain how descriptions drive the LLM's choice.</li>
+    </ul>
+    <div class="doc-ref">
+      <span class="doc-ref-lbl">📖 Reference Documentation</span>
+      <strong>Hugging Face MCP Course — Building the Gradio MCP Server</strong><br>
+      <a href="https://huggingface.co/learn/mcp-course/en/unit2/gradio-server" target="_blank">Unit 2: Building the Gradio MCP Server ↗</a><br>
+      <strong>Gradio — Building an MCP Server</strong><br>
+      <a href="https://www.gradio.app/guides/building-mcp-server-with-gradio" target="_blank">Building an MCP Server with Gradio ↗</a>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE: Part 0 setup + Part 1 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 0 — Setup</h1>
+    <p>Use a fresh virtual environment, since Gradio brings many dependencies:</p>
+    <div class="cb">mkdir Lab5 &amp;&amp; cd Lab5
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install "gradio[mcp]" textblob</div>
+
+    <h1>Part 1 — How Gradio Builds an MCP Tool</h1>
+    <p>When you call <code>demo.launch(mcp_server=True)</code>, Gradio turns every function behind a <code>gr.Interface</code> into an MCP tool. You never write a JSON Schema — Gradio derives it from your code:</p>
+    <table class="cmp-tbl">
+      <thead><tr><th>In your code</th><th>In the published tool</th></tr></thead>
+      <tbody>
+        <tr><td>Function name</td><td>Tool <code>name</code></td></tr>
+        <tr><td>Docstring summary + <code>Returns:</code></td><td>Tool <code>description</code></td></tr>
+        <tr><td><code>Args:</code> entry for a parameter</td><td>That property's <code>description</code></td></tr>
+        <tr><td>Type hint (<code>str</code>, <code>int</code>)</td><td>Property <code>type</code></td></tr>
+        <tr><td><code>gr.Radio([...])</code> input</td><td>Property <code>enum</code> — the Lab 4 pattern, generated for you</td></tr>
+        <tr><td>Input component <code>value=</code></td><td>Property <code>default</code>; the parameter is no longer <code>required</code></td></tr>
+      </tbody>
+    </table>
+    <p>For example, the provided <code>sentiment_analysis</code> function is published as:</p>
+    <div class="cb">{
+  "name": "sentiment_analysis",
+  "description": "Analyze the sentiment of the given text. Returns: str: A JSON ...",
+  "inputSchema": {
+    "type": "object",
+    "properties": {"text": {"type": "string", "description": "The text to analyze"}},
+    "required": ["text"]
+  }
+}</div>
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ No Docstring, No Description</span>
+      A function with no docstring is still published — with <code>"description": ""</code> on the tool and on every parameter. Gradio will not warn you. You will see what that does to an LLM in Part 5.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE: Part 2 implement -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 2 — Implement the Server</h1>
+    <p>Create <code>review_toolkit_starter.py</code> in your Lab5 folder from the listing in Part 3. Complete every <code>TODO</code>, then save the finished file as <code>app.py</code>. <code>sentiment_analysis</code> is the tool from the Hugging Face course and is already complete. You add two more:</p>
+    <ol class="step-list">
+      <li><div><strong>Statistics (TODO 1).</strong> Implement <code>text_statistics</code>: return JSON with <code>word_count</code>, <code>sentence_count</code>, and <code>avg_sentence_length</code> (rounded to one decimal). Use the provided <code>split_words</code> and <code>split_sentences</code> helpers. Write a docstring with a summary line, an <code>Args:</code> block, and a <code>Returns:</code> line.</div></li>
+      <li><div><strong>Ranking (TODO 2).</strong> Implement <code>rank_sentences</code>: score each sentence's polarity, sort according to <code>order</code>, and return the first <code>top_k</code> as a JSON list of <code>{"sentence", "polarity"}</code> objects. Its docstring must describe <em>all three</em> parameters — say what each value of <code>order</code> means.</div></li>
+      <li><div><strong>Register (TODO 3).</strong> Add one <code>gr.Interface</code> per new tool to the <code>gr.TabbedInterface</code> and give each a tab name. For <code>rank_sentences</code>, use a <code>gr.Radio</code> for <code>order</code> so the schema gets an <code>enum</code>, and <code>gr.Number(precision=0)</code> for <code>top_k</code> so it is an integer.</div></li>
+      <li><div><strong>Launch (TODO 4).</strong> Start the MCP server and a public share link: <code>demo.launch(mcp_server=True, share=True)</code>.</div></li>
+    </ol>
+    <div class="callout note">
+      <span class="callout-lbl">ℹ Why a Share Link?</span>
+      The MCPJam web app runs in your browser but connects only to <strong>HTTPS</strong> servers, and your server runs on plain <code>http://127.0.0.1</code>. <code>share=True</code> opens a temporary public <code>https://….gradio.live</code> tunnel to your machine. It lasts about a week and closes when you stop <code>app.py</code>.
+    </div>
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Why the Helpers?</span>
+      TextBlob's own <code>.words</code> and <code>.sentences</code> need an extra NLTK download (<code>punkt_tab</code>) that a fresh machine does not have, so the tool would error on every call. The regex helpers avoid it. Sentiment scoring does not need it.
+    </div>
+    <h3>Debugging Tip</h3>
+    <p>When a tool raises an exception, MCP clients see only <em>"The upstream Gradio app has raised an exception but has not enabled verbose error reporting."</em> While developing, add <code>show_error=True</code> to <code>launch()</code> and read the full traceback in the terminal running <code>app.py</code>.</p>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE: Part 3 starter 1 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 3 — Starter Implementation</h1>
+    <div class="src-hdr">review_toolkit_starter.py <span>complete every TODO before running</span></div>
+    <div class="cb-src">import json
+import re
+
+import gradio as gr
+from textblob import TextBlob
+
+
+# ---------------------------------------------------------------------------
+# Helpers (provided). They avoid TextBlob features that need extra downloads.
+# ---------------------------------------------------------------------------
+def split_sentences(text):
+    """Split text into sentences on . ! or ? followed by whitespace."""
+    return [s.strip() for s in re.split(r"(?&lt;=[.!?])\s+", text.strip()) if s.strip()]
+
+
+def split_words(text):
+    """Return the words in text (letters, digits, and apostrophes)."""
+    return re.findall(r"[A-Za-z0-9']+", text)
+
+
+# ---------------------------------------------------------------------------
+# Tool 1 (provided): from the Hugging Face MCP Course, Unit 2
+# ---------------------------------------------------------------------------
+def sentiment_analysis(text: str) -&gt; str:
+    """
+    Analyze the sentiment of the given text.
+
+    Args:
+        text (str): The text to analyze
+
+    Returns:
+        str: A JSON string containing polarity, subjectivity, and assessment
+    """
+    sentiment = TextBlob(text).sentiment
+    result = {
+        "polarity": round(sentiment.polarity, 2),          # -1 (negative) to 1 (positive)
+        "subjectivity": round(sentiment.subjectivity, 2),  # 0 (objective) to 1 (subjective)
+        "assessment": "positive" if sentiment.polarity &gt; 0
+                      else "negative" if sentiment.polarity &lt; 0 else "neutral",
+    }
+    return json.dumps(result)</div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE: Part 3 starter 2 -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <div class="src-hdr">review_toolkit_starter.py (continued) <span>complete every TODO before running</span></div>
+    <div class="cb-src"># ---------------------------------------------------------------------------
+# Tool 2: word and sentence counts
+# ---------------------------------------------------------------------------
+def text_statistics(text: str) -&gt; str:
+    <span class="tc"># TODO 1: write a Google-style docstring (summary line, Args:, Returns:)</span>
+    <span class="tc"># TODO 1: return json.dumps of {"word_count", "sentence_count",</span>
+<span class="tc">    #         "avg_sentence_length"} using split_words / split_sentences.</span>
+<span class="tc">    #         Round the average to 1 decimal; guard against 0 sentences.</span>
+    raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# Tool 3: rank sentences by sentiment
+# ---------------------------------------------------------------------------
+def rank_sentences(text: str, order: str, top_k: int) -&gt; str:
+    <span class="tc"># TODO 2: write a docstring whose Args: block describes ALL three parameters</span>
+    <span class="tc"># TODO 2: score each sentence with TextBlob(sentence).sentiment.polarity,</span>
+<span class="tc">    #         sort by order ("most_positive" = highest first,</span>
+<span class="tc">    #         "most_negative" = lowest first), and return json.dumps of the</span>
+<span class="tc">    #         first top_k items as [{"sentence": ..., "polarity": ...}, ...]</span>
+    raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# One gr.Interface per tool. Each becomes one tab in the UI AND one MCP tool.
+# ---------------------------------------------------------------------------
+demo = gr.TabbedInterface(
+    [
+        gr.Interface(fn=sentiment_analysis, inputs=gr.Textbox(label="Text"), outputs=gr.Textbox()),
+        <span class="tc"># TODO 3: add a gr.Interface for text_statistics (one Textbox in, one out)</span>
+        <span class="tc"># TODO 3: add a gr.Interface for rank_sentences with three inputs:</span>
+<span class="tc">        #         gr.Textbox, gr.Radio(["most_positive", "most_negative"], value=...),</span>
+<span class="tc">        #         and gr.Number(value=3, precision=0)</span>
+    ],
+    tab_names=["Sentiment"],  <span class="tc"># TODO 3: one name per tab</span>
+    title="Review Toolkit",
+)
+
+if __name__ == "__main__":
+    demo.launch()  <span class="tc"># TODO 4: start the MCP server and create a public share link</span></div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE: Part 4 run + connect -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 4 — Run and Connect</h1>
+    <h3>Step A — Run the server</h3>
+    <div class="cb">python app.py</div>
+    <p>Gradio prints a local URL and, after a few seconds, a public one:</p>
+    <div class="cb">* Running on local URL:  http://127.0.0.1:7860
+* Running on public URL: https://xxxx.gradio.live</div>
+    <p>Open <code>http://127.0.0.1:7860/gradio_api/mcp/schema</code> and confirm all three tools have descriptions and <code>order</code> has an <code>enum</code>.</p>
+
+    <h3>Step B — Connect MCPJam</h3>
+    <ol class="step-list">
+      <li><div>Open <a class="dl" href="https://app.mcpjam.com" target="_blank">app.mcpjam.com</a> in your browser.</div></li>
+      <li><div>Add a server with the <strong>HTTP</strong> connection type and your public URL plus the MCP path — keep the trailing slash:<div class="cb">https://xxxx.gradio.live/gradio_api/mcp/</div></div></li>
+      <li><div>Connect — MCPJam runs <code>initialize</code> and <code>tools/list</code> — then run each tool by hand on this review:</div></li>
+    </ol>
+    <div class="prompt">The trail to the summit was absolutely beautiful. Parking was a nightmare. The rangers were friendly and helpful! The bathrooms were disgusting.</div>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:38%">Call</th><th>Expected result</th></tr></thead>
+      <tbody>
+        <tr><td><code>sentiment_analysis</code></td><td><code>{"polarity": 0.11, "subjectivity": 0.83, "assessment": "positive"}</code></td></tr>
+        <tr><td><code>text_statistics</code></td><td><code>{"word_count": 22, "sentence_count": 4, "avg_sentence_length": 5.5}</code></td></tr>
+        <tr><td><code>rank_sentences</code><br>order=most_negative, top_k=2</td><td>"The bathrooms were disgusting." (−1.0), then "Parking was a nightmare." (0.0)</td></tr>
+      </tbody>
+    </table>
+    <p>Then call <code>rank_sentences</code> with <code>order</code> set to <code>worst</code> and record the error.</p>
+    <div class="callout warn">
+      <span class="callout-lbl">⚠ If the Share Link Fails</span>
+      Some networks block Gradio's tunnel. Install the <strong>MCPJam desktop app</strong> (Mac/Windows, no Node.js) from <a href="https://www.mcpjam.com" target="_blank">mcpjam.com</a> and connect it to <code>http://127.0.0.1:7860/gradio_api/mcp/</code> instead.
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE: Part 5 LLM picks + break -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 5 — Let a Model Choose</h1>
+    <p>Open MCPJam's chat, make sure your server is enabled, and pick one of the free models (some require a free MCPJam sign-in). Send each prompt in a <strong>new chat</strong>, pasting the Part 4 review for <code>&lt;REVIEW&gt;</code>, and check the trace view for the tool call.</p>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:56%">Prompt</th><th>Expected tool call</th></tr></thead>
+      <tbody>
+        <tr><td>1. Is this review positive or negative overall? &lt;REVIEW&gt;</td><td><code>sentiment_analysis</code></td></tr>
+        <tr><td>2. How many sentences and words are in this review? &lt;REVIEW&gt;</td><td><code>text_statistics</code></td></tr>
+        <tr><td>3. What are the two worst things this reviewer said? &lt;REVIEW&gt;</td><td><code>rank_sentences</code><br>order=most_negative, top_k=2</td></tr>
+        <tr><td>4. What is the tallest mountain in Montana?</td><td>No tool</td></tr>
+      </tbody>
+    </table>
+    <div class="callout note">
+      <span class="callout-lbl">ℹ A Correct Call Can Still Be a Wrong Answer</span>
+      TextBlob scores "Parking was a nightmare." as 0.0 — its word list has no entry for "nightmare." Note whether the model repeats that score or overrides it. Agents inherit the limits of their tools.
+    </div>
+
+    <h3>Now Remove the Descriptions</h3>
+    <p>Copy <code>app.py</code> to <code>app_nodoc.py</code>, delete the docstrings from <code>text_statistics</code> and <code>rank_sentences</code>, and rename them <code>tool_a</code> and <code>tool_b</code> (including the matching <code>fn=</code> arguments). Stop <code>app.py</code>, run <code>app_nodoc.py</code>, reconnect MCPJam to its new share URL, and rerun prompts 1–4 with the same model.</p>
+    <div class="callout tip">
+      <span class="callout-lbl">💡 Lab Focus</span>
+      Watch the arguments, not just the tool. Without an <code>Args:</code> description, does the model still guess that <code>top_k</code> means "how many"? The <code>enum</code> on <code>order</code> survives, because it comes from <code>gr.Radio</code>, not from the docstring.
+    </div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 8</span></div>
+</div>
+
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body">
+    <h1>Part 6 — Submission</h1>
+    <p>Submit the completed Student Observation Workbook together with:</p>
+    <ul>
+      <li>Your completed <code>app.py</code>.</li>
+      <li>A screenshot of MCPJam's chat trace for prompt 3 showing the <code>rank_sentences</code> call and its arguments.</li>
+    </ul>
+    <h2>To Earn Credit</h2>
+    <table class="rubric">
+      <thead><tr><th>Requirement</th><th>Standard</th></tr></thead>
+      <tbody>
+        <tr><td>Working tools</td><td>All three tools appear in MCPJam and return the Part 4 expected results.</td></tr>
+        <tr><td>Schema quality</td><td>Every tool and parameter has a description; <code>order</code> has an <code>enum</code> and <code>top_k</code> is an <code>integer</code>.</td></tr>
+        <tr><td>Workbook</td><td>Sections A–C are complete, including both columns of Section B.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 9</span></div>
+</div>
+
+<!-- WORKBOOK DIVIDER -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Model Context Protocol</span></div>
+  <div class="pg-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:800px;">
+    <div style="text-align:center;max-width:480px;">
+      <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6B0F1A;margin-bottom:14px;">Lab 5 (Extra Credit) — Autumn 2026</div>
+      <div style="font-size:30pt;font-weight:700;color:#1e1e1e;line-height:1.15;margin-bottom:20px;">Student Observation<br>Workbook</div>
+      <div style="width:60px;height:3px;background:#6B0F1A;margin:0 auto 24px;"></div>
+      <div style="font-size:11pt;color:#444;line-height:1.7;">Use this section to record the results of your tests and experiment. Complete the checkboxes and short evidence prompts rather than writing open-ended essays.</div>
+    </div>
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 10</span></div>
+</div>
+
+<!-- WORKBOOK A/B -->
+<div class="doc-page">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <p><strong>Name:</strong> <span class="blank" style="min-width:220px;"></span> &nbsp;&nbsp; <strong>Date:</strong> <span class="blank" style="min-width:140px;"></span></p>
+
+    <h1 class="mt12">A. Manual Calls (Part 4)</h1>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:34%">Call</th><th style="width:22%">Matches expected?</th></tr></thead>
+      <tbody>
+        <tr><td><code>sentiment_analysis</code></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td><code>text_statistics</code></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+        <tr><td><code>rank_sentences</code></td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+      </tbody>
+    </table>
+    <table class="obs-tbl">
+      <tr><td>Error returned for <code>order="worst"</code></td><td><span class="blank-full"></span></td></tr>
+      <tr><td>Did your <code>rank_sentences</code> code run?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes</label><label class="chk"><input type="checkbox"> No</label></div></td></tr>
+    </table>
+
+    <h1 class="mt20">B. Model Tool Selection (Part 5)</h1>
+    <p>Model used: <span class="blank" style="min-width:280px;"></span></p>
+    <table class="cmp-tbl">
+      <thead><tr><th style="width:8%">#</th><th>With descriptions: tool + args</th><th>No descriptions: tool + args</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>2</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>3</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>4</td><td><span class="blank-full"></span></td><td><span class="blank-full"></span></td></tr>
+        <tr><td>Correct (x / 4)</td><td><span class="blank" style="min-width:80px;"></span></td><td><span class="blank" style="min-width:80px;"></span></td></tr>
+      </tbody>
+    </table>
+    <table class="obs-tbl">
+      <tr><td>Prompt 3: did the model treat "Parking was a nightmare." as negative?</td><td><div class="chk-group"><label class="chk"><input type="checkbox"> Yes, despite the 0.0</label><label class="chk"><input type="checkbox"> No, it trusted the score</label></div></td></tr>
+    </table>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>Page 11</span></div>
+</div>
+
+<!-- WORKBOOK C — Final Reflection -->
+<div class="doc-page" style="margin-bottom:24px;">
+  <div class="pg-hdr"><span>CSCI 391 — Agentic Artificial Intelligence</span><span>Lab 5 (Extra Credit) — Student Observation Workbook</span></div>
+  <div class="pg-body">
+
+    <h1>C. Final Lab Reflection</h1>
+    <p>Answer the following questions. Keep each response to 2–4 sentences.</p>
+
+    <h3>1. MCPJam had never seen your server before you connected it, yet it called your tools correctly. Which MCP message made that possible, and what did it return?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>2. Using your Section B results, explain why "MCP lets any agent use any tool" is only half true.</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <h3>3. The <code>order="worst"</code> call never reached your function. Why is it useful that the schema is enforced before your code runs?</h3>
+    <div class="write-box mt8 mb16"></div>
+
+    <div class="callout tip">
+      <span class="callout-lbl">Final Thought</span>
+      MCP standardizes the envelope: discovery, invocation, and transport. Whether a model can use your tool still depends on what you put inside — a clear name, an honest description, and a schema that rules out bad input.
+    </div>
+
+  </div>
+  <div class="pg-ftr"><span>University of Montana — Autumn 2026</span><span>University of Montana &nbsp;|&nbsp; CSCI 391 — Agentic Artificial Intelligence &nbsp;|&nbsp; Lab 5 (Extra Credit)</span></div>
+</div>
+
+</body>
+
+</html>
