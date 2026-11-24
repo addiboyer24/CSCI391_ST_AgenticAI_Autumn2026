@@ -135,6 +135,8 @@
     display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 10px;
     background: #70002e; color: white; font-size: 7.5pt; letter-spacing: .05em; vertical-align: 1px;
   }
+  .badge.done { background: #8a8a8a !important; }
+  .badge.xc { background: #1a4fa8 !important; }
 
   .tl-item.future .tl-dot span { background: white; border: 2px dashed #b9a0a4; color: #b9a0a4; }
 
@@ -151,6 +153,14 @@
   .tl-item.t-quiz .tl-title { font-size: 11pt; }
   .tl-item.t-quiz .tl-links a { color: #a85f00; border-bottom-color: rgba(237,139,0,.5); }
   .tl-item.t-quiz .badge { background: #ED8B00; }
+
+  .tl-item.major.t-cap .tl-dot span,
+  .tl-item.t-cap .tl-dot span { background: #F9423A; }
+  .tl-item.t-cap .tl-card { border-left-color: #F9423A; background: #fff6f5; }
+  .tl-item.t-cap .tl-tag { color: #c4261e; }
+  .tl-item.t-cap .tl-links a { color: #c4261e; border-bottom-color: rgba(249,66,58,.5); }
+  .tl-item.t-cap .badge { background: #F9423A; }
+
   .type-chip {
     display: inline-flex; align-items: center; justify-content: center;
     width: 22px; height: 22px; border-radius: 50%; background: var(--c); color: white;
@@ -342,7 +352,7 @@
         <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 10/01 &bull; Week 6</span>
-          <div class="tl-tag">Quiz 3 <span class="badge">Today</span></div>
+          <div class="tl-tag">Quiz 3</div>
           <div class="tl-title">Models, Tools, and Memory</div>
           <div class="tl-links">
             <a href="https://canvas.umt.edu/courses/34575/assignments/419202">Take on Canvas &rarr;</a>
@@ -355,9 +365,9 @@
         <div class="tl-dot"><span title="Midterm Project"><svg class="ico"><use href="#i-mid"/></svg></span></div>
         <div class="tl-card">
           <span class="tl-mobile-date">Thu 10/01 &bull; Weeks 6&ndash;11</span>
-          <div class="tl-tag">Midterm Project <span class="badge">Current</span></div>
+          <div class="tl-tag">Midterm Project <span class="badge done">Completed</span></div>
           <div class="tl-title">Encore &mdash; A ListenBrainz Music Agent That Remembers 🤘</div>
-          <div class="tl-sub">Tools, Reliability, and Working, Episodic, Semantic, and Procedural Memory &mdash; with a Final Presentation.</div>
+          <div class="tl-sub">Tools, Reliability, and Working, Episodic, Semantic, and Procedural Memory &mdash; with a Final Presentation. Workshop 10/08; presentations 11/03 &amp; 11/05; due Thu 11/05 @ 11:59 PM.</div>
           <div class="tl-links">
             <a href="Assignments/Midterm/Midterm.html">Open Midterm &rarr;</a>
             <a href="Assignments/Midterm/encore_starter.zip">Starter Code (.zip)</a>
@@ -366,10 +376,89 @@
         </div>
       </li>
 
+      <li class="tl-item t-quiz">
+        <div class="tl-date"><strong>Thu 10/15</strong>Week 8</div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 10/15 &bull; Week 8</span>
+          <div class="tl-tag">Quiz 4</div>
+          <div class="tl-title">Planning, Decomposition, and MCP</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/421690">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item t-lab">
+        <div class="tl-date"><strong>Thu 10/15</strong>Week 8</div>
+        <div class="tl-dot"><span title="Weekly Lab"><svg class="ico"><use href="#i-lab"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 10/15 &bull; Week 8</span>
+          <div class="tl-tag">Implementation Lab <span class="badge xc">Extra Credit</span></div>
+          <div class="tl-title">Lab 5 &mdash; Model Context Protocol</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/421685">Submit on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-phase">
+        <div class="tl-date"></div>
+        <div class="tl-dot"><span></span></div>
+        <div class="tl-phase-lbl">Architecture and Patterns</div>
+      </li>
+
+      <li class="tl-item t-quiz">
+        <div class="tl-date"><strong>Tue 10/27</strong>Week 10</div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Tue 10/27 &bull; Week 10</span>
+          <div class="tl-tag">Quiz 5</div>
+          <div class="tl-title">Single-Agent Patterns and Multi-Agent Systems</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/423463">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-item major t-cap">
+        <div class="tl-date"><strong>Tue 11/10</strong>Weeks 12&ndash;16</div>
+        <div class="tl-dot"><span title="Final Capstone Project"><svg class="ico"><use href="#i-cap"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Tue 11/10 &bull; Weeks 12&ndash;16</span>
+          <div class="tl-tag">Final Capstone Project <span class="badge">Current</span></div>
+          <div class="tl-title">Encore Ensemble 🎶</div>
+          <div class="tl-sub">Assigned Tue 11/10. Submit your Final Project Idea by Thu 11/12.</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/430273">Open on Canvas &rarr;</a>
+            <a href="https://canvas.umt.edu/courses/34575/assignments/430525">Final Project Idea</a>
+          </div>
+        </div>
+      </li>
+
+      <li class="tl-phase">
+        <div class="tl-date"></div>
+        <div class="tl-dot"><span></span></div>
+        <div class="tl-phase-lbl">Hardening and Operations</div>
+      </li>
+
+      <li class="tl-item t-quiz">
+        <div class="tl-date"><strong>Thu 11/19</strong>Week 13</div>
+        <div class="tl-dot"><span title="Quiz"><svg class="ico"><use href="#i-quiz"/></svg></span></div>
+        <div class="tl-card">
+          <span class="tl-mobile-date">Thu 11/19 &bull; Week 13</span>
+          <div class="tl-tag">Quiz 6</div>
+          <div class="tl-title">Human Oversight and Long-Running Agents</div>
+          <div class="tl-links">
+            <a href="https://canvas.umt.edu/courses/34575/assignments/433040">Take on Canvas &rarr;</a>
+          </div>
+        </div>
+      </li>
+
       <li class="tl-item future">
         <div class="tl-date"><strong>Coming Up</strong></div>
         <div class="tl-dot"><span>&hellip;</span></div>
-        <div class="tl-card">More <span class="ico-inline" style="color:#70002e"><svg class="ico"><use href="#i-lab"/></svg></span> labs, <span class="ico-inline" style="color:#a85f00"><svg class="ico"><use href="#i-quiz"/></svg></span> quizzes, and the <span class="ico-inline" style="color:#F9423A"><svg class="ico"><use href="#i-cap"/></svg></span> Final Capstone Project will be added as the semester progresses.</div>
+        <div class="tl-card">More <span class="ico-inline" style="color:#70002e"><svg class="ico"><use href="#i-lab"/></svg></span> labs, <span class="ico-inline" style="color:#a85f00"><svg class="ico"><use href="#i-quiz"/></svg></span> quizzes, and <span class="ico-inline" style="color:#F9423A"><svg class="ico"><use href="#i-cap"/></svg></span> Final Capstone milestones will be added as the semester wraps up.</div>
       </li>
 
     </ol>
