@@ -1,0 +1,86 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:04.154
+This is track eleven: The Mixing Desk.
+
+2
+00:00:04.534 --> 00:00:12.277
+Every band needs someone at the board with approve, modify, and reject buttons. Today, that's the human.
+
+3
+00:00:13.877 --> 00:00:17.741
+A fraud-detection agent was deployed fully autonomously.
+
+4
+00:00:18.121 --> 00:00:21.885
+It handled the clear eighty-five percent of cases well.
+
+5
+00:00:22.265 --> 00:00:28.548
+But on the unclear fifteen percent, human reviewers disagreed with it almost half the time.
+
+6
+00:00:28.928 --> 00:00:34.457
+It didn't know when it was outside its reliable range. Neither did the team.
+
+7
+00:00:34.837 --> 00:00:45.525
+The fix: decide above a confidence threshold, and below it, escalate with a short explanation a reviewer can approve, modify, or reject in one click.
+
+8
+00:00:47.125 --> 00:00:51.474
+Following Caldwell's chapter twelve, there are two models.
+
+9
+00:00:51.854 --> 00:01:04.181
+With a human in the loop, the agent stops and waits for approval before passing a checkpoint. Think payments, external emails, production deploys, or court filings.
+
+10
+00:01:04.561 --> 00:01:13.824
+With a human on the loop, the agent keeps going, and a person monitors and can intervene. Think high-volume content moderation.
+
+11
+00:01:14.204 --> 00:01:19.787
+The choice is a risk calculation, not a judgment about how hard the task is.
+
+12
+00:01:21.387 --> 00:01:33.649
+Ask three questions. How reversible is the action? How often does the agent operate outside its reliable range? And how expensive is the delay of a human review?
+
+13
+00:01:34.029 --> 00:01:36.254
+Then follow two rules.
+
+14
+00:01:36.634 --> 00:01:45.242
+Place intervention points before irreversible actions, like sending an email, committing a transaction, or deleting data.
+
+15
+00:01:45.622 --> 00:01:50.665
+And place them where the agent's confidence drops below a threshold you've measured.
+
+16
+00:01:52.265 --> 00:01:59.034
+Design from the reviewer's chair. What do they need to know, and what do they need to be able to do?
+
+17
+00:01:59.414 --> 00:02:04.387
+Usually that's a concise summary and three buttons, not a raw trace.
+
+18
+00:02:04.767 --> 00:02:12.341
+Treat the threshold as a tunable parameter. Track how often reviewers agree, and move it with evidence.
+
+19
+00:02:12.721 --> 00:02:21.229
+And paused runs must survive restarts. Keep run state in a database, and confirm nothing changed before resuming.
+
+20
+00:02:22.829 --> 00:02:25.228
+Here's the map for this module.
+
+21
+00:02:25.608 --> 00:02:31.472
+Next, we take agents on the road: runs that last hours, or days.
+

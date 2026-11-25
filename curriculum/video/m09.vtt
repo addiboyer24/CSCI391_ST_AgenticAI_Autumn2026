@@ -1,0 +1,74 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:04.099
+This is track nine: Solo Practice.
+
+2
+00:00:04.479 --> 00:00:11.563
+Before forming a band, learn to play well alone. Today is about structuring a single agent.
+
+3
+00:00:13.163 --> 00:00:16.976
+A customer support agent ran well for six months.
+
+4
+00:00:17.356 --> 00:00:27.454
+Then, at higher volume, it started offering refunds on unverified orders, skipping steps, and calling the same tool three or four times in a row.
+
+5
+00:00:27.834 --> 00:00:31.908
+Nobody had changed the model, the tools, or the prompt.
+
+6
+00:00:32.288 --> 00:00:40.066
+The failures came from context growth, tool complexity, and a new mix of requests, all hitting one flat loop.
+
+7
+00:00:40.446 --> 00:00:52.024
+Separating routing from execution, and tracking state between steps, fixed all three within a week. It didn't get more capable. It got more organized.
+
+8
+00:00:53.624 --> 00:00:58.213
+Following Caldwell's chapter ten, here are the core patterns.
+
+9
+00:00:58.593 --> 00:01:05.476
+A router classifies the request, then hands it to an executor with a smaller, focused toolset.
+
+10
+00:01:05.856 --> 00:01:12.839
+A validator checks outputs before they leave, using schemas, tests, or a second model.
+
+11
+00:01:13.219 --> 00:01:21.657
+A step machine makes states and transitions explicit, like an onboarding flow that must collect certain fields before creating an account.
+
+12
+00:01:22.037 --> 00:01:25.766
+Most production agents combine two or three of these.
+
+13
+00:01:27.366 --> 00:01:30.635
+The flat loop is still the right place to start.
+
+14
+00:01:31.015 --> 00:01:35.723
+Add a pattern only when production evidence shows the failure it prevents.
+
+15
+00:01:36.103 --> 00:01:43.427
+Keep validators to the minimum needed to catch failures you've actually seen. Every check costs latency.
+
+16
+00:01:43.807 --> 00:01:50.175
+And if an escalation path isn't in the code, and covered by a test, it doesn't exist.
+
+17
+00:01:51.775 --> 00:01:54.174
+Here's the map for this module.
+
+18
+00:01:54.554 --> 00:01:59.748
+Next time, we form the band: multiple agents working together.
+

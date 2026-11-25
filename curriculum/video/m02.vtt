@@ -1,0 +1,130 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.339
+Welcome back. This is track two: First Riff.
+
+2
+00:00:05.719 --> 00:00:14.572
+We'll build the minimum viable agent, place it on a five-level ladder, and take a short, honest tour of fifty years of agent history.
+
+3
+00:00:16.172 --> 00:00:19.871
+Start with one customer message about a dented kettle.
+
+4
+00:00:20.251 --> 00:00:24.605
+A chatbot apologizes and suggests contacting support.
+
+5
+00:00:24.985 --> 00:00:33.488
+An agent looks up the order, checks refund eligibility, issues the refund through a narrowly scoped tool, and confirms.
+
+6
+00:00:33.868 --> 00:00:38.052
+Each step is chosen based on what it observed in the step before.
+
+7
+00:00:39.652 --> 00:00:47.510
+The minimum viable agent needs three ingredients: a system prompt, a set of tools, and the user's message.
+
+8
+00:00:47.890 --> 00:00:53.314
+Then a loop: reason, act, observe, and reason again.
+
+9
+00:00:53.694 --> 00:00:58.288
+Good tools each do one narrow thing, with an explicit schema.
+
+10
+00:00:58.668 --> 00:01:03.256
+And remember: the toolset defines the agent's blast radius.
+
+11
+00:01:04.856 --> 00:01:08.570
+Use this five-level ladder to name a system honestly.
+
+12
+00:01:08.950 --> 00:01:13.884
+Level zero is scripted automation. No model required.
+
+13
+00:01:14.264 --> 00:01:20.342
+Level one uses a language model as a text function. Level two adds tools.
+
+14
+00:01:20.722 --> 00:01:30.165
+Level three adds explicit planning. Level four adds memory that persists across sessions, and with it, the risk of memory poisoning.
+
+15
+00:01:30.545 --> 00:01:37.183
+Level five is multiple agents, or general computer use, with failure modes all its own.
+
+16
+00:01:38.783 --> 00:01:40.943
+Three classic traps.
+
+17
+00:01:41.323 --> 00:01:45.971
+Treating the model as ground truth instead of checking the system of record.
+
+18
+00:01:46.351 --> 00:01:50.310
+Assuming that longer thinking always means better answers.
+
+19
+00:01:50.690 --> 00:01:57.723
+And confusing a long list of tools with real capability. More tools often means more confusion.
+
+20
+00:01:59.323 --> 00:02:04.042
+Following Caldwell's chapter two, very little here is brand new.
+
+21
+00:02:04.422 --> 00:02:10.706
+STRIPS and SHRDLU, in the early seventies, already planned actions toward goals.
+
+22
+00:02:11.086 --> 00:02:16.764
+Expert systems ran into the frame problem: knowing what doesn't change when you act.
+
+23
+00:02:17.144 --> 00:02:22.968
+The belief, desire, intention model gave us vocabulary we still use.
+
+24
+00:02:23.348 --> 00:02:30.726
+What changed recently is the infrastructure: models trained to use tools, and protocols to connect them.
+
+25
+00:02:32.326 --> 00:02:37.960
+Your course designer, Addison Boyer, has a personal connection to this era.
+
+26
+00:02:38.340 --> 00:02:50.087
+Addison's first job after graduate school was at a startup whose product ran on Lisp routines inside AutoCAD. A lot of CAD and mapping software still has Lisp under the hood.
+
+27
+00:02:50.467 --> 00:03:02.260
+The expert systems of that lineage did impressive things. DENDRAL identified molecules from mass spectrometry data. MYCIN diagnosed bacterial infections.
+
+28
+00:03:02.640 --> 00:03:09.088
+But each one took years of hand-authored expertise, and couldn't easily be extended to anything new.
+
+29
+00:03:09.468 --> 00:03:16.601
+Most never broke even on the effort. That's a cost lesson worth remembering when you scope an agent today.
+
+30
+00:03:18.201 --> 00:03:20.600
+Here's the map for this module.
+
+31
+00:03:20.980 --> 00:03:30.483
+In the enterprise world, most systems shipped at level one or two call themselves level four. Name the level honestly in your design doc.
+
+32
+00:03:30.863 --> 00:03:36.532
+In lab, you'll build your first minimum viable agent. See you there.
+

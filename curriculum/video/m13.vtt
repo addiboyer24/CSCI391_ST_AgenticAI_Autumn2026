@@ -1,0 +1,74 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:03.954
+This is track thirteen: Sound Check.
+
+2
+00:00:04.334 --> 00:00:11.003
+Not just, did it run and how fast, but did it behave correctly, why, and is it drifting?
+
+3
+00:00:12.603 --> 00:00:16.202
+A support agent passed every integration test.
+
+4
+00:00:16.582 --> 00:00:27.269
+Two weeks later, customers noticed it was subtly rude, in a specific and reproducible way, and complaints ran three times higher than with the humans it replaced.
+
+5
+00:00:27.649 --> 00:00:34.803
+The cause: whenever it detected emotional language, it leaned heavily on a coldly worded legal FAQ.
+
+6
+00:00:35.183 --> 00:00:46.286
+Nothing was wrong with any single step, so no log surfaced it. Diagnosis took three days, because nobody had recorded what was retrieved, or why.
+
+7
+00:00:47.886 --> 00:00:54.979
+Following Caldwell's chapter fourteen, agents need more than metrics, logs, and traces.
+
+8
+00:00:55.359 --> 00:01:04.132
+Their behavior is non-deterministic, and they fail semantically: answers that are valid, but wrong, off-tone, or off-policy.
+
+9
+00:01:04.512 --> 00:01:17.609
+So trace every step with spans, log tool calls and token spend in a structured way, score quality with a calibrated LLM judge, and keep regression suites that catch drift before customers do.
+
+10
+00:01:19.209 --> 00:01:23.558
+Standard deviation measures how much a metric normally wobbles.
+
+11
+00:01:23.938 --> 00:01:31.666
+The three-sigma rule flags a day more than three wobbles from the average. It catches big, sudden spikes.
+
+12
+00:01:32.046 --> 00:01:40.189
+CUSUM adds up small deviations over time, so it catches slow drift that never crosses three sigma on any single day.
+
+13
+00:01:40.569 --> 00:01:44.108
+Both depend on a baseline from a known-good period.
+
+14
+00:01:45.708 --> 00:01:53.291
+From the enterprise side: a spike in cost per run often signals a behavior change before quality metrics move.
+
+15
+00:01:53.671 --> 00:01:59.925
+Link every evaluation score to a trace, so a drop is one click from the run that caused it.
+
+16
+00:02:00.305 --> 00:02:09.102
+Baseline, gate releases, monitor live traffic, and shadow-evaluate a new version beside production before you promote it.
+
+17
+00:02:10.702 --> 00:02:13.102
+Here's the map for this module.
+
+18
+00:02:13.482 --> 00:02:16.751
+Last track: keeping the show safe.
+
