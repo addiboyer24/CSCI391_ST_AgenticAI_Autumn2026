@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 987" width="850" height="987" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Module 07 one-page guide: Planning &amp; Decomposition</title>
+<rect width="100%" height="100%" fill="#fff"/>
+<rect width="850" height="147" fill="#70002e"/>
+<text x="40" y="42" fill="#ED8B00" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE 07 · ONE-PAGE LECTURE GUIDE</text>
+<text x="40" y="82" fill="#fff" font-size="30" font-weight="800">Planning &amp; Decomposition</text>
+<text x="40" y="120" fill="#f1dbe4" font-size="16" font-style="italic">Turn an open-ended goal into a tractable, budgeted sequence of actions.</text>
+<text x="40" y="177" fill="#555" font-size="13"><tspan font-weight="700" fill="#70002e">Part II · Core Capabilities</tspan>   ·   Week 7   ·   Read: Caldwell, The Agentic AI Bible, Ch. 8</text>
+<rect x="40" y="203" width="770" height="104" rx="10" fill="#efe8d4"/>
+<text x="60" y="231" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>
+<text x="60" y="255" fill="#1f1a1c" font-size="14">Task: research each engineering initiative, estimate effort and risk, and produce a prioritized roadmap. The agent</text>
+<text x="60" y="275" fill="#1f1a1c" font-size="14">chased dependencies on initiative #1 for twenty steps. Fix: before research, produce an explicit plan — initiatives,</text>
+<text x="60" y="295" fill="#1f1a1c" font-size="14">information needed for each, and a per-initiative step budget. Cost: ~200 prompt tokens and one extra call.</text>
+<rect x="40" y="331" width="6" height="62" fill="#ED8B00"/>
+<text x="62" y="353" fill="#70002e" font-size="20" font-weight="700">Planning is cheap insurance against an agent spending its whole budget on</text>
+<text x="62" y="380" fill="#70002e" font-size="20" font-weight="700">the first interesting thing it finds.</text>
+<text x="40" y="425" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>
+<text x="40" y="447" fill="#1f1a1c" font-size="16" font-weight="700">Four planning strategies</text>
+<circle cx="51" cy="476" r="11" fill="#70002e"/>
+<text x="51" y="481" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">1</text>
+<text x="70" y="481" fill="#1f1a1c" font-size="13.5">ReAct — thought → action → observation, interleaved</text>
+<circle cx="51" cy="504" r="11" fill="#b8432f"/>
+<text x="51" y="509" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">2</text>
+<text x="70" y="509" fill="#1f1a1c" font-size="13.5">Plan-and-Execute — upfront plan, sequential</text>
+<text x="70" y="528" fill="#1f1a1c" font-size="13.5">execution</text>
+<circle cx="51" cy="551" r="11" fill="#c77700"/>
+<text x="51" y="556" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">3</text>
+<text x="70" y="556" fill="#1f1a1c" font-size="13.5">Reflexion — revise the plan in response to failure</text>
+<circle cx="51" cy="579" r="11" fill="#2d6a87"/>
+<text x="51" y="584" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">4</text>
+<text x="70" y="584" fill="#1f1a1c" font-size="13.5">Tree-of-Thoughts — explore alternative plans in</text>
+<text x="70" y="603" fill="#1f1a1c" font-size="13.5">parallel</text>
+<text x="440.0" y="425" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>
+<path d="M442.0,453 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="457" fill="#1f1a1c" font-size="13.5">Decompose goals into verifiable, budgeted steps</text>
+<path d="M442.0,483 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="487" fill="#1f1a1c" font-size="13.5">Compare ReAct, Plan-and-Execute, Reflexion, and</text>
+<text x="466.0" y="506" fill="#1f1a1c" font-size="13.5">Tree-of-Thoughts</text>
+<path d="M442.0,532 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="536" fill="#1f1a1c" font-size="13.5">Distinguish academic framing from production</text>
+<text x="466.0" y="555" fill="#1f1a1c" font-size="13.5">implementation</text>
+<path d="M442.0,581 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="585" fill="#1f1a1c" font-size="13.5">Design hybrid planning with checkpoints and bounded</text>
+<text x="466.0" y="604" fill="#1f1a1c" font-size="13.5">replanning</text>
+<rect x="40" y="646" width="770" height="175" rx="10" fill="#fff6e8" stroke="#f0c98a"/>
+<rect x="40" y="646" width="7" height="175" rx="3" fill="#ED8B00"/>
+<text x="62" y="674" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · ADDISON BOYER</text>
+<circle cx="68" cy="694" r="3.5" fill="#ED8B00"/>
+<text x="80" y="698" fill="#1f1a1c" font-size="13.5">Academic Reflexion re-runs whole episodes. In production I fire per-step reflection only when a tool call fails or</text>
+<text x="80" y="717" fill="#1f1a1c" font-size="13.5">a validator rejects output.</text>
+<circle cx="68" cy="742" r="3.5" fill="#ED8B00"/>
+<text x="80" y="746" fill="#1f1a1c" font-size="13.5">Tree-of-Thoughts needs a judge to pick a branch — and that judge is another probabilistic model. Budget for it,</text>
+<text x="80" y="765" fill="#1f1a1c" font-size="13.5">and test the judge.</text>
+<circle cx="68" cy="790" r="3.5" fill="#ED8B00"/>
+<text x="80" y="794" fill="#1f1a1c" font-size="13.5">Persist the plan. A plan that lives only in the context window can&#x27;t be audited, resumed, or reviewed by a human.</text>
+<text x="40" y="851" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">DISCUSS</text>
+<text x="40" y="871" fill="#1f1a1c" font-size="14">→  When is detailed planning wasteful?</text>
+<text x="40" y="897" fill="#1f1a1c" font-size="14">→  What event should invalidate a plan even if no step has failed?</text>
+<line x1="40" y1="941" x2="810" y2="941" stroke="#ddd"/>
+<text x="40" y="965" fill="#777" font-size="11.5">Concepts after Caldwell, The Agentic AI Bible, Ch. 8. Case framing, synthesis, and enterprise lens: Addison Boyer.</text>
+</svg>

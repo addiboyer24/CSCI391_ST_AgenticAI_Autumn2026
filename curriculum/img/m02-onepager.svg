@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1054" width="850" height="1054" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Module 02 one-page guide: The Minimum Viable Agent &amp; a Short History of Agents</title>
+<rect width="100%" height="100%" fill="#fff"/>
+<rect width="850" height="183" fill="#70002e"/>
+<text x="40" y="42" fill="#ED8B00" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE 02 · ONE-PAGE LECTURE GUIDE</text>
+<text x="40" y="82" fill="#fff" font-size="30" font-weight="800">The Minimum Viable Agent &amp; a Short History of</text>
+<text x="40" y="118" fill="#fff" font-size="30" font-weight="800">Agents</text>
+<text x="40" y="156" fill="#f1dbe4" font-size="16" font-style="italic">A system prompt, a set of tools, and a loop — and fifty years of ideas behind them.</text>
+<text x="40" y="213" fill="#555" font-size="13"><tspan font-weight="700" fill="#70002e">Part I · Foundations and Mindset</tspan>   ·   Week 2   ·   Read: Caldwell, The Agentic AI Bible, Ch. 2</text>
+<rect x="40" y="239" width="770" height="104" rx="10" fill="#efe8d4"/>
+<text x="60" y="267" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>
+<text x="60" y="291" fill="#1f1a1c" font-size="14">“I ordered the blue kettle two weeks ago and it arrived dented. I&#x27;d like a refund.” A chatbot apologizes. An agent</text>
+<text x="60" y="311" fill="#1f1a1c" font-size="14">looks up the order, checks refund eligibility, issues the refund through a scoped tool, and confirms — choosing each</text>
+<text x="60" y="331" fill="#1f1a1c" font-size="14">step from what it observed in the last one.</text>
+<rect x="40" y="367" width="6" height="62" fill="#ED8B00"/>
+<text x="62" y="389" fill="#70002e" font-size="20" font-weight="700">The toolset defines the agent&#x27;s blast radius. Each tool should do one narrow</text>
+<text x="62" y="416" fill="#70002e" font-size="20" font-weight="700">thing, with an explicit schema.</text>
+<text x="40" y="461" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>
+<text x="40" y="483" fill="#1f1a1c" font-size="16" font-weight="700">Five-level agent taxonomy</text>
+<circle cx="51" cy="512" r="11" fill="#70002e"/>
+<text x="51" y="517" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">1</text>
+<text x="70" y="517" fill="#1f1a1c" font-size="13.5">L0 Scripted automation — no LLM required</text>
+<circle cx="51" cy="540" r="11" fill="#b8432f"/>
+<text x="51" y="545" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">2</text>
+<text x="70" y="545" fill="#1f1a1c" font-size="13.5">L1 LLM as a text function</text>
+<circle cx="51" cy="568" r="11" fill="#c77700"/>
+<text x="51" y="573" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">3</text>
+<text x="70" y="573" fill="#1f1a1c" font-size="13.5">L2 Tool-using LLM</text>
+<circle cx="51" cy="596" r="11" fill="#2d6a87"/>
+<text x="51" y="601" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">4</text>
+<text x="70" y="601" fill="#1f1a1c" font-size="13.5">L3 Goal-directed agent with planning</text>
+<circle cx="51" cy="624" r="11" fill="#3f7a55"/>
+<text x="51" y="629" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">5</text>
+<text x="70" y="629" fill="#1f1a1c" font-size="13.5">L4 Adaptive agent with persistent memory</text>
+<circle cx="51" cy="652" r="11" fill="#5a4787"/>
+<text x="51" y="657" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">6</text>
+<text x="70" y="657" fill="#1f1a1c" font-size="13.5">L5 Autonomous multi-agent / computer-use systems</text>
+<text x="440.0" y="461" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>
+<path d="M442.0,489 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="493" fill="#1f1a1c" font-size="13.5">Assemble a Minimum Viable Agent: system prompt,</text>
+<text x="466.0" y="512" fill="#1f1a1c" font-size="13.5">tools, user message, loop</text>
+<path d="M442.0,538 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="542" fill="#1f1a1c" font-size="13.5">Classify systems using the five-level taxonomy</text>
+<path d="M442.0,568 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="572" fill="#1f1a1c" font-size="13.5">Identify the classic pitfalls: LLM-as-ground-truth,</text>
+<text x="466.0" y="591" fill="#1f1a1c" font-size="13.5">longer-thinking-is-better, tool breadth</text>
+<path d="M442.0,617 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="621" fill="#1f1a1c" font-size="13.5">Connect modern agents to STRIPS, SHRDLU, expert</text>
+<text x="466.0" y="640" fill="#1f1a1c" font-size="13.5">systems, the frame problem, and BDI</text>
+<rect x="40" y="694" width="770" height="194" rx="10" fill="#fff6e8" stroke="#f0c98a"/>
+<rect x="40" y="694" width="7" height="194" rx="3" fill="#ED8B00"/>
+<text x="62" y="722" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · ADDISON BOYER</text>
+<circle cx="68" cy="742" r="3.5" fill="#ED8B00"/>
+<text x="80" y="746" fill="#1f1a1c" font-size="13.5">Scope tools the way you scope IAM roles: the smallest set of verbs that completes the job. A &#x27;refund&#x27; tool should</text>
+<text x="80" y="765" fill="#1f1a1c" font-size="13.5">not also be able to edit orders.</text>
+<circle cx="68" cy="790" r="3.5" fill="#ED8B00"/>
+<text x="80" y="794" fill="#1f1a1c" font-size="13.5">Never treat model output as a system of record. Verify facts against the database, the catalog, or the API that</text>
+<text x="80" y="813" fill="#1f1a1c" font-size="13.5">owns them.</text>
+<circle cx="68" cy="838" r="3.5" fill="#ED8B00"/>
+<text x="80" y="842" fill="#1f1a1c" font-size="13.5">Most problems I&#x27;ve seen ship at Level 1 or 2 and call themselves Level 4. Name the level honestly in your design</text>
+<text x="80" y="861" fill="#1f1a1c" font-size="13.5">doc.</text>
+<text x="40" y="918" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">DISCUSS</text>
+<text x="40" y="938" fill="#1f1a1c" font-size="14">→  Which level is the system you use most at work or school — honestly?</text>
+<text x="40" y="964" fill="#1f1a1c" font-size="14">→  Which problems in modern agents are genuinely new, and which are 1970s problems in new clothes?</text>
+<line x1="40" y1="1008" x2="810" y2="1008" stroke="#ddd"/>
+<text x="40" y="1032" fill="#777" font-size="11.5">Concepts after Caldwell, The Agentic AI Bible, Ch. 2. Case framing, synthesis, and enterprise lens: Addison Boyer.</text>
+</svg>

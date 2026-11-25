@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1042" width="850" height="1042" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Module 06 one-page guide: Memory: Working, Episodic, Semantic, Procedural</title>
+<rect width="100%" height="100%" fill="#fff"/>
+<rect width="850" height="183" fill="#70002e"/>
+<text x="40" y="42" fill="#ED8B00" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE 06 · ONE-PAGE LECTURE GUIDE</text>
+<text x="40" y="82" fill="#fff" font-size="30" font-weight="800">Memory: Working, Episodic, Semantic,</text>
+<text x="40" y="118" fill="#fff" font-size="30" font-weight="800">Procedural</text>
+<text x="40" y="156" fill="#f1dbe4" font-size="16" font-style="italic">A brilliant agent with amnesia is still frustrating to work with.</text>
+<text x="40" y="213" fill="#555" font-size="13"><tspan font-weight="700" fill="#70002e">Part II · Core Capabilities</tspan>   ·   Week 6   ·   Read: Caldwell, The Agentic AI Bible, Ch. 7</text>
+<rect x="40" y="239" width="770" height="104" rx="10" fill="#efe8d4"/>
+<text x="60" y="267" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>
+<text x="60" y="291" fill="#1f1a1c" font-size="14">Analysts re-explained competitors, preferred frameworks, and open research threads at the start of every conversation.</text>
+<text x="60" y="311" fill="#1f1a1c" font-size="14">After two weeks, usage dropped 60%. The fix: preferences and open threads stored in a vector database keyed by</text>
+<text x="60" y="331" fill="#1f1a1c" font-size="14">analyst, retrieved at the start of each session.</text>
+<rect x="40" y="367" width="6" height="62" fill="#ED8B00"/>
+<text x="62" y="389" fill="#70002e" font-size="20" font-weight="700">Start simple. Add memory stores only when production evidence justifies the</text>
+<text x="62" y="416" fill="#70002e" font-size="20" font-weight="700">operational cost — not because the architecture diagram looks elegant.</text>
+<text x="40" y="461" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>
+<text x="40" y="483" fill="#1f1a1c" font-size="16" font-weight="700">Four types of memory</text>
+<circle cx="51" cy="512" r="11" fill="#70002e"/>
+<text x="51" y="517" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">1</text>
+<text x="70" y="517" fill="#1f1a1c" font-size="13.5">Working — what the model attends to right now</text>
+<circle cx="51" cy="540" r="11" fill="#b8432f"/>
+<text x="51" y="545" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">2</text>
+<text x="70" y="545" fill="#1f1a1c" font-size="13.5">Episodic — what happened in past sessions</text>
+<circle cx="51" cy="568" r="11" fill="#c77700"/>
+<text x="51" y="573" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">3</text>
+<text x="70" y="573" fill="#1f1a1c" font-size="13.5">Semantic — facts and knowledge that don&#x27;t expire</text>
+<circle cx="51" cy="596" r="11" fill="#2d6a87"/>
+<text x="51" y="601" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">4</text>
+<text x="70" y="601" fill="#1f1a1c" font-size="13.5">Procedural — routines learned over a deployment&#x27;s</text>
+<text x="70" y="620" fill="#1f1a1c" font-size="13.5">lifetime</text>
+<text x="440.0" y="461" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>
+<path d="M442.0,489 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="493" fill="#1f1a1c" font-size="13.5">Differentiate working, episodic, semantic, and</text>
+<text x="466.0" y="512" fill="#1f1a1c" font-size="13.5">procedural memory</text>
+<path d="M442.0,538 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="542" fill="#1f1a1c" font-size="13.5">Match vector, keyword/hybrid, graph, and key-value</text>
+<text x="466.0" y="561" fill="#1f1a1c" font-size="13.5">stores to memory needs</text>
+<path d="M442.0,587 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="591" fill="#1f1a1c" font-size="13.5">Design write, deduplication, and retention policies</text>
+<path d="M442.0,617 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="621" fill="#1f1a1c" font-size="13.5">Anticipate long-term failure modes: staleness,</text>
+<text x="466.0" y="640" fill="#1f1a1c" font-size="13.5">overlap, sensitive data</text>
+<rect x="40" y="682" width="770" height="194" rx="10" fill="#fff6e8" stroke="#f0c98a"/>
+<rect x="40" y="682" width="7" height="194" rx="3" fill="#ED8B00"/>
+<text x="62" y="710" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · ADDISON BOYER</text>
+<circle cx="68" cy="730" r="3.5" fill="#ED8B00"/>
+<text x="80" y="734" fill="#1f1a1c" font-size="13.5">Hybrid search (vector similarity + BM25 keyword) should be your default; most production vector databases support</text>
+<text x="80" y="753" fill="#1f1a1c" font-size="13.5">it natively.</text>
+<circle cx="68" cy="778" r="3.5" fill="#ED8B00"/>
+<text x="80" y="782" fill="#1f1a1c" font-size="13.5">A user who asks about the same company in ten sessions over three months leaves ten overlapping summaries. Design</text>
+<text x="80" y="801" fill="#1f1a1c" font-size="13.5">consolidation from day one.</text>
+<circle cx="68" cy="826" r="3.5" fill="#ED8B00"/>
+<text x="80" y="830" fill="#1f1a1c" font-size="13.5">Memory accumulates names, affiliations, and financial data. Retention, tenancy boundaries, and deletion are</text>
+<text x="80" y="849" fill="#1f1a1c" font-size="13.5">requirements, not features.</text>
+<text x="40" y="906" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">DISCUSS</text>
+<text x="40" y="926" fill="#1f1a1c" font-size="14">→  Which memories should never become prompt context?</text>
+<text x="40" y="952" fill="#1f1a1c" font-size="14">→  How should an agent resolve a recalled fact that conflicts with the live system?</text>
+<line x1="40" y1="996" x2="810" y2="996" stroke="#ddd"/>
+<text x="40" y="1020" fill="#777" font-size="11.5">Concepts after Caldwell, The Agentic AI Bible, Ch. 7. Case framing, synthesis, and enterprise lens: Addison Boyer.</text>
+</svg>

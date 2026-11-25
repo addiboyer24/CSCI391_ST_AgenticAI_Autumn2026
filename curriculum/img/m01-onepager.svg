@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1045" width="850" height="1045" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Module 01 one-page guide: What Is an AI Agent?</title>
+<rect width="100%" height="100%" fill="#fff"/>
+<rect width="850" height="147" fill="#70002e"/>
+<text x="40" y="42" fill="#ED8B00" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE 01 · ONE-PAGE LECTURE GUIDE</text>
+<text x="40" y="82" fill="#fff" font-size="30" font-weight="800">What Is an AI Agent?</text>
+<text x="40" y="120" fill="#f1dbe4" font-size="16" font-style="italic">Agents produce actions a system executes — not just text a person reads.</text>
+<text x="40" y="177" fill="#555" font-size="13"><tspan font-weight="700" fill="#70002e">Part I · Foundations and Mindset</tspan>   ·   Week 1   ·   Read: Caldwell, The Agentic AI Bible, Ch. 1</text>
+<rect x="40" y="203" width="770" height="124" rx="10" fill="#efe8d4"/>
+<text x="60" y="231" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>
+<text x="60" y="255" fill="#1f1a1c" font-size="14">A mid-sized SaaS company shipped an &#x27;autonomous AI refund agent&#x27;. After a routine model upgrade, a better fuzzy-</text>
+<text x="60" y="275" fill="#1f1a1c" font-size="14">matcher began matching refund requests against a stale catalog and approved refunds for items never sold. Rolled back</text>
+<text x="60" y="295" fill="#1f1a1c" font-size="14">in an afternoon; the postmortem took months. They hadn&#x27;t built an agent — they&#x27;d built a chatbot with write access to</text>
+<text x="60" y="315" fill="#1f1a1c" font-size="14">a database.</text>
+<rect x="40" y="351" width="6" height="62" fill="#ED8B00"/>
+<text x="62" y="373" fill="#70002e" font-size="20" font-weight="700">Most agent failures blamed on the model are architectural. Ask &#x27;have we</text>
+<text x="62" y="400" fill="#70002e" font-size="20" font-weight="700">built the right thing for the problem?&#x27; before &#x27;is the model good enough?&#x27;</text>
+<text x="40" y="445" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>
+<text x="40" y="467" fill="#1f1a1c" font-size="16" font-weight="700">What an agent is NOT</text>
+<circle cx="51" cy="496" r="11" fill="#70002e"/>
+<text x="51" y="501" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">1</text>
+<text x="70" y="501" fill="#1f1a1c" font-size="13.5">A chatbot — RAG gives information, not agency</text>
+<circle cx="51" cy="524" r="11" fill="#b8432f"/>
+<text x="51" y="529" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">2</text>
+<text x="70" y="529" fill="#1f1a1c" font-size="13.5">RPA — drives a UI deterministically; nothing inside</text>
+<text x="70" y="548" fill="#1f1a1c" font-size="13.5">decides</text>
+<circle cx="51" cy="571" r="11" fill="#c77700"/>
+<text x="51" y="576" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">3</text>
+<text x="70" y="576" fill="#1f1a1c" font-size="13.5">A workflow engine — the workflow owns the plan; an</text>
+<text x="70" y="595" fill="#1f1a1c" font-size="13.5">agent owns its plan</text>
+<circle cx="51" cy="618" r="11" fill="#2d6a87"/>
+<text x="51" y="623" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">4</text>
+<text x="70" y="623" fill="#1f1a1c" font-size="13.5">A classical planner — a cousin, not a twin</text>
+<text x="440.0" y="445" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>
+<path d="M442.0,473 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="477" fill="#1f1a1c" font-size="13.5">Define an agent as a goal-directed reason → act →</text>
+<text x="466.0" y="496" fill="#1f1a1c" font-size="13.5">observe loop</text>
+<path d="M442.0,522 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="526" fill="#1f1a1c" font-size="13.5">Distinguish agents from chatbots, RPA, workflow</text>
+<text x="466.0" y="545" fill="#1f1a1c" font-size="13.5">engines, and classical planners</text>
+<path d="M442.0,571 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="575" fill="#1f1a1c" font-size="13.5">Recognize the &#x27;three horsemen&#x27; of production agent</text>
+<text x="466.0" y="594" fill="#1f1a1c" font-size="13.5">incidents</text>
+<path d="M442.0,620 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="624" fill="#1f1a1c" font-size="13.5">Explain &#x27;autonomy theater&#x27; and why it is a product-</text>
+<text x="466.0" y="643" fill="#1f1a1c" font-size="13.5">management failure</text>
+<rect x="40" y="685" width="770" height="194" rx="10" fill="#fff6e8" stroke="#f0c98a"/>
+<rect x="40" y="685" width="7" height="194" rx="3" fill="#ED8B00"/>
+<text x="62" y="713" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · ADDISON BOYER</text>
+<circle cx="68" cy="733" r="3.5" fill="#ED8B00"/>
+<text x="80" y="737" fill="#1f1a1c" font-size="13.5">Before any architecture review I ask one question: if this were a whiteboard DAG, would a workflow engine already</text>
+<text x="80" y="756" fill="#1f1a1c" font-size="13.5">solve it?</text>
+<circle cx="68" cy="781" r="3.5" fill="#ED8B00"/>
+<text x="80" y="785" fill="#1f1a1c" font-size="13.5">Every production agent needs explicit termination conditions, budgets, and a first-class way to say “I can&#x27;t do</text>
+<text x="80" y="804" fill="#1f1a1c" font-size="13.5">this safely.”</text>
+<circle cx="68" cy="829" r="3.5" fill="#ED8B00"/>
+<text x="80" y="833" fill="#1f1a1c" font-size="13.5">Write access is the line. The moment an LLM can mutate a system of record, it needs the same scrutiny as a new</text>
+<text x="80" y="852" fill="#1f1a1c" font-size="13.5">service account.</text>
+<text x="40" y="909" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">DISCUSS</text>
+<text x="40" y="929" fill="#1f1a1c" font-size="14">→  Where does traditional automation end and an agent begin?</text>
+<text x="40" y="955" fill="#1f1a1c" font-size="14">→  What evidence would justify upgrading a workflow into an agent?</text>
+<line x1="40" y1="999" x2="810" y2="999" stroke="#ddd"/>
+<text x="40" y="1023" fill="#777" font-size="11.5">Concepts after Caldwell, The Agentic AI Bible, Ch. 1. Case framing, synthesis, and enterprise lens: Addison Boyer.</text>
+</svg>

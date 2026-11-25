@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1006" width="850" height="1006" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Module 04 one-page guide: When Not to Build an Agent</title>
+<rect width="100%" height="100%" fill="#fff"/>
+<rect width="850" height="147" fill="#70002e"/>
+<text x="40" y="42" fill="#ED8B00" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE 04 · ONE-PAGE LECTURE GUIDE</text>
+<text x="40" y="82" fill="#fff" font-size="30" font-weight="800">When Not to Build an Agent</text>
+<text x="40" y="120" fill="#f1dbe4" font-size="16" font-style="italic">Agents are a Swiss Army knife. Sometimes you only need the screwdriver.</text>
+<text x="40" y="177" fill="#555" font-size="13"><tspan font-weight="700" fill="#70002e">Part I · Foundations and Mindset</tspan>   ·   Week 4   ·   Read: Caldwell, The Agentic AI Bible, Ch. 4</text>
+<rect x="40" y="203" width="770" height="104" rx="10" fill="#efe8d4"/>
+<text x="60" y="231" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>
+<text x="60" y="255" fill="#1f1a1c" font-size="14">A team needs to route support emails into one of four queues. The agent prototype demos beautifully. A prompted</text>
+<text x="60" y="275" fill="#1f1a1c" font-size="14">classifier with structured output does the same job for a fraction of the cost, with an accuracy ceiling you can read</text>
+<text x="60" y="295" fill="#1f1a1c" font-size="14">straight off a confusion matrix.</text>
+<rect x="40" y="331" width="6" height="62" fill="#ED8B00"/>
+<text x="62" y="353" fill="#70002e" font-size="20" font-weight="700">If the answer to all four questions isn&#x27;t clearly yes, stop and look for a</text>
+<text x="62" y="380" fill="#70002e" font-size="20" font-weight="700">simpler system first.</text>
+<text x="40" y="425" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>
+<text x="40" y="447" fill="#1f1a1c" font-size="16" font-weight="700">The four-question decision rule</text>
+<circle cx="51" cy="476" r="11" fill="#70002e"/>
+<text x="51" y="481" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">1</text>
+<text x="70" y="481" fill="#1f1a1c" font-size="13.5">Is the trajectory open-ended?</text>
+<circle cx="51" cy="504" r="11" fill="#b8432f"/>
+<text x="51" y="509" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">2</text>
+<text x="70" y="509" fill="#1f1a1c" font-size="13.5">Do the inputs vary in structure in ways a schema</text>
+<text x="70" y="528" fill="#1f1a1c" font-size="13.5">can&#x27;t capture?</text>
+<circle cx="51" cy="551" r="11" fill="#c77700"/>
+<text x="51" y="556" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">3</text>
+<text x="70" y="556" fill="#1f1a1c" font-size="13.5">Is the output space itself open?</text>
+<circle cx="51" cy="579" r="11" fill="#2d6a87"/>
+<text x="51" y="584" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">4</text>
+<text x="70" y="584" fill="#1f1a1c" font-size="13.5">Is there genuine action in the world, interleaved</text>
+<text x="70" y="603" fill="#1f1a1c" font-size="13.5">with observation?</text>
+<text x="440.0" y="425" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>
+<path d="M442.0,453 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="457" fill="#1f1a1c" font-size="13.5">Apply the four-question rule before starting agent</text>
+<text x="466.0" y="476" fill="#1f1a1c" font-size="13.5">development</text>
+<path d="M442.0,502 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="506" fill="#1f1a1c" font-size="13.5">Choose among function calls, classifiers,</text>
+<text x="466.0" y="525" fill="#1f1a1c" font-size="13.5">extraction, workflows, and agents</text>
+<path d="M442.0,551 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="555" fill="#1f1a1c" font-size="13.5">Compare build-cost vs. run-cost for classifier</text>
+<text x="466.0" y="574" fill="#1f1a1c" font-size="13.5">options</text>
+<path d="M442.0,600 l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>
+<text x="466.0" y="604" fill="#1f1a1c" font-size="13.5">Evaluate a classifier with a confusion matrix</text>
+<rect x="40" y="646" width="770" height="194" rx="10" fill="#fff6e8" stroke="#f0c98a"/>
+<rect x="40" y="646" width="7" height="194" rx="3" fill="#ED8B00"/>
+<text x="62" y="674" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · ADDISON BOYER</text>
+<circle cx="68" cy="694" r="3.5" fill="#ED8B00"/>
+<text x="80" y="698" fill="#1f1a1c" font-size="13.5">When a stakeholder asks for &#x27;an agent&#x27;, I ask for ten real inputs and the ideal outputs. Half the time the outputs</text>
+<text x="80" y="717" fill="#1f1a1c" font-size="13.5">have a fixed shape — that&#x27;s a function call.</text>
+<circle cx="68" cy="742" r="3.5" fill="#ED8B00"/>
+<text x="80" y="746" fill="#1f1a1c" font-size="13.5">Shadow-run the simpler system next to the agent on real traffic and review the disagreements by hand before</text>
+<text x="80" y="765" fill="#1f1a1c" font-size="13.5">deciding.</text>
+<circle cx="68" cy="790" r="3.5" fill="#ED8B00"/>
+<text x="80" y="794" fill="#1f1a1c" font-size="13.5">Rule of thumb: if violating a constraint would cause a production incident, it belongs in a re-injected constraint</text>
+<text x="80" y="813" fill="#1f1a1c" font-size="13.5">or in code — not buried in a long prompt.</text>
+<text x="40" y="870" fill="#70002e" font-size="13" font-weight="800" letter-spacing="1.8">DISCUSS</text>
+<text x="40" y="890" fill="#1f1a1c" font-size="14">→  How would you prove a problem needs adaptive action rather than a workflow?</text>
+<text x="40" y="916" fill="#1f1a1c" font-size="14">→  What is the cheapest system that would meet the requirement?</text>
+<line x1="40" y1="960" x2="810" y2="960" stroke="#ddd"/>
+<text x="40" y="984" fill="#777" font-size="11.5">Concepts after Caldwell, The Agentic AI Bible, Ch. 4. Case framing, synthesis, and enterprise lens: Addison Boyer.</text>
+</svg>
