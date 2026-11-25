@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page Not Found · CSCI 391</title>
+<link rel="icon" data-asset="favicon.ico" href="/CSCI391_ST_AgenticAI_Autumn2026/favicon.ico" sizes="any">
+<link rel="icon" data-asset="curriculum/img/favicon-32.png" type="image/png" sizes="32x32" href="/CSCI391_ST_AgenticAI_Autumn2026/curriculum/img/favicon-32.png">
+<link rel="apple-touch-icon" data-asset="curriculum/img/apple-touch-icon.png" href="/CSCI391_ST_AgenticAI_Autumn2026/curriculum/img/apple-touch-icon.png">
 <style>
   :root { --bg:#f1f1f1; --ink:#6b6b6b; --ink-strong:#4a4a4a; --rule:#cfcfcf; --link:#70002e; }
   @media (prefers-color-scheme: dark) { :root { --bg:#16161a; --ink:#a9a9b2; --ink-strong:#d6d6dc; --rule:#3a3a42; --link:#e8a3bd; } }
@@ -99,6 +102,7 @@
     var seg = location.pathname.split("/")[1] || "";
     var base = /^CSCI391/i.test(seg) ? "/" + seg + "/" : "/";
     document.querySelectorAll("a[data-home]").forEach(function (a) { a.href = base + (a.getAttribute("data-home") || ""); });
+    document.querySelectorAll("link[data-asset]").forEach(function (l) { l.href = base + l.getAttribute("data-asset"); });
     // Prefer the Bigfoot photo when it exists; keep the drawing as the fallback.
     var img = new Image();
     img.alt = "Bigfoot wearing a maroon GRIZ T-shirt";
