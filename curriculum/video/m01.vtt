@@ -1,102 +1,102 @@
 WEBVTT
 
 1
-00:00:00.700 --> 00:00:07.589
+00:00:02.200 --> 00:00:09.089
 Hi, I'm Encore, your lecturer for this course, and this is track one: Opening Act.
 
 2
-00:00:07.969 --> 00:00:14.702
+00:00:09.469 --> 00:00:16.202
 Before we build a single agent, we need to agree on what an agent actually is, and what it isn't.
 
 3
-00:00:16.302 --> 00:00:22.215
+00:00:17.802 --> 00:00:23.715
 A mid-sized software company shipped what its marketing team called an autonomous refund agent.
 
 4
-00:00:22.595 --> 00:00:28.704
+00:00:24.095 --> 00:00:30.204
 It worked for a small set of low-risk products. Then came a routine model update.
 
 5
-00:00:29.084 --> 00:00:35.447
+00:00:30.584 --> 00:00:36.947
 The new model was better at fuzzy matching, and its product lookup tool read from a stale catalog.
 
 6
-00:00:35.827 --> 00:00:40.576
+00:00:37.327 --> 00:00:42.076
 So it cheerfully approved refunds for items the company had never sold.
 
 7
-00:00:40.956 --> 00:00:46.039
+00:00:42.456 --> 00:00:47.539
 They rolled it back that afternoon. The postmortem took months.
 
 8
-00:00:47.639 --> 00:00:50.064
+00:00:49.139 --> 00:00:51.564
 Here's our working definition.
 
 9
-00:00:50.444 --> 00:00:54.332
+00:00:51.944 --> 00:00:55.832
 An agentic system is given a goal in natural language.
 
 10
-00:00:54.712 --> 00:01:01.895
+00:00:56.212 --> 00:01:03.395
 It chooses its own next action from a set of tools, and executes that action against an external environment.
 
 11
-00:01:02.275 --> 00:01:09.024
+00:01:03.775 --> 00:01:10.524
 Then it observes the result, and repeats the cycle until it judges the goal is met, or gives up.
 
 12
-00:01:10.624 --> 00:01:14.262
+00:01:12.124 --> 00:01:15.762
 Four kinds of systems get confused with agents.
 
 13
-00:01:14.642 --> 00:01:25.880
+00:01:16.142 --> 00:01:27.380
 A chatbot produces text a person reads. An agent produces actions a system executes. Retrieval gives a chatbot information, not agency.
 
 14
-00:01:26.260 --> 00:01:35.917
+00:01:27.760 --> 00:01:37.417
 Robotic process automation drives a user interface from a script. Music comes out of a player piano, but nothing inside is deciding.
 
 15
-00:01:36.297 --> 00:01:47.015
+00:01:37.797 --> 00:01:48.515
 A workflow engine owns its plan. An agent owns its plan. If you can draw your problem on a whiteboard as a graph, you probably want a workflow.
 
 16
-00:01:47.395 --> 00:01:54.019
+00:01:48.895 --> 00:01:55.519
 And classical planners are serious ancestors of agents. Cousins, not twins.
 
 17
-00:01:55.619 --> 00:02:00.387
+00:01:57.119 --> 00:02:01.887
 In production, agent incidents tend to arrive as three horsemen.
 
 18
-00:02:00.767 --> 00:02:06.201
+00:02:02.267 --> 00:02:07.701
 Unbounded loops. Confidently wrong answers. And stubborn retries.
 
 19
-00:02:06.581 --> 00:02:14.669
+00:02:08.081 --> 00:02:16.169
 Every production agent needs explicit termination conditions, limits, and a way to recognize when it can't safely finish the job.
 
 20
-00:02:16.269 --> 00:02:21.432
+00:02:17.769 --> 00:02:22.932
 From the enterprise side, there's a name for this: autonomy theater.
 
 21
-00:02:21.812 --> 00:02:26.706
+00:02:23.312 --> 00:02:28.206
 Systems that look autonomous in a demo, and collapse in production.
 
 22
-00:02:27.086 --> 00:02:35.619
+00:02:28.586 --> 00:02:37.119
 It's usually not a technical failure. It's a product decision, made before anyone asked whether an agent was the right tool.
 
 23
-00:02:35.999 --> 00:02:42.857
+00:02:37.499 --> 00:02:44.357
 So before asking, is the model good enough, ask, have we built the right thing for the problem?
 
 24
-00:02:44.457 --> 00:02:48.991
+00:02:45.957 --> 00:02:50.491
 Here's today's map. Use it to review before the quiz.
 
 25
-00:02:49.371 --> 00:02:56.130
+00:02:50.871 --> 00:02:57.630
 Next time, we'll build the smallest thing that deserves to be called an agent. See you then.
 

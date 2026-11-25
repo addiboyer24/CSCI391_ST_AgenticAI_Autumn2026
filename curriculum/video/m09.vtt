@@ -1,74 +1,74 @@
 WEBVTT
 
 1
-00:00:00.700 --> 00:00:04.099
+00:00:02.200 --> 00:00:05.599
 This is track nine: Solo Practice.
 
 2
-00:00:04.479 --> 00:00:11.563
+00:00:05.979 --> 00:00:13.063
 Before forming a band, learn to play well alone. Today is about structuring a single agent.
 
 3
-00:00:13.163 --> 00:00:16.976
+00:00:14.663 --> 00:00:18.476
 A customer support agent ran well for six months.
 
 4
-00:00:17.356 --> 00:00:27.454
+00:00:18.856 --> 00:00:28.954
 Then, at higher volume, it started offering refunds on unverified orders, skipping steps, and calling the same tool three or four times in a row.
 
 5
-00:00:27.834 --> 00:00:31.908
+00:00:29.334 --> 00:00:33.408
 Nobody had changed the model, the tools, or the prompt.
 
 6
-00:00:32.288 --> 00:00:40.066
+00:00:33.788 --> 00:00:41.566
 The failures came from context growth, tool complexity, and a new mix of requests, all hitting one flat loop.
 
 7
-00:00:40.446 --> 00:00:52.024
+00:00:41.946 --> 00:00:53.524
 Separating routing from execution, and tracking state between steps, fixed all three within a week. It didn't get more capable. It got more organized.
 
 8
-00:00:53.624 --> 00:00:58.213
+00:00:55.124 --> 00:00:59.713
 Following Caldwell's chapter ten, here are the core patterns.
 
 9
-00:00:58.593 --> 00:01:05.476
+00:01:00.093 --> 00:01:06.976
 A router classifies the request, then hands it to an executor with a smaller, focused toolset.
 
 10
-00:01:05.856 --> 00:01:12.839
+00:01:07.356 --> 00:01:14.339
 A validator checks outputs before they leave, using schemas, tests, or a second model.
 
 11
-00:01:13.219 --> 00:01:21.657
+00:01:14.719 --> 00:01:23.157
 A step machine makes states and transitions explicit, like an onboarding flow that must collect certain fields before creating an account.
 
 12
-00:01:22.037 --> 00:01:25.766
+00:01:23.537 --> 00:01:27.266
 Most production agents combine two or three of these.
 
 13
-00:01:27.366 --> 00:01:30.635
+00:01:28.866 --> 00:01:32.135
 The flat loop is still the right place to start.
 
 14
-00:01:31.015 --> 00:01:35.723
+00:01:32.515 --> 00:01:37.223
 Add a pattern only when production evidence shows the failure it prevents.
 
 15
-00:01:36.103 --> 00:01:43.427
+00:01:37.603 --> 00:01:44.927
 Keep validators to the minimum needed to catch failures you've actually seen. Every check costs latency.
 
 16
-00:01:43.807 --> 00:01:50.175
+00:01:45.307 --> 00:01:51.675
 And if an escalation path isn't in the code, and covered by a test, it doesn't exist.
 
 17
-00:01:51.775 --> 00:01:54.174
+00:01:53.275 --> 00:01:55.674
 Here's the map for this module.
 
 18
-00:01:54.554 --> 00:01:59.748
+00:01:56.054 --> 00:02:01.248
 Next time, we form the band: multiple agents working together.
 

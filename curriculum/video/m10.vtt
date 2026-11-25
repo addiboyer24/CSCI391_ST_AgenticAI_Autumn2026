@@ -1,78 +1,78 @@
 WEBVTT
 
 1
-00:00:00.700 --> 00:00:03.964
+00:00:02.200 --> 00:00:05.464
 This is track ten: Forming the Band.
 
 2
-00:00:04.344 --> 00:00:10.113
+00:00:05.844 --> 00:00:11.613
 Agents talking to each other isn't an architecture. Today we look at what is.
 
 3
-00:00:11.713 --> 00:00:19.556
+00:00:13.213 --> 00:00:21.056
 A legal technology company built a paralegal pipeline: extract facts, research precedent, draft.
 
 4
-00:00:19.936 --> 00:00:26.414
+00:00:21.436 --> 00:00:27.914
 On paper it was clean. On document sets hundreds of pages long, it failed.
 
 5
-00:00:26.794 --> 00:00:36.117
+00:00:28.294 --> 00:00:37.617
 Connecting facts to precedent required understanding the extraction step couldn't produce up front, and mismatched schemas between stages made it worse.
 
 6
-00:00:37.717 --> 00:00:42.630
+00:00:39.217 --> 00:00:44.130
 Following Caldwell's chapter eleven, there are a few common patterns.
 
 7
-00:00:43.010 --> 00:00:48.234
+00:00:44.510 --> 00:00:49.734
 A supervisor assigns work to specialized workers and combines the results.
 
 8
-00:00:48.614 --> 00:00:52.343
+00:00:50.114 --> 00:00:53.843
 A pipeline passes work through explicit stages.
 
 9
-00:00:52.723 --> 00:00:59.266
+00:00:54.223 --> 00:01:00.766
 Parallel fan-out suits independent tasks, like the same research run against many companies.
 
 10
-00:00:59.646 --> 00:01:07.959
+00:01:01.146 --> 00:01:09.459
 Hierarchies can go deep, but most production systems settle at two levels: one supervisor, several workers.
 
 11
-00:01:09.559 --> 00:01:13.778
+00:01:11.059 --> 00:01:15.278
 Whatever the pattern, the same infrastructure shows up.
 
 12
-00:01:14.158 --> 00:01:20.851
+00:01:15.658 --> 00:01:22.351
 Shared state needs locking or optimistic concurrency, or two agents will overwrite each other's work.
 
 13
-00:01:21.231 --> 00:01:26.589
+00:01:22.731 --> 00:01:28.089
 Messages between agents need schemas both sides agree on, with versions.
 
 14
-00:01:26.969 --> 00:01:36.227
+00:01:28.469 --> 00:01:37.727
 And retries need idempotency. With an atomic set-if-not-exists, only the first agent to finish a task records its result.
 
 15
-00:01:37.827 --> 00:01:42.346
+00:01:39.327 --> 00:01:43.846
 From the enterprise side: version every message contract.
 
 16
-00:01:42.726 --> 00:01:48.230
+00:01:44.226 --> 00:01:49.730
 Mismatched schemas between stages cause more pipeline failures than anything else.
 
 17
-00:01:48.610 --> 00:01:58.272
+00:01:50.110 --> 00:01:59.772
 Multiple agents multiply both specialization and coordination risk. Spend your effort on shared state and recovery, not role-play.
 
 18
-00:01:59.872 --> 00:02:02.272
+00:02:01.372 --> 00:02:03.772
 Here's the map for this module.
 
 19
-00:02:02.652 --> 00:02:08.240
+00:02:04.152 --> 00:02:09.740
 Next, we bring the humans back in: who approves what, and when.
 

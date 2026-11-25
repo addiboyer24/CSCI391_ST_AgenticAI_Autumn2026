@@ -1,118 +1,118 @@
 WEBVTT
 
 1
-00:00:00.700 --> 00:00:05.934
+00:00:02.200 --> 00:00:07.434
 Hi, I'm Encore, and this is track three: Five-Piece Band.
 
 2
-00:00:06.314 --> 00:00:13.322
+00:00:07.814 --> 00:00:14.822
 Today we take an agent apart, organ by organ, and find out which one teams forget most often.
 
 3
-00:00:14.922 --> 00:00:18.276
+00:00:16.422 --> 00:00:19.776
 Remember the refund agent from our first lecture?
 
 4
-00:00:18.656 --> 00:00:25.605
+00:00:20.156 --> 00:00:27.105
 When it wasn't confident, it didn't say so. It invented a refund policy and acted on it.
 
 5
-00:00:25.985 --> 00:00:31.058
+00:00:27.485 --> 00:00:32.558
 That agent wasn't missing intelligence. It was missing an organ.
 
 6
-00:00:31.438 --> 00:00:39.071
+00:00:32.938 --> 00:00:40.571
 Specifically, the termination check that would have forced it to say, I don't know, before doing anything else.
 
 7
-00:00:40.671 --> 00:00:45.875
+00:00:42.171 --> 00:00:47.375
 Following Caldwell's chapter three, a production agent has five parts.
 
 8
-00:00:46.255 --> 00:00:50.073
+00:00:47.755 --> 00:00:51.573
 The model does the reasoning and decides which tool to call.
 
 9
-00:00:50.453 --> 00:00:59.087
+00:00:51.953 --> 00:01:00.587
 The tool set defines what the agent can actually do in the world, like a web search, a database query, or a calculator.
 
 10
-00:00:59.467 --> 00:01:05.350
+00:01:00.967 --> 00:01:06.850
 Memory, at minimum, is a rolling context window, and ideally more.
 
 11
-00:01:05.730 --> 00:01:08.979
+00:01:07.230 --> 00:01:10.479
 The loop alternates between thinking and acting.
 
 12
-00:01:09.359 --> 00:01:12.758
+00:01:10.859 --> 00:01:14.258
 And the termination policy knows when to stop.
 
 13
-00:01:13.138 --> 00:01:20.806
+00:01:14.638 --> 00:01:22.306
 Most framework documentation lists three or four of these. The one that usually goes missing is the last one.
 
 14
-00:01:22.406 --> 00:01:25.220
+00:01:23.906 --> 00:01:26.720
 Here's the whole anatomy on one map.
 
 15
-00:01:25.600 --> 00:01:32.673
+00:01:27.100 --> 00:01:34.173
 Notice that the model reasons and emits tool calls, but it never executes privileged operations itself.
 
 16
-00:01:33.053 --> 00:01:40.681
+00:01:34.553 --> 00:01:42.181
 Tools take typed, validated inputs. The loop observes every result before deciding the next step.
 
 17
-00:01:42.281 --> 00:01:45.525
+00:01:43.781 --> 00:01:47.025
 Here's an example from Addison's own testing.
 
 18
-00:01:45.905 --> 00:01:57.543
+00:01:47.405 --> 00:01:59.043
 A calculator tool accepted a single expression as a string. The model called it with two arguments, a left operand and a right operand, a schema it simply made up.
 
 19
-00:01:57.923 --> 00:02:04.296
+00:01:59.423 --> 00:02:05.796
 So validate inputs before you run anything. Does the number of parameters even match?
 
 20
-00:02:04.676 --> 00:02:18.259
+00:02:06.176 --> 00:02:19.759
 And when a call fails, don't hand the model a raw stack trace. Return a typed result: a success flag, and a clear message, like, customer email must be a valid email address.
 
 21
-00:02:18.639 --> 00:02:25.237
+00:02:20.139 --> 00:02:26.737
 Your tool names and descriptions become the living documentation of your agent, so write them carefully.
 
 22
-00:02:26.837 --> 00:02:29.246
+00:02:28.337 --> 00:02:30.746
 Here's the enterprise lens.
 
 23
-00:02:29.626 --> 00:02:37.149
+00:02:31.126 --> 00:02:38.649
 Production systems pin model versions, log their seeds, and keep traces of the exact messages they sent.
 
 24
-00:02:37.529 --> 00:02:41.158
+00:02:39.029 --> 00:02:42.658
 If you can't replay a run, you can't debug it.
 
 25
-00:02:41.538 --> 00:02:53.276
+00:02:43.038 --> 00:02:54.776
 And make the termination policy code, not prose: a step limit, a spending limit, a time limit, and an explicit way to say, I can't complete this safely.
 
 26
-00:02:54.876 --> 00:02:57.305
+00:02:56.376 --> 00:02:58.805
 Two questions to think about.
 
 27
-00:02:57.685 --> 00:03:01.858
+00:02:59.185 --> 00:03:03.358
 Which component is most often mistaken for the entire agent?
 
 28
-00:03:02.238 --> 00:03:07.857
+00:03:03.738 --> 00:03:09.357
 And what does a termination policy look like for an agent that has no natural done state?
 
 29
-00:03:08.237 --> 00:03:14.855
+00:03:09.737 --> 00:03:16.355
 In lab, you'll put all five parts together in the Coffee Shop Agent. See you there.
 

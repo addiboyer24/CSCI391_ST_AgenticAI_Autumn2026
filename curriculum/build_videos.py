@@ -27,6 +27,7 @@ import wave
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import video_scripts as V  # noqa: E402
+import encore_sprites as ES  # noqa: E402
 
 OUT = os.path.join(HERE, "video")
 IMG = os.path.join(HERE, "img")
@@ -38,6 +39,7 @@ VOICE = os.environ.get("CSCI391_VOICE", "Microsoft David Desktop")
 RATE = 22050
 GAP = 0.38          # silence between sentences (s)
 LEAD, TAIL = 0.7, 0.9  # silence at the start / end of each scene (s)
+WALK_IN = 1.5          # Encore walks on stage at the start of each lecture (s)
 E = lambda s: html.escape(str(s))  # noqa: E731
 
 
@@ -119,30 +121,6 @@ def edge_shot(html_text, png, w=1280, h=720, transparent=False):
     raise RuntimeError("Edge did not render " + page)
 
 
-ROBOT_SVG = open(os.path.join(IMG, "robot-lecturer.svg"), encoding="utf-8").read()
-BLINK_EYES = '<g id="eyes" fill="none" stroke="#5ff3ff" stroke-width="9" stroke-linecap="round" filter="url(#glow)"><path d="M157 196 h32"/><path d="M231 196 h32"/></g>'
-
-
-def robot_state(mouth, blink=False):
-    svg = ROBOT_SVG
-    for m in ("closed", "mid", "open"):
-        op = "1" if m == mouth else "0"
-        svg = re.sub(rf'(<path id="mouth-{m}"[^>]*?)(?: opacity="[^"]*")?\s*/>', rf'\1 opacity="{op}"/>', svg)
-    if blink:
-        svg = re.sub(r'<g id="eyes".*?</g>', BLINK_EYES, svg, flags=re.S)
-    return svg
-
-
-def render_robots():
-    states = {}
-    for key, mouth, blink in [("closed", "closed", False), ("mid", "mid", False), ("open", "open", False), ("blink", "closed", True)]:
-        png = os.path.join(WORK, f"robot_{key}.png")
-        if not os.path.exists(png):
-            body = robot_state(mouth, blink).replace('width="420" height="520"', 'width="380" height="470"')
-            edge_shot(f"<html><body style='margin:0;background:transparent'>{body}</body></html>", png, 380, 470, transparent=True)
-        states[key] = png
-    return states
-
 
 SLIDE_CSS = """
 *{box-sizing:border-box;margin:0}
@@ -212,7 +190,7 @@ def ts(sec, vtt=True):
     return f"{int(h):02d}:{int(m):02d}:{s:06.3f}" if vtt else f"{int(h):02d}:{int(m):02d}:{s:06.3f}".replace(".", ",")
 
 
-def build(lec, n, robots):
+def build(lec, n, enc):
     d = os.path.join(WORK, lec["id"])
     os.makedirs(d, exist_ok=True)
     # 1. speech
@@ -225,27 +203,30 @@ def build(lec, n, robots):
             idx += 1
     synthesize(items)
     # 2. timeline
-    audio, cues, mouth, slides = [], [], [], []
+    audio, cues, robot, slides = [], [], [], []
     t, idx = 0.0, 0
     rnd = random.Random(lec["id"])
+    salt = int(hashlib.sha1(lec["id"].encode()).hexdigest(), 16) % 97
+    n_scenes = len(lec["scenes"])
     for si, scene in enumerate(lec["scenes"]):
         png = os.path.join(d, f"slide_{si:02d}.png")
         edge_shot(slide_html(scene, lec, n), png)
         start = t
-        audio.append(silence(LEAD)); mouth.append(("closed", LEAD)); t += LEAD
+        poses = [ES.choose_pose(scene, si, li, n_scenes, line, salt) for li, line in enumerate(scene["lines"])]
+        if si == 0:  # Encore walks on stage before the first line
+            walk = enc.walk_in(WALK_IN)
+            audio.append(silence(WALK_IN)); robot += walk; t += WALK_IN
+        audio.append(silence(LEAD)); robot += enc.rest(poses[0], LEAD, rnd); t += LEAD
         for li, line in enumerate(scene["lines"]):
             pcm = read_wav(items[idx]["out"]); idx += 1
             dur = len(pcm) / 2 / RATE
             audio.append(pcm)
             cues.append((t, t + dur, line))
-            left = dur
-            while left > 0:
-                step = min(left, rnd.choice([0.09, 0.11, 0.13]))
-                mouth.append((rnd.choice(["open", "mid", "open", "closed"]), step)); left -= step
+            robot += enc.speak(poses[li], dur, rnd)
             t += dur
             gap = GAP if li < len(scene["lines"]) - 1 else TAIL
             audio.append(silence(gap))
-            mouth.append(("blink" if rnd.random() < 0.3 else "closed", gap)); t += gap
+            robot += enc.rest(poses[li + 1] if li + 1 < len(poses) else poses[li], gap, rnd); t += gap
         slides.append((png, t - start))
     wav_path = os.path.join(d, "narration.wav")
     with wave.open(wav_path, "wb") as w:
@@ -268,7 +249,7 @@ def build(lec, n, robots):
             chunked.append((png, step))
             dur -= step
     slides_txt = concat_file("slides.txt", chunked)
-    robot_txt = concat_file("robot.txt", [(robots[k], dur) for k, dur in mouth])
+    robot_txt = concat_file("robot.txt", robot)
     # 4. captions
     os.makedirs(OUT, exist_ok=True)
     vtt = os.path.join(OUT, f"{lec['id']}.vtt")
@@ -287,7 +268,7 @@ def build(lec, n, robots):
     subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-y",
                     "-f", "concat", "-safe", "0", "-i", slides_txt,
                     "-f", "concat", "-safe", "0", "-i", robot_txt,
-                    "-filter_complex", "[0:v]fps=25,scale=1280:720,format=yuv420p[bg];[1:v]fps=25,format=rgba[r];[bg][r]overlay=x=870:y=250,format=yuv420p[v]",
+                    "-filter_complex", "[0:v]fps=25,scale=1280:720,format=yuv420p[bg];[1:v]fps=25,format=rgba[r];[bg][r]overlay=x=0:y=0,format=yuv420p[v]",
                     "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "26", "-t", f"{t:.2f}", raw], check=True)
     # Pass 2: encode narration to ADTS AAC. (64k: ffmpeg 9.1 AAC hangs at 96k for 22.05 kHz mono.)
     aac = os.path.join(d, "narration.aac")
@@ -312,11 +293,11 @@ def main():
         sys.exit("Need ffmpeg (on PATH or FFMPEG env var) and Microsoft Edge.")
     os.makedirs(WORK, exist_ok=True)
     want = set(sys.argv[1:])
-    robots = render_robots()
+    enc = ES.Encore(WORK)
     for n, lec in enumerate(V.LECTURES, 1):
         if want and lec["id"] not in want:
             continue
-        dur = build(lec, int(lec["id"][1:]), robots)
+        dur = build(lec, int(lec["id"][1:]), enc)
         print(f"{lec['id']}  {lec['track']}  {lec['name']}  {dur/60:.1f} min", flush=True)
 
 
