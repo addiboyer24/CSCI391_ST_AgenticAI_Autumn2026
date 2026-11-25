@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300">
+  <title>Encore, the midterm music agent, on stage</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a0b3d"/><stop offset=".55" stop-color="#5a1170"/><stop offset="1" stop-color="#a3166f"/></linearGradient>
+    <radialGradient id="spot" cx="78%" cy="45%" r="45%"><stop offset="0" stop-color="#ff9be8" stop-opacity=".55"/><stop offset="1" stop-color="#ff9be8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ff6ff" stop-opacity=".7"/><stop offset="1" stop-color="#9ff6ff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#2a0838"/></linearGradient>
+  </defs>
+  <rect width="900" height="300" fill="url(#sky)"/>
+  <path d="M120 -10 L30 300 L150 300Z" fill="url(#beam)" opacity="0.35"/><path d="M300 -10 L216 300 L336 300Z" fill="url(#beam)" opacity="0.45"/><path d="M480 -10 L402 300 L522 300Z" fill="url(#beam)" opacity="0.55"/><path d="M640 -10 L568 300 L688 300Z" fill="url(#beam)" opacity="0.35"/><path d="M800 -10 L734 300 L854 300Z" fill="url(#beam)" opacity="0.45"/>
+  <rect width="900" height="300" fill="url(#spot)"/>
+  <text x="470" y="90" font-size="34" fill="#5ff3ff" opacity=".85" font-family="Segoe UI Symbol, sans-serif">♪</text><text x="545" y="60" font-size="26" fill="#ff7ad9" opacity=".85" font-family="Segoe UI Symbol, sans-serif">♫</text><text x="575" y="150" font-size="30" fill="#ffd35f" opacity=".85" font-family="Segoe UI Symbol, sans-serif">♪</text><text x="860" y="70" font-size="28" fill="#5ff3ff" opacity=".85" font-family="Segoe UI Symbol, sans-serif">♫</text><text x="440" y="190" font-size="22" fill="#ff7ad9" opacity=".85" font-family="Segoe UI Symbol, sans-serif">♫</text>
+  <rect x="520" y="238" width="380" height="62" fill="url(#floor)" opacity=".9"/>
+  <rect x="520" y="236" width="380" height="4" fill="#ff8ae6"/>
+  <g transform="translate(598 6) scale(.5)">
+  
+  <defs>
+    <radialGradient id="helm" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dee6"/></radialGradient>
+    <radialGradient id="visor" cx="45%" cy="40%" r="75%"><stop offset="0" stop-color="#1c2233"/><stop offset="1" stop-color="#05070d"/></radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d92b2b"/><stop offset="1" stop-color="#a51717"/></linearGradient>
+  </defs>
+  <!-- body / hoodie -->
+  <path d="M95 520 C95 400 130 345 210 345 C290 345 325 400 325 520Z" fill="url(#hood)"/>
+  <path d="M150 352 C170 395 250 395 270 352" fill="none" stroke="#8c1010" stroke-width="10" stroke-linecap="round"/>
+  <path d="M186 380 l-6 70 M234 380 l6 70" stroke="#f3f3f3" stroke-width="5" stroke-linecap="round"/>
+  <rect x="190" y="440" width="40" height="30" rx="6" fill="#8c1010"/>
+  <!-- pointer arm (gesturing) -->
+  <path d="M310 420 C350 400 365 370 372 340" fill="none" stroke="url(#hood)" stroke-width="40" stroke-linecap="round"/>
+  <circle cx="374" cy="328" r="22" fill="#fff" stroke="#cfd5de" stroke-width="3"/>
+  <!-- antenna -->
+  <line x1="210" y1="70" x2="210" y2="30" stroke="#cfd5de" stroke-width="6"/>
+  <circle cx="210" cy="24" r="11" fill="#5ff3ff" filter="url(#glow)"/>
+  <!-- headphones band -->
+  <path d="M95 190 C95 80 325 80 325 190" fill="none" stroke="#2b2b33" stroke-width="12"/>
+  <!-- helmet -->
+  <ellipse cx="210" cy="200" rx="120" ry="125" fill="url(#helm)" stroke="#c7ccd6" stroke-width="3"/>
+  <!-- ear cups -->
+  <rect x="70" y="160" width="40" height="80" rx="18" fill="#ff8a00" stroke="#c96500" stroke-width="4"/>
+  <rect x="310" y="160" width="40" height="80" rx="18" fill="#ff8a00" stroke="#c96500" stroke-width="4"/>
+  <!-- mic -->
+  <path d="M100 235 C110 285 150 300 175 292" fill="none" stroke="#2b2b33" stroke-width="5"/>
+  <circle cx="178" cy="291" r="7" fill="#2b2b33"/>
+  <!-- visor -->
+  <rect x="120" y="135" width="180" height="140" rx="62" fill="url(#visor)"/>
+  <!-- eyes: happy arcs -->
+  <g id="eyes" fill="none" stroke="#5ff3ff" stroke-width="9" stroke-linecap="round" filter="url(#glow)">
+    <path d="M155 200 q18 -22 36 0"/>
+    <path d="M229 200 q18 -22 36 0"/>
+  </g>
+  <!-- mouth: three states for lip-sync (closed / mid / open); a renderer shows one at a time -->
+  <g filter="url(#glow)">
+    <path id="mouth-closed" d="M185 238 q25 18 50 0" fill="none" stroke="#5ff3ff" stroke-width="7" stroke-linecap="round"/>
+    <path id="mouth-mid" d="M185 236 q25 26 50 0 q-25 8 -50 0Z" fill="#5ff3ff" opacity="0" />
+    <path id="mouth-open" d="M182 234 q28 38 56 0 q-28 10 -56 0Z" fill="#5ff3ff" opacity="0"/>
+  </g>
+  <!-- cheek blush -->
+  <circle cx="148" cy="228" r="7" fill="#5ff3ff" opacity=".25"/>
+  <circle cx="272" cy="228" r="7" fill="#5ff3ff" opacity=".25"/>
+</g>
+  <rect x="40" y="244" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="111" y="241" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="182" y="238" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="253" y="235" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="324" y="232" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="395" y="229" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="466" y="226" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="537" y="245" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="608" y="242" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="679" y="239" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="750" y="236" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="821" y="233" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/><rect x="892" y="230" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/>
+  <circle cx="10" cy="293" r="16" fill="#0b0618"/><circle cx="36" cy="300" r="17" fill="#0b0618"/><circle cx="62" cy="298" r="18" fill="#0b0618"/><circle cx="88" cy="296" r="19" fill="#0b0618"/><circle cx="114" cy="294" r="20" fill="#0b0618"/><circle cx="140" cy="292" r="14" fill="#0b0618"/><circle cx="166" cy="299" r="15" fill="#0b0618"/><circle cx="192" cy="297" r="16" fill="#0b0618"/><circle cx="218" cy="295" r="17" fill="#0b0618"/><circle cx="244" cy="293" r="18" fill="#0b0618"/><circle cx="270" cy="300" r="19" fill="#0b0618"/><circle cx="296" cy="298" r="20" fill="#0b0618"/><circle cx="322" cy="296" r="14" fill="#0b0618"/><circle cx="348" cy="294" r="15" fill="#0b0618"/><circle cx="374" cy="292" r="16" fill="#0b0618"/><circle cx="400" cy="299" r="17" fill="#0b0618"/><circle cx="426" cy="297" r="18" fill="#0b0618"/><circle cx="452" cy="295" r="19" fill="#0b0618"/><circle cx="478" cy="293" r="20" fill="#0b0618"/><circle cx="504" cy="300" r="14" fill="#0b0618"/><circle cx="530" cy="298" r="15" fill="#0b0618"/><circle cx="556" cy="296" r="16" fill="#0b0618"/><circle cx="582" cy="294" r="17" fill="#0b0618"/><circle cx="608" cy="292" r="18" fill="#0b0618"/><circle cx="634" cy="299" r="19" fill="#0b0618"/><circle cx="660" cy="297" r="20" fill="#0b0618"/><circle cx="686" cy="295" r="14" fill="#0b0618"/><circle cx="712" cy="293" r="15" fill="#0b0618"/><circle cx="738" cy="300" r="16" fill="#0b0618"/><circle cx="764" cy="298" r="17" fill="#0b0618"/><circle cx="790" cy="296" r="18" fill="#0b0618"/><circle cx="816" cy="294" r="19" fill="#0b0618"/><circle cx="842" cy="292" r="20" fill="#0b0618"/><circle cx="868" cy="299" r="14" fill="#0b0618"/><circle cx="894" cy="297" r="15" fill="#0b0618"/>
+</svg>

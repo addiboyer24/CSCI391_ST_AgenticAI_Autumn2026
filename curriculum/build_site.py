@@ -409,7 +409,43 @@ def page():
 TEMPLATE = open(os.path.join(HERE, "template.html"), encoding="utf8").read()
 
 
+def encore_cover_svg():
+    """Midterm cover: the Encore robot (same character as the video lecturer) solo on a neon stage."""
+    import re
+    robot = open(os.path.join(IMG, "robot-lecturer.svg"), encoding="utf8").read()
+    robot = re.sub(r"^\s*<svg[^>]*>|</svg>\s*$|<title>.*?</title>", "", robot.strip(), flags=re.S)
+    beams = "".join(
+        f'<path d="M{x} -10 L{x - 90 + i * 6} 300 L{x + 30 + i * 6} 300Z" fill="url(#beam)" opacity="{0.35 + 0.1 * (i % 3):.2f}"/>'
+        for i, x in enumerate([120, 300, 480, 640, 800]))
+    notes = "".join(
+        f'<text x="{x}" y="{y}" font-size="{s}" fill="{c}" opacity=".85" font-family="Segoe UI Symbol, sans-serif">{g}</text>'
+        for x, y, s, c, g in [(470, 90, 34, "#5ff3ff", "♪"), (545, 60, 26, "#ff7ad9", "♫"), (575, 150, 30, "#ffd35f", "♪"),
+                              (860, 70, 28, "#5ff3ff", "♫"), (440, 190, 22, "#ff7ad9", "♫")])
+    crowd = "".join(f'<circle cx="{x}" cy="{300 - (x * 7) % 9}" r="{14 + (x * 3) % 7}" fill="#0b0618"/>' for x in range(10, 900, 26))
+    sticks = "".join(f'<rect x="{x}" y="{246 - (x * 5) % 22}" width="4" height="26" rx="2" fill="#c77dff" opacity=".8"/>' for x in range(40, 900, 71))
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300">
+  <title>Encore, the midterm music agent, on stage</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a0b3d"/><stop offset=".55" stop-color="#5a1170"/><stop offset="1" stop-color="#a3166f"/></linearGradient>
+    <radialGradient id="spot" cx="78%" cy="45%" r="45%"><stop offset="0" stop-color="#ff9be8" stop-opacity=".55"/><stop offset="1" stop-color="#ff9be8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ff6ff" stop-opacity=".7"/><stop offset="1" stop-color="#9ff6ff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#2a0838"/></linearGradient>
+  </defs>
+  <rect width="900" height="300" fill="url(#sky)"/>
+  {beams}
+  <rect width="900" height="300" fill="url(#spot)"/>
+  {notes}
+  <rect x="520" y="238" width="380" height="62" fill="url(#floor)" opacity=".9"/>
+  <rect x="520" y="236" width="380" height="4" fill="#ff8ae6"/>
+  <g transform="translate(598 6) scale(.5)">{robot}</g>
+  {sticks}
+  {crowd}
+</svg>'''
+
+
 def main():
+    with open(os.path.join(IMG, "encore-cover.svg"), "w", encoding="utf8") as f:
+        f.write(encore_cover_svg())
     for n, m in enumerate(D.MODULES, 1):
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
