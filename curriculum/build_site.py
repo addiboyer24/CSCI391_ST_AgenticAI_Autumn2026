@@ -6,6 +6,7 @@ Reads curriculum/course_data.py and writes:
   * index.html                          (repo root, Coursera-style course page)
   * curriculum/img/<id>-mindmap.svg     (radial mind map per module)
   * curriculum/img/<id>-onepager.svg    (one-page lecture guide per module)
+Optional inputs: video_scripts.py (Encore lectures) and checks.py (practice quizzes).
 """
 import html
 import string
@@ -23,6 +24,12 @@ try:
     LECTURE = {l["id"]: l for l in VS.LECTURES}
 except ImportError:
     LECTURE = {}
+
+try:
+    import checks as CK  # noqa: E402
+    CHECKS = CK.CHECKS
+except ImportError:
+    CHECKS = {}
 
 
 def video_for(m):
@@ -219,6 +226,7 @@ ICON = {
     "quiz": '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="m8.5 13 2.5 2.5L15.5 11"/>',
     "project": '<path d="M3 9.5 12 5l9 4.5-9 4.5zM7 11.5v4.5c2.8 2 7.2 2 10 0v-4.5"/>',
     "code": '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
+    "practice": '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.3 2.4c-.6.3-.9.8-.9 1.4v.6M12 16.8v.2"/>',
     "check": '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
     "chev": '<path d="m6 9 6 6 6-6"/>',
     "person": '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>',
@@ -235,8 +243,10 @@ def counts(m):
     for a in m["activities"]:
         if a["kind"] in c:
             c[a["kind"]] += 1
-    names = {"video": "video", "reading": "reading", "lab": "lab", "quiz": "quiz", "project": "project milestone"}
-    parts = [f'{v} {names[k]}{"s" if v != 1 else ""}' if not k == "quiz" else f'{v} quiz{"zes" if v != 1 else ""}' for k, v in c.items() if v]
+    if m["id"] in CHECKS:
+        c["practice"] = 1
+    names = {"video": "video", "reading": "reading", "lab": "lab", "quiz": "graded quiz", "project": "project milestone", "practice": "practice quiz"}
+    parts = [f'{v} {names[k]}{"s" if v != 1 else ""}' if not k.endswith("quiz") and k != "practice" else f'{v} {names[k][:-4]}quiz{"zes" if v != 1 else ""}' for k, v in c.items() if v]
     return parts
 
 
@@ -262,6 +272,31 @@ def player(m):
     </figure>'''
 
 
+def check_html(m, n):
+    qs = CHECKS.get(m["id"])
+    if not qs:
+        return ""
+    graded = [a["title"].split(" — ")[0] for a in m["activities"] if a["kind"] == "quiz"]
+    note = f" Graded in class: {E(graded[0])}." if graded else ""
+    need = max(1, round(len(qs) * 2 / 3))
+    out = []
+    for qi, q in enumerate(qs):
+        opts = "".join(
+            f'<label class="opt" data-why="{E(why)}"><input type="radio" name="{m["id"]}-q{qi}" value="{oi}"><span>{E(text)}</span></label>'
+            for oi, (text, why) in enumerate(q["options"]))
+        out.append(f'<li class="q" data-answer="{q["answer"]}"><p class="stem">{E(q["q"])}</p>'
+                   f'<div class="opts" role="radiogroup" aria-label="Question {qi + 1}">{opts}</div><p class="fb" hidden></p></li>')
+    return f'''<section class="check" id="{m['id']}-check" data-mod="{m['id']}" data-pass="{need}">
+      <div class="check-head">{icon('practice')}<div><span class="kicker">Check your progress · Practice quiz</span>
+        <h4>Module {n}: {E(m['title'])}</h4>
+        <p>{len(qs)} questions · ungraded · instant feedback · pass with {need} of {len(qs)}.{note}</p></div>
+        <span class="best" hidden></span></div>
+      <ol class="qs">{''.join(out)}</ol>
+      <div class="check-foot"><button type="button" class="btn primary submit" disabled>Submit answers</button>
+        <button type="button" class="btn ghost retry" hidden>Try again</button><span class="score" aria-live="polite"></span></div>
+    </section>'''
+
+
 def module_html(m, n):
     items = []
     for k, t in chapter_titles(m):
@@ -273,8 +308,10 @@ def module_html(m, n):
     lec = video_for(m)
     if lec:
         items.insert(0, ("video", f"Video lecture · Encore {lec['track']}", f"{lec['name']} — narrated by Encore, with captions", f"#{m['id']}-video"))
+    if m["id"] in CHECKS:
+        items.append(("practice", "Practice quiz · Check your progress", f"{len(CHECKS[m['id']])} questions · ungraded · instant feedback", f"#{m['id']}-check"))
     for a in m["activities"]:
-        label = {"lab": "Lab", "quiz": "Quiz", "project": "Project", "code": "Code example"}[a["kind"]]
+        label = {"lab": "Lab", "quiz": "Graded quiz", "project": "Project", "code": "Code example"}[a["kind"]]
         items.append((a["kind"], label, f'{a["title"]} — {a["desc"]}', a.get("href")))
     li = []
     for kind, label, text, href in items:
@@ -299,7 +336,7 @@ def module_html(m, n):
     <div class="mod-head">
       <h3>{E(m['title'])}</h3>
       <p class="mod-tag">{E(m['tagline'])}</p>
-      <p class="mod-meta">{E(' · '.join(counts(m)))} · Reading {E(m['chapters'])}</p>
+      <p class="mod-meta">{E(' · '.join(counts(m)))} · Reading {E(m['chapters'])}<span class="done" data-done="{m['id']}" hidden>{icon('check')} Check passed</span></p>
     </div>
     {icon('chev', 'chev')}
   </summary>
@@ -327,6 +364,7 @@ def module_html(m, n):
     <ul class="items">{''.join(li)}</ul>
     <h4>Discussion prompts</h4>
     <ul class="prompts">{prompts}</ul>
+    {check_html(m, n)}
   </div>
 </details>'''
 
@@ -359,7 +397,7 @@ def page():
         book_title=E(B["title"]), book_sub=E(B["subtitle"]), book_author=E(B["author"]), book_ed=E(B["edition"]), book_url=E(B["url"]),
         pilot=E(C["pilot"]), credits=C["credits"], length=E(C["length"]), level=E(C["level"]), prereq=E(C["prereq"]),
         repo=E(C["repo"]), syllabus=E(C["syllabus"]),
-        n_vid=sum(1 for m in D.MODULES if video_for(m)), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
+        n_vid=sum(1 for m in D.MODULES if video_for(m)), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
         outcomes=outcomes, skills=skills, modules="\n".join(mods), chapters="".join(chap_rows),
         grading=grading, tech=tech, faq=faq, toc=toc,
     )
