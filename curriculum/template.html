@@ -87,7 +87,16 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .contents a{display:block;padding:5px 0;text-decoration:none;color:var(--ink);font-size:14.5px;line-height:1.35}
 .contents a.sub{font-size:13.5px;color:var(--muted);padding:3px 0 3px 12px}
 .contents a.sub span{color:var(--copper-d);font-weight:700;margin-right:6px;font-variant-numeric:tabular-nums}
-.contents .grp{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d);font-weight:800;margin:10px 0 2px 12px}
+.contents summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 0;font-size:14.5px;color:var(--ink);user-select:none}
+.contents summary::-webkit-details-marker{display:none}
+.contents summary::before{content:"";flex:none;width:6px;height:6px;margin:0 2px 0 1px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.contents details[open]>summary::before{transform:rotate(45deg)}
+.contents summary:hover{color:var(--maroon)}
+.contents summary:focus-visible{outline:2px solid var(--maroon);outline-offset:2px;border-radius:4px}
+.contents .lvl>a.sub{padding-left:18px}
+.contents .grp{margin-left:12px}
+.contents .grp>summary{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d);font-weight:800;padding:7px 0 4px;line-height:1.35}
+.contents .grp>a.sub{padding-left:18px}
 .contents a:hover{color:var(--maroon)}
 .contents a.on{font-weight:700;color:var(--ink)}
 .contents a.sub.on{color:var(--maroon)}
@@ -641,6 +650,20 @@ $contents
   });
   try { var saved = localStorage.getItem(VKEY); if (saved) setVoice(saved); } catch (err) {}
 
+  // Collapsible contents: the part you are reading opens by itself and the others fold away,
+  // except groups you opened or closed yourself, which stay the way you left them.
+  var groups = document.querySelectorAll('.contents details');
+  Array.prototype.forEach.call(groups, function (d) {
+    d.querySelector('summary').addEventListener('click', function () { d.dataset.user = '1'; });
+  });
+  function follow(a) {
+    var mine = [];
+    for (var d = a.parentNode.closest('details'); d; d = d.parentNode.closest('details')) mine.push(d);
+    Array.prototype.forEach.call(groups, function (d) {
+      if (d.dataset.user) return;
+      d.open = mine.indexOf(d) >= 0 || d.classList.contains('lvl');
+    });
+  }
   var tabs = document.querySelectorAll('.contents a');
   var targets = Array.prototype.map.call(tabs, function (a) { return document.querySelector(a.getAttribute('href')); });
   if ('IntersectionObserver' in window) {
@@ -651,6 +674,7 @@ $contents
           if (targets[i] === en.target) {
             Array.prototype.forEach.call(tabs, function (s) { s.classList.remove('on'); });
             a.classList.add('on');
+            follow(a);
           }
         });
       });

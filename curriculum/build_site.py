@@ -226,15 +226,19 @@ def mosaic_html(guide):
 
 
 def contents_html():
+    """Sticky table of contents. Modules is a collapsible group; each part inside it collapses too."""
     out = ['<nav class="contents" aria-label="Contents"><h2>Contents</h2>', '<a href="#intro">Introduction</a>',
-           '<a href="#about">What you\'ll learn</a>', '<a href="#modules">Modules</a>']
+           '<a href="#about">What you\'ll learn</a>',
+           '<details class="lvl" open><summary>Modules</summary>', '<a class="sub" href="#modules">Overview</a>']
     current = None
     for n, m in enumerate(D.MODULES, 1):
         if m["part"] != current:
+            if current:
+                out.append("</details>")
             current = m["part"]
-            out.append(f'<div class="grp">{E(D.PARTS[current][0])} · {E(D.PARTS[current][1])}</div>')
+            out.append(f'<details class="grp"><summary>{E(D.PARTS[current][0])} · {E(D.PARTS[current][1])}</summary>')
         out.append(f'<a class="sub" href="#{m["id"]}"><span>{n:02d}</span>{E(m["title"])}</a>')
-    out += ['<a href="#projects">Projects</a>', '<a href="#textbook">Textbook</a>', '<a href="#author">Author</a>',
+    out += ["</details>", "</details>", '<a href="#projects">Projects</a>', '<a href="#textbook">Textbook</a>', '<a href="#author">Author</a>',
             '<a href="#adopt">Adopt this course</a>', '<a href="#faq">FAQ</a>', "</nav>"]
     return "\n".join(out)
 
