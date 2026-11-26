@@ -70,21 +70,21 @@ GATE = r"""<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--maroon:#70002e;--maroon-d:#4f0020;--ink:#1f1a1c;--muted:#5b5559;--line:#e4dfe1;--soft:#f7f5f2}
+:root{--brand:#1d4f9c;--brand-d:#143a75;--ink:#1b2533;--muted:#566173;--line:#e1e7ef;--soft:#f5f8fc}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--soft);color:var(--ink);font-family:Inter,'Segoe UI',system-ui,Arial,sans-serif}
 .card{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 28px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
-.brand{display:inline-block;background:var(--maroon);color:#fff;border-radius:6px;padding:5px 8px;font-size:13px;font-weight:800;letter-spacing:.04em}
+.brand{display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:5px 8px;font-size:13px;font-weight:800;letter-spacing:.04em}
 h1{font-size:24px;margin:14px 0 6px}
 p{margin:0 0 18px;color:var(--muted);font-size:15px;line-height:1.5}
 label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
 input{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px}
-input:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px rgba(112,0,46,.12)}
-button{margin-top:14px;width:100%;font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--maroon);border:0;border-radius:8px;padding:12px;cursor:pointer}
-button:hover{background:var(--maroon-d)}
+input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(112,0,46,.12)}
+button{margin-top:14px;width:100%;font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--brand);border:0;border-radius:8px;padding:12px;cursor:pointer}
+button:hover{background:var(--brand-d)}
 button[disabled]{opacity:.6;cursor:progress}
 .err{color:#b3261e;font-size:14px;margin:10px 0 0;min-height:1.2em}
-.back{display:block;margin-top:18px;font-size:14px;color:var(--maroon)}
+.back{display:block;margin-top:18px;font-size:14px;color:var(--brand)}
 </style>
 </head>
 <body>
@@ -96,7 +96,7 @@ button[disabled]{opacity:.6;cursor:progress}
   <input id="pw" type="password" autocomplete="current-password" required autofocus>
   <button type="submit" id="go">Open the guide</button>
   <p class="err" id="err" role="alert"></p>
-  <a class="back" href="index.html">← Back to the course site</a>
+  <a class="back" href="csci391.html">← Back to the course site</a>
 </form>
 <script>
 (function () {

@@ -34,7 +34,7 @@ def browser():
 def open_page(browser, server):
     pages = []
 
-    def go(path="index.html", **ctx):
+    def go(path="csci391.html", **ctx):
         context = browser.new_context(**ctx)
         page = context.new_page()
         page.errors = []
@@ -159,3 +159,53 @@ def test_nothing_marked_hidden_is_shown(open_page):
         .filter(e => getComputedStyle(e).display !== 'none').map(e => e.className || e.id || e.tagName)""")
     assert not shown, f"elements with the hidden attribute are visible: {shown[:10]}"
     assert page.locator('[data-done]:visible').count() == 0
+
+
+# ───────────── the Aideation catalog ─────────────
+def test_catalog_loads_without_errors(open_page):
+    page = open_page("index.html")
+    page.wait_for_timeout(400)
+    assert not [e for e in page.errors if "favicon" not in e], page.errors
+
+
+def test_course_card_opens_its_preview_and_enroll_starts_sign_up(open_page):
+    page = open_page("index.html")
+    page.locator('.card[data-course-open="csci391"]').click()
+    dlg = page.locator("#course-csci391")
+    assert dlg.is_visible() and dlg.locator("video").count() == 1
+    dlg.locator('[data-join="join"]').click()
+    join = page.locator("#join")
+    assert join.is_visible() and not dlg.is_visible(), "enrolling should swap the preview for the join dialog"
+    join.locator('input[value="instructor"]').check()
+    join.locator("[data-next]").click()
+    assert "as Instructor" in page.locator("#join-summary").inner_text()
+    join.locator('[data-provider="google"]').click()
+    if not page.evaluate("document.querySelector('meta[name=aideation-api]').content"):
+        assert page.locator("#join-soon").is_visible(), "with no API yet, say accounts open soon"
+
+
+def test_log_in_goes_straight_to_providers(open_page):
+    page = open_page("csci391.html")
+    page.locator('.atop [data-join="login"]').click()
+    assert page.locator("#join-title").inner_text() == "Log in"
+    assert page.locator('#join [data-step="sign"]').is_visible() and not page.locator('#join [data-step="role"]').is_visible()
+
+
+def test_old_course_links_land_on_the_course_page(open_page):
+    page = open_page("index.html#m03")
+    page.wait_for_url("**/csci391.html#m03")
+
+
+def test_catalog_search_filters(open_page):
+    page = open_page("index.html")
+    page.fill("#asearch", "zzzz-nothing")
+    assert page.locator("#empty").is_visible()
+    page.fill("#asearch", "mcp")
+    assert page.locator('.card[data-course-open="csci391"]').is_visible() and not page.locator("#empty").is_visible()
+
+
+@pytest.mark.parametrize("width", [375, 768])
+def test_catalog_fits_small_screens(open_page, width):
+    page = open_page("index.html", viewport={"width": width, "height": 800})
+    page.wait_for_timeout(300)
+    assert page.evaluate("document.documentElement.scrollWidth") <= width

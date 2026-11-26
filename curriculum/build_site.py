@@ -3,7 +3,8 @@
     python curriculum/build_site.py
 
 Reads curriculum/course_data.py and writes:
-  * index.html                          (repo root, the course page)
+  * index.html                          (repo root, the Aideation catalog)
+  * csci391.html                        (repo root, the course page)
   * instructor-guide.html               (repo root, the same course with module maps and track scripts instead of videos)
   * curriculum/img/<id>-mindmap.svg     (radial mind map; fallback when no explainer board exists)
   * curriculum/img/<id>-board.pdf/.jpg   (the illustrated board from the video = the module mind map; made by build_explainer.py)
@@ -63,9 +64,9 @@ os.makedirs(IMG, exist_ok=True)
 
 E = lambda s: html.escape(str(s), quote=True)  # noqa: E731
 FONT = "'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
-MAROON, COPPER, INK, CREAM = "#70002e", "#ED8B00", "#1f1a1c", "#efe8d4"
-BRANCH_COLORS = ["#70002e", "#b8432f", "#c77700", "#2d6a87", "#3f7a55", "#5a4787"]
-TINTS = ["#f6e9ee", "#f9ebe7", "#fdf1df", "#e6f0f5", "#e7f1ea", "#eeeaf5"]
+MAROON, COPPER, INK, CREAM = "#1d4f9c", "#ff8a1f", "#1b2533", "#fff4dc"
+BRANCH_COLORS = ["#1d4f9c", "#1fa7b8", "#4f9a2a", "#e8a400", "#f2721e", "#e0306a"]
+TINTS = ["#e3edf9", "#e1f6f6", "#edf6e4", "#fff6d6", "#fff0e3", "#fde6ee"]
 
 
 def wrap(text, width, max_lines=None):
@@ -99,7 +100,7 @@ def mindmap_svg(m, n):
     rows = [220, 440, 660]
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="{FONT}">',
            f'<title>Module {n:02d} mind map: {E(m["title"])}</title>',
-           '<rect width="100%" height="100%" fill="#fbfaf7"/>',
+           '<rect width="100%" height="100%" fill="#f8fafd"/>',
            f'<rect width="{W}" height="66" fill="{MAROON}"/>',
            f'<text x="32" y="40" fill="#fff" font-size="17" font-weight="700" letter-spacing="2">CSCI 391 · MODULE {n:02d} · MIND MAP</text>',
            f'<text x="{W-32}" y="40" fill="#f3c98b" font-size="15" text-anchor="end">{E(part_label(m))}</text>']
@@ -188,7 +189,7 @@ def board_files(m):
 
 # Hero: the "setlist stage". Every track appears, in course order, grouped like a concert setlist.
 COVER = {"encore": "curriculum/img/encore-cover.webp", "ensemble": "curriculum/img/encore-ensemble-cover.webp"}
-SETS = [("I", "Part I · Foundations"), ("II", "Part II · Core capabilities"), ("III", "Part III · Patterns"),
+SETS = [("overview", "Start here"), ("I", "Part I · Foundations"), ("II", "Part II · Core capabilities"), ("III", "Part III · Patterns"),
         ("IV", "Part IV · Hardening"), ("lab", "Labs"), ("project", "Projects")]
 
 
@@ -230,7 +231,7 @@ def stage_html(guide):
 
 def contents_html():
     """Sticky table of contents. Modules is a collapsible group; each part inside it collapses too."""
-    out = ['<nav class="contents" aria-label="Contents"><h2>Contents</h2>', '<a href="#intro">Introduction</a>',
+    out = ['<nav class="contents" aria-label="Contents"><h2>Contents</h2>', '<a href="#intro">Introduction</a>', '<a href="#start">Start here</a>',
            '<a href="#about">What you\'ll learn</a>',
            '<details class="lvl" open><summary>Modules</summary>', '<a class="sub" href="#modules">Overview</a>']
     current = None
@@ -332,6 +333,19 @@ def track_block(lec, series, guide, pid=None):
                     body, open_=True, rid=f"{pid or vid}-script")
     return fold("video", f"Video · {d} · {lec['track']}", lec["name"], "Narrated by Encore · captions on · choose a voice",
                 player_for(lec, series, pid), img=f"curriculum/video/{vid}.jpg", play=True)
+
+
+def start_here(guide):
+    """The course overview track and the course map: the first thing on the course page."""
+    lec = track_video("overview")
+    if not lec:
+        return ""
+    pdf, jpg = "curriculum/img/overview-board.pdf", "curriculum/img/overview-board.jpg"
+    if guide:
+        return ('<div class="rows">' + map_figure(pdf, jpg, "Course map: the whole course on one illustrated board", "Course map · the board the overview draws")
+                + track_block(lec, "Course overview", True) + "</div>")
+    return ('<div class="rows">' + track_block(lec, "Course overview", False)
+            + row("map", "Course map · PDF", "The whole course on one board", "Print it, or keep it open beside the tracks", pdf, jpg) + "</div>")
 
 
 def player(m):
@@ -535,18 +549,32 @@ def page(guide=False):
         book_title=E(B["title"]), book_sub=E(B["subtitle"]), book_author=E(B["author"]), book_ed=E(B["edition"]), book_url=E(B["url"]),
         pilot=E(C["pilot"]), credits=C["credits"], length=E(C["length"]), level=E(C["level"]), prereq=E(C["prereq"]),
         repo=E(C["repo"]), syllabus=E(C["syllabus"]),
-        n_vid=sum(1 for m in D.MODULES if video_for(m)) + sum(1 for l in LECTURE.values() if l.get("for") and track_video(l["id"])), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
+        n_vid=len(setlist(False)), course_id=CATALOG_ID, start_here=start_here(guide),
+        start_href="#overview-script" if guide else "#overview-video", start_verb="Read the overview script" if guide else "Watch the overview", n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
         outcomes=outcomes, skills=skills, modules="\n".join(mods), chapters="".join(chap_rows),
         grading=grading, tech=tech, faq=faq, stage=stage_html(guide)[0], setlist=stage_html(guide)[1], n_tracks=len(setlist(guide)), contents=contents_html(),
         encore_video=track_block(track_video("encore"), "Project walkthrough", guide, "encore-proj") if track_video("encore") else "",
         ensemble_video=track_block(track_video("ensemble"), "Project walkthrough", guide, "ensemble-proj") if track_video("ensemble") else "",
         kind="Instructor's guide" if guide else "Agentic AI Curriculum",
         label="Instructor's guide" if guide else "Course collection",
-        switch='<a href="index.html">Student site</a>' if guide else '<a href="instructor-guide.html">Instructor\'s guide</a>',
-        cta2='<a class="btn ghost" href="index.html">Open the student site</a>' if guide else '<a class="btn ghost" href="instructor-guide.html">Instructor\'s guide</a>',
+        switch='<a href="csci391.html">Student site</a>' if guide else '<a href="instructor-guide.html">Instructor\'s guide</a>',
+        cta2='<a class="btn ghost" href="csci391.html">Open the student site</a>' if guide else '<a class="btn ghost" href="instructor-guide.html">Instructor\'s guide</a>',
         intro=E(GUIDE_INTRO if guide else SITE_INTRO), mod_intro=E(GUIDE_MODS if guide else SITE_MODS),
     )
     for k, v in {"$ICON_PERSON": icon("person"), "$ICON_BOOK": icon("book"), "$ICON_CHEV": icon("chev", "chev")}.items():
+        out = out.replace(k, v)
+    return shell(out, CATALOG_ID)
+
+
+CATALOG_ID = "csci391"
+
+
+def shell(out, here):
+    """Wrap a page in the Aideation shell (top bar, footer, join dialog). Inserted after templating: the shell's JS uses '$'."""
+    import shell as SH
+    for k, v in {"<!--SHELL:head-->": SH.HEAD, "/*SHELL:css*/": SH.SHELL_CSS, "<!--SHELL:topbar-->": SH.topbar("index.html", here),
+                 "<!--SHELL:footer-->": SH.footer(), "<!--SHELL:join-->": SH.join_dialog(), "/*SHELL:js*/": SH.SHELL_JS}.items():
+        assert out.count(k) == 1, k
         out = out.replace(k, v)
     return out
 
@@ -560,12 +588,15 @@ def main():
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
     import guide_lock
+    import catalog_page
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf8", newline="\n") as f:
+        f.write(catalog_page.page())
+    with open(os.path.join(ROOT, "csci391.html"), "w", encoding="utf8", newline="\n") as f:
         f.write(page(False))
     # the guide holds quiz questions and answer keys: publish it encrypted, never as plaintext
     with open(os.path.join(ROOT, "instructor-guide.html"), "w", encoding="utf8", newline="\n") as f:
         f.write(guide_lock.locked_page(page(True), f"{D.COURSE['code']} · Instructor's guide"))
-    print(f"Built index.html, instructor-guide.html and {len(D.MODULES)} fallback maps in {IMG}")
+    print(f"Built index.html (catalog), csci391.html, instructor-guide.html and {len(D.MODULES)} fallback maps in {IMG}")
 
 
 if __name__ == "__main__":

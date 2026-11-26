@@ -21,29 +21,29 @@ TEXT_EXT = {".py", ".html", ".md", ".txt", ".json", ".yml", ".yaml", ".js", ".cs
 
 
 # ───────────── freshness ─────────────
-def test_index_is_up_to_date_with_its_sources(site, index_html):
+def test_index_is_up_to_date_with_its_sources(site, course_html):
     """index.html is generated. If this fails, run  python curriculum/build_site.py  and commit the result."""
     built = site.page(False).replace("\r\n", "\n")
-    assert built == index_html.replace("\r\n", "\n"), "index.html is stale: rebuild with python curriculum/build_site.py"
+    assert built == course_html.replace("\r\n", "\n"), "index.html is stale: rebuild with python curriculum/build_site.py"
 
 
-def test_no_template_placeholders_left(index_html):
-    leftovers = re.findall(r"\$\$?[A-Za-z_]{3,}", re.sub(r"<script>.*?</script>", "", index_html, flags=re.S))
+def test_no_template_placeholders_left(course_html):
+    leftovers = re.findall(r"\$\$?[A-Za-z_]{3,}", re.sub(r"<script>.*?</script>", "", course_html, flags=re.S))
     assert not leftovers, f"unfilled template fields: {sorted(set(leftovers))[:10]}"
 
 
 # ───────────── structure ─────────────
 @pytest.fixture(scope="module")
-def page(index_html):
-    return parse(index_html)
+def page(course_html):
+    return parse(course_html)
 
 
-def test_basic_document_shape(page, index_html):
-    assert index_html.lstrip().lower().startswith("<!doctype html>")
+def test_basic_document_shape(page, course_html):
+    assert course_html.lstrip().lower().startswith("<!doctype html>")
     tags = [t for t, _ in page.tags]
     assert tags.count("h1") == 1, "exactly one main heading"
     assert ("meta", {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}) in page.tags
-    assert re.search(r"<title>[^<]{10,}</title>", index_html)
+    assert re.search(r"<title>[^<]{10,}</title>", course_html)
     assert ("html", {"lang": "en"}) in page.tags
 
 
@@ -79,24 +79,24 @@ def test_external_links_open_safely(page):
             assert "noopener" in (a.get("rel") or ""), f"target=_blank without rel=noopener: {a.get('href')}"
 
 
-def test_every_track_is_on_the_setlist(index_html):
+def test_every_track_is_on_the_setlist(course_html):
     import video_scripts as VS
-    songs = re.findall(r'class="song[^"]*" href="#([\w-]+)-video"', index_html)
+    songs = re.findall(r'class="song[^"]*" href="#([\w-]+)-video"', course_html)
     assert sorted(songs) == sorted(l["id"] for l in VS.LECTURES), "the hero setlist should list every track exactly once"
 
 
-def test_every_module_has_track_reading_and_quiz(index_html):
+def test_every_module_has_track_reading_and_quiz(course_html):
     import course_data as D
     for m in D.MODULES:
-        block = index_html.split(f'<article class="module" id="{m["id"]}">', 1)[1].split("</article>", 1)[0]
+        block = course_html.split(f'<article class="module" id="{m["id"]}">', 1)[1].split("</article>", 1)[0]
         for part in ("Track", "Reading"):
             assert f"<h4>{part}</h4>" in block, f"{m['id']} has no {part} section"
         if any(a["kind"] in ("lab", "project", "code") for a in m["activities"]):
             assert "<h4>Application</h4>" in block, f"{m['id']} has an assignment but no Application section"
 
 
-def test_page_weight_is_reasonable(index_html):
-    assert len(index_html.encode("utf8")) < 1_500_000, "index.html is getting heavy; check for inlined media"
+def test_page_weight_is_reasonable(course_html):
+    assert len(course_html.encode("utf8")) < 1_500_000, "index.html is getting heavy; check for inlined media"
 
 
 # ───────────── privacy ─────────────
@@ -169,3 +169,64 @@ def test_guide_decrypts_with_the_real_password(guide_html):
     assert not sorted({h[1:] for _, k, h in g.links if k == "href" and h.startswith("#") and len(h) > 1 and h[1:] not in ids})
     for block in re.findall(r'<ol class="bank graded">(.*?)</ol>\s*</div>', html, re.S):
         assert 'class="key"' not in block, "a graded quiz shows its answer key"
+
+
+# ───────────── the Aideation catalog ─────────────
+def test_catalog_is_up_to_date(catalog_html):
+    import catalog_page
+    assert catalog_page.page().replace("\r\n", "\n") == catalog_html.replace("\r\n", "\n"), "index.html is stale: rebuild"
+
+
+@pytest.fixture(scope="module")
+def cat(catalog_html):
+    return parse(catalog_html)
+
+
+def test_catalog_structure(cat, catalog_html, tracked):
+    dup = sorted({i for i in cat.ids if cat.ids.count(i) > 1})
+    assert not dup, f"duplicate ids on the catalog: {dup}"
+    ids = set(cat.ids)
+    broken = sorted({h[1:] for _, k, h in cat.links if k == "href" and h.startswith("#") and len(h) > 1 and h[1:] not in ids})
+    assert not broken, f"catalog links to missing anchors: {broken}"
+    missing = sorted({u.split("#")[0] for _, _, u in cat.links
+                      if not u.startswith(("http", "#", "data:", "mailto:")) and u.split("#")[0] not in tracked})
+    assert not missing, f"catalog links to files that aren't committed: {missing}"
+    assert all("alt" in i for i in cat.imgs)
+    assert catalog_html.count("<h1") == 1
+
+
+def test_every_course_has_a_card_a_preview_and_a_page(catalog_html, tracked):
+    import catalog as K
+    for c in K.COURSES:
+        assert f'data-course-open="{c["id"]}"' in catalog_html, f"{c['id']}: no course card"
+        assert f'id="course-{c["id"]}"' in catalog_html, f"{c['id']}: no preview dialog"
+        assert c["page"] in tracked and c["cover"] in tracked, f"{c['id']}: page or cover not committed"
+        assert c["map"] in tracked, f"{c['id']}: course map not committed"
+        block = catalog_html.split(f'id="course-{c["id"]}"', 1)[1].split("</dialog>", 1)[0]
+        assert f'{c["overview"]}.mp4' in block, f"{c['id']}: the preview has no overview track"
+        assert 'data-join="join"' in block, f"{c['id']}: the preview has no way to enroll"
+
+
+def test_join_dialog_offers_every_role_on_every_page(catalog_html, course_html):
+    import catalog as K
+    for name, html in (("catalog", catalog_html), ("course page", course_html)):
+        assert html.count('id="join"') == 1, f"{name}: join dialog missing or duplicated"
+        for r in K.ROLES:
+            assert f'name="role" value="{r["id"]}"' in html, f"{name}: no '{r['id']}' role"
+        assert 'data-provider="github"' in html and 'data-provider="google"' in html
+        assert '<meta name="aideation-api"' in html
+
+
+def test_old_course_links_redirect_to_the_course_page(course_html):
+    """index.html used to be the course page; its anchors must still land somewhere."""
+    import catalog_page
+    p = parse(course_html)
+    anchors = [i for i in p.ids if re.match(r"^(m\d\d|lab\d|encore|ensemble|overview)", i)] + ["intro", "modules", "faq"]
+    assert all(re.match(catalog_page.LEGACY, "#" + a) for a in anchors)
+    assert not re.match(catalog_page.LEGACY, "#courses") and not re.match(catalog_page.LEGACY, "#course-csci391")
+
+
+def test_brand_assets_are_committed(tracked):
+    import catalog as K
+    for k in ("logo", "mark", "mark_lg", "favicon"):
+        assert K.BRAND[k] in tracked, f"brand asset not committed: {K.BRAND[k]}"

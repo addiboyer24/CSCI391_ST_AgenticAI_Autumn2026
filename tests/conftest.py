@@ -69,8 +69,8 @@ def tracked():
 
 
 @pytest.fixture(scope="session")
-def index_html():
-    return read("index.html")
+def course_html():
+    return read("csci391.html")
 
 
 @pytest.fixture(scope="session")
@@ -99,3 +99,8 @@ def server():
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{port}"
     httpd.shutdown()
+
+
+@pytest.fixture(scope="session")
+def catalog_html():
+    return read("index.html")

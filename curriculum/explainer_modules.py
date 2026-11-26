@@ -700,6 +700,17 @@ def make_board(spec):
 
 # ───────────────────────── per-module specs (line numbers are lecture-wide) ─────────────────────────
 SPECS = {
+    "overview": [
+        {"deco": ["music", "map"]},
+        {"rel": True, "beats": [(0, "curtain", "a brilliant demo"), (1, "crack", "real users, real failures"), (2, "shield", "reliable, observable, safe")], "quote_at": (1, 3.0)},
+        {"rel": True, "cards": [("target", 1), ("blocks", 2), ("brain", 3), ("knife", 4)]},
+        {"rel": True, "cards": [("contract", 1), ("notebook", 2), ("map", 3), ("plug", 4)]},
+        {"rel": True, "cards": [("states", 1), ("hierarchy", 2), ("person", 3), ("road", 4)]},
+        {"rel": True, "cards": [("eye", 1), ("lock", 2), ("trophy", 3)]},
+        {"rel": True, "cards": [("wrench", 1), ("music", 2), ("network", 3)]},
+        {"rel": True, "cards": [("film", 1), ("book", 2), ("checklist", 3), ("toolbox", 4)]},
+        {"rel": True, "close": (1, "music", "next: Track 1 · Opening Act")},
+    ],
     "m01": [
         {"deco": ["target", "cycle"]},
         {"beats": [(2, "coin", "an “autonomous” refund agent"), (3, "gear", "a routine model update"), (4, "database", "a stale catalog"),

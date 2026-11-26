@@ -915,3 +915,71 @@ PRACTICE_TRACKS = [
     },
 ]
 LECTURES = LECTURES + PRACTICE_TRACKS
+
+# The course-level overview: the first thing a visitor plays, and the course card's preview on the catalog.
+OVERVIEW_TRACK = {
+    "id": "overview", "track": "Track 00", "name": "The Whole Tour", "kind": "overview",
+    "module": "Course overview", "chapters": "Chapters 1–14",
+    "scenes": [
+        {"type": "title", "lines": [
+            "Hi, I'm Encore, your lecturer for this course, and this is track zero: The Whole Tour.",
+            "Before the first module, here's the whole show on one page: what you'll learn, how it fits together, and what you'll build.",
+        ]},
+        {"type": "quote", "kicker": "Why this course", "quote": "Getting an agent to work once is easy. Getting it to work every day, safely, is the job.", "lines": [
+            "A demo agent can look brilliant in an afternoon.",
+            "Then it meets real users, flaky tools, and model updates, and it loops, guesses, or quietly does the wrong thing.",
+            "This course is about closing that gap: building agents that act, and keeping them reliable, observable, and safe.",
+        ]},
+        {"type": "bullets", "kicker": "Part I", "heading": "Foundations and mindset",
+         "bullets": ["What an agent is — and isn't", "The minimum viable agent", "Five-part anatomy", "When not to build one"], "lines": [
+            "The tour has four parts. Part one is foundations.",
+            "First, what an agent actually is: a system that chooses its own next action, not a chatbot with extra steps.",
+            "Then the smallest real agent: a system prompt, a set of tools, and a loop, plus the fifty years of ideas behind it.",
+            "Next, its anatomy: model, tools, memory, loop, and a termination policy.",
+            "And the most underrated skill in the field: knowing when a workflow or a single model call is the better answer.",
+        ]},
+        {"type": "bullets", "kicker": "Part II", "heading": "Core capabilities",
+         "bullets": ["The model and its tool contracts", "Memory, four kinds", "Planning and decomposition", "The Model Context Protocol"], "lines": [
+            "Part two builds the capabilities.",
+            "The model proposes, and typed tool contracts decide what actually happens.",
+            "Memory gives the agent continuity: working, episodic, semantic, and procedural.",
+            "Planning turns an open-ended goal into a budgeted sequence of steps.",
+            "And the Model Context Protocol standardizes how agents reach tools and data.",
+        ]},
+        {"type": "bullets", "kicker": "Part III", "heading": "Architecture and patterns",
+         "bullets": ["Single-agent patterns", "Multi-agent systems", "Humans in and on the loop", "Long-running agents"], "lines": [
+            "Part three is architecture.",
+            "Single-agent patterns make one agent more organized, not just more capable.",
+            "Multi-agent systems coordinate a team, with typed messages and shared state.",
+            "Human oversight goes where the risk is: approvals in the loop, and monitoring on it.",
+            "And long-running agents survive restarts, throttling, and runs that last for days.",
+        ]},
+        {"type": "bullets", "kicker": "Part IV", "heading": "Hardening and operations",
+         "bullets": ["Observability, evaluation and drift", "Safety and guardrails", "A capstone with evidence"], "lines": [
+            "Part four hardens it all for production.",
+            "You'll trace, evaluate, and watch for drift, so you know not just that the agent ran, but that it behaved.",
+            "You'll put guardrails at every boundary, because no prompt, by itself, is a security boundary.",
+            "And you'll finish with a capstone that brings evidence, not just a demo.",
+        ]},
+        {"type": "bullets", "kicker": "What you'll build", "heading": "Labs, then a band",
+         "bullets": ["Five labs — chatbot to MCP server", "Midterm: Encore — a music agent that remembers", "Final: Encore Ensemble — a coordinated team"], "lines": [
+            "Along the way, you build.",
+            "Five labs take you from a bare chatbot to a hardened, tool-routing agent and an M C P server.",
+            "At the midterm you build Encore, a music agent with memory, tools, and approval before it writes.",
+            "And in the final, Encore Ensemble, your soloist becomes a band.",
+        ]},
+        {"type": "bullets", "kicker": "Every module", "heading": "Four steps, every week",
+         "bullets": ["Track — a narrated lecture and its map", "Reading — a chapter of the textbook", "Quiz — a practice check", "Application — a lab or project"], "lines": [
+            "Every module runs the same way.",
+            "Watch its track, an illustrated lecture like this one, and keep its map.",
+            "Read the matching chapter of the textbook.",
+            "Take the practice check, as many times as you like.",
+            "And apply it, in that week's lab or project.",
+        ]},
+        {"type": "image", "src": "", "lines": [
+            "Here's the whole course on one board. Download it, and keep it next to you.",
+            "Ready? Track one is up next: Opening Act.",
+        ]},
+    ],
+}
+LECTURES = [OVERVIEW_TRACK] + LECTURES
