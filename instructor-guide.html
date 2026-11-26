@@ -46,16 +46,21 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .btn.ghost:hover{background:var(--hero)}
 .btn.sm{padding:7px 14px;font-size:13px}
 
-/* hero: a mosaic of track art and project covers around the title card */
-.hero{background:var(--soft);padding:26px 0 30px}
-.mosaic{display:grid;grid-template-columns:1fr 1fr 2.3fr 1fr 1fr;gap:12px;align-items:stretch}
-.mosaic .tile{display:block;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#e7dfd6;box-shadow:0 3px 10px rgba(42,36,32,.12)}
+/* hero (collection-page layout): full-bleed mosaic of flat art tiles around a big title card */
+.hero{background:#fff;padding:14px 0 0;overflow:hidden}
+.crumbs{font-size:13px;color:var(--muted);margin:0 0 12px}
+.crumbs a{color:var(--ink);text-decoration:none;font-weight:600}
+.crumbs a:hover{text-decoration:underline}
+.mosaic{display:grid;grid-template-columns:1fr 1.75fr .95fr 4.6fr 1fr;grid-template-rows:repeat(2,clamp(120px,14.5vw,200px));gap:10px;margin:0 -70px 0 10px}
+.mosaic .tile{display:block;border-radius:18px;overflow:hidden;background:#e7dfd6}
 .mosaic .tile img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.mosaic .tile:hover img,.mosaic .tile:focus-visible img{transform:scale(1.06)}
-.titlecard{grid-column:3;grid-row:1/4;border-radius:16px;background:var(--cream);color:var(--maroon);display:flex;flex-direction:column;justify-content:center;padding:28px 34px}
-.titlecard small{font-size:12.5px;letter-spacing:.16em;font-weight:800;color:var(--copper-d);text-transform:uppercase}
-.titlecard h1{font-size:clamp(28px,3.4vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.04;margin:10px 0 12px}
-.titlecard p{margin:0;font-size:16px;color:#5a2a3c;max-width:420px}
+.mosaic .tile:hover img,.mosaic .tile:focus-visible img{transform:scale(1.05)}
+.t-a{grid-column:1;grid-row:1}.t-b{grid-column:2/4;grid-row:1}.t-c{grid-column:1/3;grid-row:2}.t-d{grid-column:3;grid-row:2}
+.t-e{grid-column:5;grid-row:1}.t-f{grid-column:5;grid-row:2}
+.titlecard{grid-column:4;grid-row:1/3;border-radius:18px;background:#f4c56e;color:#5c1424;display:flex;flex-direction:column;justify-content:center;padding:28px 44px}
+.titlecard small{font-size:17px;font-weight:700;color:#7a2a1c}
+.titlecard h1{font-size:clamp(28px,3.3vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:4px 0 10px}
+.titlecard p{margin:0;font-size:16.5px;color:#6b2a20;max-width:520px}
 
 /* guide extras: reading outline and quiz question bank */
 .outline{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 20px}
@@ -75,24 +80,30 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 
 /* page: sticky Contents on the left, the course on the right */
 .page{display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;align-items:start;padding-top:34px}
-.contents{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow:auto;padding-bottom:20px;scrollbar-width:thin}
-.contents h2{font-size:20px;margin:0 0 10px 10px}
-.contents a{display:block;padding:6px 10px;border-radius:6px;text-decoration:none;color:var(--ink);font-size:14.5px;font-weight:600;line-height:1.35}
-.contents a.sub{font-weight:500;font-size:13.5px;color:var(--muted);padding-left:18px}
+.contents{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow:auto;padding:0 6px 20px 0;scrollbar-width:thin}
+.contents h2{font-size:15px;font-weight:600;margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.contents a{display:block;padding:5px 0;text-decoration:none;color:var(--ink);font-size:14.5px;line-height:1.35}
+.contents a.sub{font-size:13.5px;color:var(--muted);padding:3px 0 3px 12px}
 .contents a.sub span{color:var(--copper-d);font-weight:700;margin-right:6px;font-variant-numeric:tabular-nums}
-.contents .grp{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d);font-weight:800;margin:12px 10px 2px}
-.contents a:hover,.contents a.on{background:var(--hero);color:var(--maroon)}
+.contents .grp{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d);font-weight:800;margin:10px 0 2px 12px}
+.contents a:hover{color:var(--maroon)}
+.contents a.on{font-weight:700;color:var(--ink)}
+.contents a.sub.on{color:var(--maroon)}
 main section{padding:44px 0;border-bottom:1px solid var(--line)}
 main section:last-child{border-bottom:0}
-.intro{background:var(--soft);border-radius:16px;padding:30px 34px}
-.badge{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--maroon);margin-bottom:14px}
-.lede{font-size:19px;color:var(--ink);margin:0 0 18px;max-width:720px}
-.byline{display:flex;flex-direction:column;gap:6px;font-size:15px;margin-bottom:18px}
-.byline .ic{color:var(--maroon)}
+.intro{background:#fbf0d9;border-radius:18px;padding:22px 28px;color:#6b2a20}
+.lede{font-size:16.5px;line-height:1.6;margin:0 0 12px;max-width:none}
+.byline{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;color:#6b2a20}
+.byline .ic{color:#7a2a1c}
 .byline div{display:flex;gap:8px;align-items:center}
-.facts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;padding:0;list-style:none}
-.facts li{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13.5px;font-weight:600}
-.cta{display:flex;gap:12px;flex-wrap:wrap}
+.enroll{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:26px 0 0}
+.enroll .btn.primary{padding:15px 34px;font-size:16px}
+.enroll small{color:var(--muted);font-size:13.5px}
+.keyfacts{display:grid;grid-template-columns:repeat(4,1fr);margin:26px 0 0;border:1px solid var(--line);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.keyfacts div{padding:16px 18px;border-right:1px solid var(--line)}
+.keyfacts div:last-child{border-right:0}
+.keyfacts b{display:block;font-size:16px;font-weight:700}
+.keyfacts span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 .pilot{font-size:13px;color:var(--muted);margin:16px 0 0}
 
 /* about */
@@ -290,9 +301,13 @@ dialog img{width:100%;height:auto}
   .bookcover{max-width:260px}
 }
 @media (max-width:760px){
-  .mosaic{grid-template-columns:1fr 1fr 1fr}
-  .mosaic .tile:nth-of-type(n+7){display:none}
+  .hero{padding-bottom:20px}
+  .mosaic{grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto;margin:0 16px}
+  .mosaic .tile{grid-column:auto!important;grid-row:auto!important;aspect-ratio:1}
   .titlecard{grid-column:1/-1;grid-row:1;padding:24px 22px}
+  .keyfacts{grid-template-columns:1fr 1fr}
+  .keyfacts div:nth-child(2){border-right:0}
+  .keyfacts div:nth-child(-n+2){border-bottom:1px solid var(--line)}
 }
 @media (max-width:640px){
   .wrap{padding:0 16px}
@@ -320,22 +335,15 @@ dialog img{width:100%;height:auto}
 </header>
 
 <div class="hero">
-  <div class="wrap">
-    <div class="mosaic">
-      <a class="tile" href="#m01" title="Module 1 map · What Is an AI Agent?" aria-label="Module 1 map · What Is an AI Agent?"><img src="curriculum/img/m01-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m02" title="Module 2 map · The Minimum Viable Agent &amp; a Short History of Agents" aria-label="Module 2 map · The Minimum Viable Agent &amp; a Short History of Agents"><img src="curriculum/img/m02-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#projects" title="Encore · midterm project" aria-label="Encore · midterm project"><img src="curriculum/img/encore-cover.webp" alt="" loading="eager"></a>
-      <a class="tile" href="#m03" title="Module 3 map · The Anatomy of an Agent" aria-label="Module 3 map · The Anatomy of an Agent"><img src="curriculum/img/m03-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m05" title="Module 5 map · LLMs as Reasoning Engines &amp; Tools as Contracts" aria-label="Module 5 map · LLMs as Reasoning Engines &amp; Tools as Contracts"><img src="curriculum/img/m05-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m06" title="Module 6 map · Memory: Working, Episodic, Semantic, Procedural" aria-label="Module 6 map · Memory: Working, Episodic, Semantic, Procedural"><img src="curriculum/img/m06-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m07" title="Module 7 map · Planning &amp; Decomposition" aria-label="Module 7 map · Planning &amp; Decomposition"><img src="curriculum/img/m07-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m10" title="Module 10 map · Multi-Agent Systems &amp; Shared Infrastructure" aria-label="Module 10 map · Multi-Agent Systems &amp; Shared Infrastructure"><img src="curriculum/img/m10-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#projects" title="Encore Ensemble · final project" aria-label="Encore Ensemble · final project"><img src="curriculum/img/encore-ensemble-cover.webp" alt="" loading="eager"></a>
-      <a class="tile" href="#m11" title="Module 11 map · Human-in-the-Loop &amp; Human-on-the-Loop" aria-label="Module 11 map · Human-in-the-Loop &amp; Human-on-the-Loop"><img src="curriculum/img/m11-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m12" title="Module 12 map · Long-Running &amp; Asynchronous Agents" aria-label="Module 12 map · Long-Running &amp; Asynchronous Agents"><img src="curriculum/img/m12-board.jpg" alt="" loading="eager"></a>
-      <a class="tile" href="#m14" title="Module 14 map · Safety, Alignment &amp; Guardrails" aria-label="Module 14 map · Safety, Alignment &amp; Guardrails"><img src="curriculum/img/m14-board.jpg" alt="" loading="eager"></a>
-      <div class="titlecard"><small>CSCI 391 · Instructor's guide</small><h1>Agentic Artificial Intelligence</h1><p>Design, build, and operate AI agents that reason, plan, use tools, remember, and know when to stop.</p></div>
-    </div>
+  <div class="wrap"><div class="crumbs"><a href="#">Computer Science</a> › <a href="#">Artificial Intelligence</a> › Agentic AI</div></div>
+  <div class="mosaic">
+    <a class="tile t-a" href="#m06" title="Module 6 · LLMs as reasoning engines" aria-label="Module 6 · LLMs as reasoning engines"><img src="curriculum/img/tiles/brain.svg" alt="" loading="eager"></a>
+    <a class="tile t-b" href="#projects" title="Encore · the midterm project" aria-label="Encore · the midterm project"><img src="curriculum/img/encore-cover.webp" alt="" loading="eager"></a>
+    <a class="tile t-c" href="#projects" title="Encore Ensemble · the capstone" aria-label="Encore Ensemble · the capstone"><img src="curriculum/img/encore-ensemble-cover.webp" alt="" loading="eager"></a>
+    <a class="tile t-d" href="#m05" title="Module 5 · tools as contracts" aria-label="Module 5 · tools as contracts"><img src="curriculum/img/tiles/toolbox.svg" alt="" loading="eager"></a>
+    <a class="tile t-e" href="#m10" title="Module 10 · multi-agent systems" aria-label="Module 10 · multi-agent systems"><img src="curriculum/img/tiles/hierarchy.svg" alt="" loading="eager"></a>
+    <a class="tile t-f" href="#m14" title="Module 14 · security and alignment" aria-label="Module 14 · security and alignment"><img src="curriculum/img/tiles/shield.svg" alt="" loading="eager"></a>
+    <div class="titlecard"><small>CSCI 391 · Instructor's guide</small><h1>Agentic Artificial Intelligence</h1><p>Design, build, and operate AI agents that reason, plan, use tools, remember, and know when to stop.</p></div>
   </div>
 </div>
 
@@ -370,19 +378,24 @@ dialog img{width:100%;height:auto}
 </nav>
 <main>
 <div class="intro" id="intro">
-  <span class="badge">3 credits · 15 weeks · 2 sessions per week · semester- and instructor-neutral</span>
   <p class="lede">The whole course, arranged for teaching. In place of the videos, each module shows its module map and the full narration script of its track, scene by scene, followed by the reading, quizzes, assignments, and teaching notes.</p>
   <div class="byline">
     <div><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/></svg><span>Curriculum &amp; enterprise lens by <strong>Addison Boyer</strong></span></div>
     <div><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/></svg><span>Inspired by <em>The Agentic AI Bible</em> by <strong>Thomas R. Caldwell</strong></span></div>
   </div>
-  <ul class="facts"><li>14 modules</li><li>21 tracks</li><li>5 labs</li><li>6 quizzes</li><li>2 projects</li><li>Data Structures &amp; Algorithms (CSCI 232) or instructor consent</li></ul>
-  <div class="cta">
-    <a class="btn primary" href="#m01">Start with Module 1</a>
-    <a class="btn ghost" href="index.html">Open the student site</a>
-  </div>
-  <p class="pilot">Piloted at the University of Montana, Autumn 2026</p>
 </div>
+<div class="enroll">
+  <a class="btn primary" href="#m01">Start with Module 1</a>
+  <a class="btn ghost" href="index.html">Open the student site</a>
+  <small>Piloted at the University of Montana, Autumn 2026 · free and open · semester- and instructor-neutral</small>
+</div>
+<div class="keyfacts">
+  <div><b>14-module course</b><span>Track, reading, quiz, and application every week</span></div>
+  <div><b>21 illustrated tracks</b><span>Narrated and captioned · two voices</span></div>
+  <div><b>Intermediate level</b><span>Data Structures &amp; Algorithms (CSCI 232) or instructor consent</span></div>
+  <div><b>15 weeks · 2 sessions per week</b><span>3 credits · 5 labs · 6 quizzes · 2 projects</span></div>
+</div>
+
 
 <section id="about">
   <div>

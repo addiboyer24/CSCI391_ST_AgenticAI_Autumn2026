@@ -177,27 +177,44 @@ def board_files(m):
     return (f"curriculum/img/{m['id']}-mindmap.svg",) * 2
 
 
-MOSAIC = ["m01", "m02", "encore", "m03", "m05", "m06", "m07", "m10", "ensemble", "m11", "m12", "m14"]
-COVERS = {"encore": ("curriculum/img/encore-cover.webp", "#projects", "Encore · midterm project"),
-          "ensemble": ("curriculum/img/encore-ensemble-cover.webp", "#projects", "Encore Ensemble · final project")}
+# Hero tiles: flat illustrations drawn from the explainer's own icon set, plus the two project covers.
+TILES = [  # (slot, art, background, glow, link, label)
+    ("a", "brain", "#2f6f8f", "#cfe6ef", "#m06", "Module 6 · LLMs as reasoning engines"),
+    ("b", "cover:encore", None, None, "#projects", "Encore · the midterm project"),
+    ("c", "cover:ensemble", None, None, "#projects", "Encore Ensemble · the capstone"),
+    ("d", "toolbox", "#70002e", "#f3c98b", "#m05", "Module 5 · tools as contracts"),
+    ("e", "hierarchy", "#3f7a55", "#d9ecdf", "#m10", "Module 10 · multi-agent systems"),
+    ("f", "shield", "#5a4787", "#e4def3", "#m14", "Module 14 · security and alignment"),
+]
+COVER = {"encore": "curriculum/img/encore-cover.webp", "ensemble": "curriculum/img/encore-ensemble-cover.webp"}
+
+
+def tile_svgs():
+    """Write curriculum/img/tiles/<icon>.svg: one big hand-drawn icon on a flat color, with a few sparkles."""
+    try:
+        import explainer_modules as XM
+    except ImportError:
+        return
+    os.makedirs(os.path.join(IMG, "tiles"), exist_ok=True)
+    for _, art, bg, glow, _, _ in TILES:
+        if art.startswith("cover:"):
+            continue
+        dots = "".join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{glow}" opacity=".55"/>'
+                       for x, y, r in [(-230, -150, 7), (210, -170, 5), (250, 120, 8), (-260, 140, 5), (150, 200, 4), (-160, -210, 4)])
+        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMid slice">'
+               f'<rect x="-2000" y="-2000" width="4000" height="4000" fill="{bg}"/>{dots}'
+               f'<circle cx="0" cy="0" r="150" fill="{glow}" opacity=".9"/>'
+               f'<g transform="scale(1.05)">{XM.ICONS[art](0, 0, 1)}</g></svg>')
+        with open(os.path.join(IMG, "tiles", art + ".svg"), "w", encoding="utf8") as f:
+            f.write(svg)
 
 
 def mosaic_html(guide):
-    """Tiles around the title card: track posters (module maps in the guide) mixed with the project cover art."""
     tiles = []
-    for mid in MOSAIC:
-        if mid in COVERS:
-            img, href, lbl = COVERS[mid]
-        else:
-            n = next(i for i, m in enumerate(D.MODULES, 1) if m["id"] == mid)
-            if guide:
-                img, href, lbl = board_files(D.MODULES[n - 1])[0], f"#{mid}", f"Module {n} map · {D.MODULES[n - 1]['title']}"
-            elif video_for(D.MODULES[n - 1]):
-                img, href, lbl = f"curriculum/video/{mid}.jpg", f"#{mid}-video", f"Track {n} · {LECTURE[mid]['name']}"
-            else:
-                continue
-        tiles.append(f'<a class="tile" href="{href}" title="{E(lbl)}" aria-label="{E(lbl)}"><img src="{img}" alt="" loading="eager"></a>')
-    return "\n      ".join(tiles)
+    for slot, art, _, _, href, lbl in TILES:
+        img = COVER[art[6:]] if art.startswith("cover:") else f"curriculum/img/tiles/{art}.svg"
+        tiles.append(f'<a class="tile t-{slot}" href="{href}" title="{E(lbl)}" aria-label="{E(lbl)}"><img src="{img}" alt="" loading="eager"></a>')
+    return "\n    ".join(tiles)
 
 
 def contents_html():
@@ -459,6 +476,7 @@ def page(guide=False):
         encore_video=track_block(track_video("encore"), "Project walkthrough", guide, "encore-proj") if track_video("encore") else "",
         ensemble_video=track_block(track_video("ensemble"), "Project walkthrough", guide, "ensemble-proj") if track_video("ensemble") else "",
         kind="Instructor's guide" if guide else "Agentic AI Curriculum",
+        label="Instructor's guide" if guide else "Course collection",
         switch='<a href="index.html">Student site</a>' if guide else '<a href="instructor-guide.html">Instructor\'s guide</a>',
         cta2='<a class="btn ghost" href="index.html">Open the student site</a>' if guide else '<a class="btn ghost" href="instructor-guide.html">Instructor\'s guide</a>',
         intro=E(GUIDE_INTRO if guide else SITE_INTRO), mod_intro=E(GUIDE_MODS if guide else SITE_MODS),
@@ -473,6 +491,7 @@ TEMPLATE = open(os.path.join(HERE, "template.html"), encoding="utf8").read()
 
 
 def main():
+    tile_svgs()
     for n, m in enumerate(D.MODULES, 1):
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
