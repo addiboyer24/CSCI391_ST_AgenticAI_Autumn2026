@@ -27,6 +27,14 @@ try:
 except ImportError:
     LECTURE = {}
 
+PRIVATE = os.path.join(HERE, "private")  # gitignored: graded quizzes and the guide password
+sys.path.insert(0, PRIVATE)
+try:
+    import graded_quizzes as GQ  # noqa: E402  (questions only, never answers: the guide is public)
+    GRADED = GQ.QUIZZES
+except ImportError:
+    GRADED = {}
+
 try:
     import checks as CK  # noqa: E402
     CHECKS = CK.CHECKS
@@ -347,6 +355,25 @@ TAILOR = ("Use these as a starting point, not as the quiz. Each semester you tea
           "and fresh scenarios and distractors — so the quiz fits your teaching and old answers don't carry over between terms.")
 
 
+def graded_html(gq):
+    out = []
+    for q in gq["questions"]:
+        tag = "Extra credit · " if q.get("extra") else ("Fill in the blanks · " if q.get("blank") else "")
+        body = f'<p class="stem">{E(tag)}{E(q["q"])}</p>'
+        if q.get("img"):  # inlined, so the figure only exists inside the encrypted guide
+            import base64
+            with open(os.path.join(PRIVATE, q["img"]), "rb") as f:
+                uri = "data:image/png;base64," + base64.b64encode(f.read()).decode("ascii")
+            body += f'<div class="qimg"><img src="{uri}" alt="Figure for this question"></div>'
+        if q.get("items"):
+            body += "<ul>" + "".join(f"<li>{E(x)}</li>" for x in q["items"]) + "</ul>"
+        if q.get("options"):
+            body += '<ol type="A">' + "".join(f"<li>{E(o)}</li>" for o in q["options"]) + "</ol>"
+        out.append(f"<li>{body}</li>")
+    return (f'<div class="tailor"><b>Give it in class, unannounced — then retire it.</b> These are the pilot’s questions, shown without answers. '
+            f'Write a fresh quiz in your own style each semester; this one shows the level and coverage to aim for.</div><ol class="bank graded">{"".join(out)}</ol>')
+
+
 def bank_html(m):
     out = []
     for q in CHECKS[m["id"]]:
@@ -392,7 +419,12 @@ def module_html(m, n, guide, shown):
                              check_html(m, n)))
     for a in m["activities"]:
         if a["kind"] == "quiz":
-            quiz.append(row("quiz", "Graded quiz · in class, unannounced", a["title"], a["desc"]))
+            gq = GRADED.get(m["id"]) if guide else None
+            if gq:
+                quiz.append(fold("quiz", f"Graded quiz · {len(gq['questions'])} questions · questions only, no key", gq["title"],
+                                 "As given in the pilot · keep your answer key private", graded_html(gq), open_=True, rid=f"{m['id']}-graded"))
+            else:
+                quiz.append(row("quiz", "Graded quiz · in class, unannounced", a["title"], a["desc"]))
     if quiz:
         sec.append(("Quiz", quiz))
 
@@ -495,9 +527,12 @@ def main():
     for n, m in enumerate(D.MODULES, 1):
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
-    for name, guide in (("index.html", False), ("instructor-guide.html", True)):
-        with open(os.path.join(ROOT, name), "w", encoding="utf8", newline="\n") as f:
-            f.write(page(guide))
+    import guide_lock
+    with open(os.path.join(ROOT, "index.html"), "w", encoding="utf8", newline="\n") as f:
+        f.write(page(False))
+    # the guide holds quiz questions and answer keys: publish it encrypted, never as plaintext
+    with open(os.path.join(ROOT, "instructor-guide.html"), "w", encoding="utf8", newline="\n") as f:
+        f.write(guide_lock.locked_page(page(True), f"{D.COURSE['code']} · Instructor's guide"))
     print(f"Built index.html, instructor-guide.html and {len(D.MODULES)} fallback maps in {IMG}")
 
 
