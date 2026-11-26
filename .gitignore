@@ -1,3 +1,7 @@
-
-# instructor-only sources and the guide password (the published guide is encrypted)
-curriculum/private/
+# API keys and local environments: never commit these
+.env
+*.env
+.venv/
+venv/
+__pycache__/
+*.pyc

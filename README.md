@@ -2,12 +2,7 @@
 
 Materials for the current offering of CSCI 391 (University of Montana pilot, Autumn 2026): lab and project briefs, starter code, and the syllabus.
 
-**The course site** — tracks, readings, practice checks, and the catalog — now lives on the Aideation platform:
-
-- Site: https://therealaideation.github.io/aideation-platform/
-- Source: https://github.com/TheRealAideation/aideation-platform
-
-Old links to this site redirect there automatically.
+The course site (lessons, readings, quizzes) is on the Aideation platform: https://therealaideation.github.io/aideation-platform/csci391.html
 
 ## What's here
 
