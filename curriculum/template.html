@@ -169,8 +169,15 @@ a.row:hover,details.row:hover{border-color:#cdbfc5;box-shadow:0 4px 14px rgba(0,
 .row .body>.player,.row .body>.check{margin:0}
 .done{display:inline-flex;align-items:center;gap:4px;margin-left:10px;color:var(--green);font-weight:700}
 .mapfig{margin:0 0 10px}
-.mapfig a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff}
-.mapfig figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.mapfig .mapimg{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff;transition:box-shadow .2s,border-color .2s}
+.mapfig .mapimg:hover{border-color:#cdbfc5;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.mapfig figcaption{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13.5px;color:var(--muted);margin-top:10px}
+/* download button: used for every map PDF */
+.dl{display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13.5px;font-weight:700;line-height:1;color:var(--maroon);background:#fff;border:1.5px solid var(--maroon);border-radius:999px;padding:8px 15px 8px 12px;text-decoration:none;transition:background .15s,color .15s}
+.dl .ic{width:17px;height:17px;stroke-width:2.2}
+a.dl:hover,a.row:hover .dl{background:var(--maroon);color:#fff}
+a.dl:focus-visible{outline:2px solid var(--maroon);outline-offset:2px}
+.go.dl{padding:7px 13px 7px 10px;font-size:13px}
 .script{display:grid;gap:16px;font-size:15px}
 .scene{border-left:3px solid var(--copper);padding:0 0 0 16px}
 .scene .sk{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper-d);font-weight:800}
@@ -327,7 +334,9 @@ dialog img{width:100%;height:auto}
   .learn ul,.details,.steps,.projects,.legend{grid-template-columns:1fr}
   .panel{padding:4px 10px 12px}
   .th{width:92px}
-  .go{display:none}
+  .go:not(.dl){display:none}
+  .go.dl span{display:none}
+  .go.dl{padding:8px}
   footer .wrap{grid-template-columns:1fr}
 }
 @media print{.top,.contents,.cta,.hero,.progress,.go{display:none}.page{display:block}.module{break-inside:auto}.row{break-inside:avoid}}

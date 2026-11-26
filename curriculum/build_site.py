@@ -151,6 +151,7 @@ ICON = {
     "person": '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>',
     "book": '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
     "script": '<path d="M6 3h9l3 3v15H6zM9 9h6M9 12.5h6M9 16h4"/>',
+    "download": '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/>',
 }
 
 
@@ -262,12 +263,31 @@ def text(meta, title, sub=""):
             + (f'<span class="sub">{E(sub)}</span>' if sub else "") + "</span>")
 
 
+def pdf_name(href):
+    """A tidy filename for a downloaded map, e.g. CSCI391-m04-map.pdf."""
+    stem = os.path.basename(href).replace("-board.pdf", "")
+    return f"{D.COURSE['code'].replace(' ', '')}-{stem}-map.pdf"
+
+
+def download_btn(href, label="Download PDF"):
+    return f'<a class="dl" href="{E(href)}" download="{pdf_name(href)}">{icon("download")}<span>{E(label)}</span></a>'
+
+
+def map_figure(pdf, jpg, alt, caption):
+    """A map in the guide: the board image (click to view the PDF) with a caption and a download button."""
+    return (f'<figure class="mapfig"><a class="mapimg" href="{E(pdf)}" target="_blank" rel="noopener" title="View the PDF">'
+            f'<img src="{E(jpg)}" alt="{E(alt)}" loading="lazy"></a>'
+            f'<figcaption><span>{E(caption)}</span>{download_btn(pdf)}</figcaption></figure>')
+
+
 def row(kind, meta, title, sub="", href=None, img=None):
     if not href:
         return f'<div class="row">{thumb(kind, img)}{text(meta, title, sub)}</div>'
     ext = href.startswith("http") or href.endswith(".pdf")
     return (f'<a class="row" href="{E(href)}"{" target=_blank rel=noopener" if ext else ""}>{thumb(kind, img)}{text(meta, title, sub)}'
-            f'<span class="go">{"Open" if not href.startswith("#") else "Go"}</span></a>')
+            f'<span class="go">{"Open" if not href.startswith("#") else "Go"}</span></a>') if not href.endswith(".pdf") else (
+        f'<a class="row" href="{E(href)}" download="{pdf_name(href)}">{thumb(kind, img)}{text(meta, title, sub)}'
+        f'<span class="go dl">{icon("download")}<span>Download</span></span></a>')
 
 
 def fold(kind, meta, title, sub, body, img=None, play=False, open_=False, rid=None):
@@ -303,10 +323,9 @@ def track_block(lec, series, guide, pid=None):
         # lab and project walkthroughs carry their own map (a module's map is shown above its track instead)
         if lec.get("for") and os.path.exists(os.path.join(IMG, f"{vid}-board.pdf")):
             what = "Lab" if lec.get("kind") == "lab" else "Project"
-            body = (f'<figure class="mapfig"><a href="curriculum/img/{vid}-board.pdf" target="_blank" rel="noopener">'
-                    f'<img src="curriculum/img/{vid}-board.jpg" alt="{what} map: the finished illustrated board from the {E(lec["name"])} walkthrough" loading="lazy"></a>'
-                    f'<figcaption>{what} map · the board the walkthrough draws · <a href="curriculum/img/{vid}-board.pdf" target="_blank" rel="noopener">printable PDF</a></figcaption></figure>'
-                    + body)
+            body = map_figure(f"curriculum/img/{vid}-board.pdf", f"curriculum/img/{vid}-board.jpg",
+                              f"{what} map: the finished illustrated board from the {lec['name']} walkthrough",
+                              f"{what} map · the board the walkthrough draws") + body
         return fold("script", f"Script · {d} track · {lec['track']}", lec["name"], f"{len(lec['scenes'])} scenes · {n} narration lines",
                     body, open_=True, rid=f"{pid or vid}-script")
     return fold("video", f"Video · {d} · {lec['track']}", lec["name"], "Narrated by Encore · captions on · choose a voice",
@@ -403,8 +422,8 @@ def module_html(m, n, guide, shown):
     track = []
     mm_img, mm = board_files(m)
     if guide:
-        track.append(f'<figure class="mapfig"><a href="{mm}" target="_blank" rel="noopener"><img src="{mm_img}" alt="Module {n} map: the finished illustrated board from the track, {E(m["title"])}" loading="lazy"></a>'
-                     f'<figcaption>Module map · the board the track draws, scene by scene · <a href="{mm}" target="_blank" rel="noopener">printable PDF</a></figcaption></figure>')
+        track.append(map_figure(mm, mm_img, f"Module {n} map: the finished illustrated board from the track, {m['title']}",
+                                "Module map · the board the track draws, scene by scene"))
     if lec:
         track.append(track_block(lec, "Encore Lectures", guide))
     if not guide:
