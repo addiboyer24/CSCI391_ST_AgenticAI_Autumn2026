@@ -203,8 +203,8 @@ def calendar(cx, cy, s=1.0):
 
 def scale(cx, cy, s=1.0):
     return (P(f"M{cx} {cy-110*s} V{cy+100*s} M{cx-70*s} {cy+100*s} H{cx+70*s}", w=SW + 2) + P(f"M{cx-130*s} {cy-40*s} L{cx+130*s} {cy-100*s}", w=SW + 2)
-            + P(f"M{cx-130*s} {cy-40*s} l-40 70 h80 Z", fill=MAROON, op=.85) + P(f"M{cx+130*s} {cy-100*s} l-40 70 h80 Z", fill=COPPER, op=.85)
-            + T(cx - 130 * s, cy + 70 * s, "cost", int(36 * s), MAROON) + T(cx + 130 * s, cy + 10 * s, "value", int(36 * s), COPPER))
+            + P(f"M{cx-130*s} {cy-40*s} l{-40*s} {70*s} h{80*s} Z", fill=MAROON, op=.85) + P(f"M{cx+130*s} {cy-100*s} l{-40*s} {70*s} h{80*s} Z", fill=COPPER, op=.85)
+            + T(cx - 130 * s, cy + 78 * s, "cost", int(34 * s), MAROON) + T(cx + 130 * s, cy + 18 * s, "value", int(34 * s), COPPER))
 
 
 def beaker(cx, cy, s=1.0):

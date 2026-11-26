@@ -1,0 +1,4 @@
+# Test and build tools for the course site (python -m pip install -r requirements-dev.txt)
+pytest==8.2.0
+playwright==1.65.2
+cryptography==50.0.0
