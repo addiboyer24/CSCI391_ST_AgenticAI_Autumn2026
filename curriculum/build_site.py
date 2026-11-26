@@ -299,8 +299,16 @@ def track_block(lec, series, guide, pid=None):
     vid, d = lec["id"], duration(lec["id"])
     if guide:
         n = sum(len(sc["lines"]) for sc in lec["scenes"])
+        body = script_html(lec)
+        # lab and project walkthroughs carry their own map (a module's map is shown above its track instead)
+        if lec.get("for") and os.path.exists(os.path.join(IMG, f"{vid}-board.pdf")):
+            what = "Lab" if lec.get("kind") == "lab" else "Project"
+            body = (f'<figure class="mapfig"><a href="curriculum/img/{vid}-board.pdf" target="_blank" rel="noopener">'
+                    f'<img src="curriculum/img/{vid}-board.jpg" alt="{what} map: the finished illustrated board from the {E(lec["name"])} walkthrough" loading="lazy"></a>'
+                    f'<figcaption>{what} map · the board the walkthrough draws · <a href="curriculum/img/{vid}-board.pdf" target="_blank" rel="noopener">printable PDF</a></figcaption></figure>'
+                    + body)
         return fold("script", f"Script · {d} track · {lec['track']}", lec["name"], f"{len(lec['scenes'])} scenes · {n} narration lines",
-                    script_html(lec), open_=True, rid=f"{pid or vid}-script")
+                    body, open_=True, rid=f"{pid or vid}-script")
     return fold("video", f"Video · {d} · {lec['track']}", lec["name"], "Narrated by Encore · captions on · choose a voice",
                 player_for(lec, series, pid), img=f"curriculum/video/{vid}.jpg", play=True)
 
