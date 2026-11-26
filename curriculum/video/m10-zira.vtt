@@ -1,0 +1,78 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.669
+This is track ten: Forming the Band.
+
+2
+00:00:05.049 --> 00:00:10.752
+Agents talking to each other isn't an architecture. Today we look at what is.
+
+3
+00:00:12.352 --> 00:00:20.046
+A legal technology company built a paralegal pipeline: extract facts, research precedent, draft.
+
+4
+00:00:20.426 --> 00:00:26.809
+On paper it was clean. On document sets hundreds of pages long, it failed.
+
+5
+00:00:27.189 --> 00:00:36.491
+Connecting facts to precedent required understanding the extraction step couldn't produce up front, and mismatched schemas between stages made it worse.
+
+6
+00:00:38.091 --> 00:00:42.965
+Following Caldwell's chapter eleven, there are a few common patterns.
+
+7
+00:00:43.345 --> 00:00:48.459
+A supervisor assigns work to specialized workers and combines the results.
+
+8
+00:00:48.839 --> 00:00:52.507
+A pipeline passes work through explicit stages.
+
+9
+00:00:52.887 --> 00:00:59.221
+Parallel fan-out suits independent tasks, like the same research run against many companies.
+
+10
+00:00:59.601 --> 00:01:07.849
+Hierarchies can go deep, but most production systems settle at two levels: one supervisor, several workers.
+
+11
+00:01:09.449 --> 00:01:13.628
+Whatever the pattern, the same infrastructure shows up.
+
+12
+00:01:14.008 --> 00:01:20.611
+Shared state needs locking or optimistic concurrency, or two agents will overwrite each other's work.
+
+13
+00:01:20.991 --> 00:01:26.219
+Messages between agents need schemas both sides agree on, with versions.
+
+14
+00:01:26.599 --> 00:01:35.757
+And retries need idempotency. With an atomic set-if-not-exists, only the first agent to finish a task records its result.
+
+15
+00:01:37.357 --> 00:01:41.736
+From the enterprise side: version every message contract.
+
+16
+00:01:42.116 --> 00:01:47.519
+Mismatched schemas between stages cause more pipeline failures than anything else.
+
+17
+00:01:47.899 --> 00:01:57.457
+Multiple agents multiply both specialization and coordination risk. Spend your effort on shared state and recovery, not role-play.
+
+18
+00:01:59.057 --> 00:02:01.516
+Here's the map for this module.
+
+19
+00:02:01.896 --> 00:02:07.365
+Next, we bring the humans back in: who approves what, and when.
+

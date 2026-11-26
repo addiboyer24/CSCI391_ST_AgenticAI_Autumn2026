@@ -1,130 +1,130 @@
 WEBVTT
 
 1
-00:00:02.200 --> 00:00:06.839
+00:00:01.500 --> 00:00:06.139
 Welcome back. This is track two: First Riff.
 
 2
-00:00:07.219 --> 00:00:16.072
+00:00:06.519 --> 00:00:15.372
 We'll build the minimum viable agent, place it on a five-level ladder, and take a short, honest tour of fifty years of agent history.
 
 3
-00:00:17.672 --> 00:00:21.371
+00:00:16.972 --> 00:00:20.671
 Start with one customer message about a dented kettle.
 
 4
-00:00:21.751 --> 00:00:26.105
+00:00:21.051 --> 00:00:25.405
 A chatbot apologizes and suggests contacting support.
 
 5
-00:00:26.485 --> 00:00:34.988
+00:00:25.785 --> 00:00:34.288
 An agent looks up the order, checks refund eligibility, issues the refund through a narrowly scoped tool, and confirms.
 
 6
-00:00:35.368 --> 00:00:39.552
+00:00:34.668 --> 00:00:38.852
 Each step is chosen based on what it observed in the step before.
 
 7
-00:00:41.152 --> 00:00:49.010
+00:00:40.452 --> 00:00:48.310
 The minimum viable agent needs three ingredients: a system prompt, a set of tools, and the user's message.
 
 8
-00:00:49.390 --> 00:00:54.814
+00:00:48.690 --> 00:00:54.114
 Then a loop: reason, act, observe, and reason again.
 
 9
-00:00:55.194 --> 00:00:59.788
+00:00:54.494 --> 00:00:59.088
 Good tools each do one narrow thing, with an explicit schema.
 
 10
-00:01:00.168 --> 00:01:04.756
+00:00:59.468 --> 00:01:04.056
 And remember: the toolset defines the agent's blast radius.
 
 11
-00:01:06.356 --> 00:01:10.070
+00:01:05.656 --> 00:01:09.370
 Use this five-level ladder to name a system honestly.
 
 12
-00:01:10.450 --> 00:01:15.384
+00:01:09.750 --> 00:01:14.684
 Level zero is scripted automation. No model required.
 
 13
-00:01:15.764 --> 00:01:21.842
+00:01:15.064 --> 00:01:21.142
 Level one uses a language model as a text function. Level two adds tools.
 
 14
-00:01:22.222 --> 00:01:31.665
+00:01:21.522 --> 00:01:30.965
 Level three adds explicit planning. Level four adds memory that persists across sessions, and with it, the risk of memory poisoning.
 
 15
-00:01:32.045 --> 00:01:38.683
+00:01:31.345 --> 00:01:37.983
 Level five is multiple agents, or general computer use, with failure modes all its own.
 
 16
-00:01:40.283 --> 00:01:42.443
+00:01:39.583 --> 00:01:41.743
 Three classic traps.
 
 17
-00:01:42.823 --> 00:01:47.471
+00:01:42.123 --> 00:01:46.771
 Treating the model as ground truth instead of checking the system of record.
 
 18
-00:01:47.851 --> 00:01:51.810
+00:01:47.151 --> 00:01:51.110
 Assuming that longer thinking always means better answers.
 
 19
-00:01:52.190 --> 00:01:59.223
+00:01:51.490 --> 00:01:58.523
 And confusing a long list of tools with real capability. More tools often means more confusion.
 
 20
-00:02:00.823 --> 00:02:05.542
+00:02:00.123 --> 00:02:04.842
 Following Caldwell's chapter two, very little here is brand new.
 
 21
-00:02:05.922 --> 00:02:12.206
+00:02:05.222 --> 00:02:11.506
 STRIPS and SHRDLU, in the early seventies, already planned actions toward goals.
 
 22
-00:02:12.586 --> 00:02:18.264
+00:02:11.886 --> 00:02:17.564
 Expert systems ran into the frame problem: knowing what doesn't change when you act.
 
 23
-00:02:18.644 --> 00:02:24.468
+00:02:17.944 --> 00:02:23.768
 The belief, desire, intention model gave us vocabulary we still use.
 
 24
-00:02:24.848 --> 00:02:32.226
+00:02:24.148 --> 00:02:31.526
 What changed recently is the infrastructure: models trained to use tools, and protocols to connect them.
 
 25
-00:02:33.826 --> 00:02:39.460
+00:02:33.126 --> 00:02:38.760
 Your course designer, Addison Boyer, has a personal connection to this era.
 
 26
-00:02:39.840 --> 00:02:51.587
+00:02:39.140 --> 00:02:50.887
 Addison's first job after graduate school was at a startup whose product ran on Lisp routines inside AutoCAD. A lot of CAD and mapping software still has Lisp under the hood.
 
 27
-00:02:51.967 --> 00:03:03.760
+00:02:51.267 --> 00:03:03.060
 The expert systems of that lineage did impressive things. DENDRAL identified molecules from mass spectrometry data. MYCIN diagnosed bacterial infections.
 
 28
-00:03:04.140 --> 00:03:10.588
+00:03:03.440 --> 00:03:09.888
 But each one took years of hand-authored expertise, and couldn't easily be extended to anything new.
 
 29
-00:03:10.968 --> 00:03:18.101
+00:03:10.268 --> 00:03:17.401
 Most never broke even on the effort. That's a cost lesson worth remembering when you scope an agent today.
 
 30
-00:03:19.701 --> 00:03:22.100
+00:03:19.001 --> 00:03:21.400
 Here's the map for this module.
 
 31
-00:03:22.480 --> 00:03:31.983
+00:03:21.780 --> 00:03:31.283
 In the enterprise world, most systems shipped at level one or two call themselves level four. Name the level honestly in your design doc.
 
 32
-00:03:32.363 --> 00:03:38.032
+00:03:31.663 --> 00:03:37.332
 In lab, you'll build your first minimum viable agent. See you there.
 

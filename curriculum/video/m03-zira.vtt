@@ -1,0 +1,118 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:06.659
+Hi, I'm Encore, and this is track three: Five-Piece Band.
+
+2
+00:00:07.039 --> 00:00:13.897
+Today we take an agent apart, organ by organ, and find out which one teams forget most often.
+
+3
+00:00:15.497 --> 00:00:18.931
+Remember the refund agent from our first lecture?
+
+4
+00:00:19.311 --> 00:00:26.174
+When it wasn't confident, it didn't say so. It invented a refund policy and acted on it.
+
+5
+00:00:26.554 --> 00:00:31.598
+That agent wasn't missing intelligence. It was missing an organ.
+
+6
+00:00:31.978 --> 00:00:39.406
+Specifically, the termination check that would have forced it to say, I don't know, before doing anything else.
+
+7
+00:00:41.006 --> 00:00:46.250
+Following Caldwell's chapter three, a production agent has five parts.
+
+8
+00:00:46.630 --> 00:00:50.453
+The model does the reasoning and decides which tool to call.
+
+9
+00:00:50.833 --> 00:00:59.286
+The tool set defines what the agent can actually do in the world, like a web search, a database query, or a calculator.
+
+10
+00:00:59.666 --> 00:01:05.305
+Memory, at minimum, is a rolling context window, and ideally more.
+
+11
+00:01:05.685 --> 00:01:08.909
+The loop alternates between thinking and acting.
+
+12
+00:01:09.289 --> 00:01:12.607
+And the termination policy knows when to stop.
+
+13
+00:01:12.987 --> 00:01:20.631
+Most framework documentation lists three or four of these. The one that usually goes missing is the last one.
+
+14
+00:01:22.231 --> 00:01:25.035
+Here's the whole anatomy on one map.
+
+15
+00:01:25.415 --> 00:01:32.313
+Notice that the model reasons and emits tool calls, but it never executes privileged operations itself.
+
+16
+00:01:32.693 --> 00:01:40.241
+Tools take typed, validated inputs. The loop observes every result before deciding the next step.
+
+17
+00:01:41.841 --> 00:01:45.070
+Here's an example from Addison's own testing.
+
+18
+00:01:45.450 --> 00:01:56.667
+A calculator tool accepted a single expression as a string. The model called it with two arguments, a left operand and a right operand, a schema it simply made up.
+
+19
+00:01:57.047 --> 00:02:03.326
+So validate inputs before you run anything. Does the number of parameters even match?
+
+20
+00:02:03.706 --> 00:02:17.128
+And when a call fails, don't hand the model a raw stack trace. Return a typed result: a success flag, and a clear message, like, customer email must be a valid email address.
+
+21
+00:02:17.508 --> 00:02:24.006
+Your tool names and descriptions become the living documentation of your agent, so write them carefully.
+
+22
+00:02:25.606 --> 00:02:28.040
+Here's the enterprise lens.
+
+23
+00:02:28.420 --> 00:02:35.703
+Production systems pin model versions, log their seeds, and keep traces of the exact messages they sent.
+
+24
+00:02:36.083 --> 00:02:39.727
+If you can't replay a run, you can't debug it.
+
+25
+00:02:40.107 --> 00:02:51.485
+And make the termination policy code, not prose: a step limit, a spending limit, a time limit, and an explicit way to say, I can't complete this safely.
+
+26
+00:02:53.085 --> 00:02:55.504
+Two questions to think about.
+
+27
+00:02:55.884 --> 00:02:59.938
+Which component is most often mistaken for the entire agent?
+
+28
+00:03:00.318 --> 00:03:05.961
+And what does a termination policy look like for an agent that has no natural done state?
+
+29
+00:03:06.341 --> 00:03:12.964
+In lab, you'll put all five parts together in the Coffee Shop Agent. See you there.
+

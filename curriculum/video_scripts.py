@@ -9,6 +9,18 @@ Scene types: title | bullets | quote | image   (each has "lines" = narration, on
 Rebuild with:  python curriculum/build_videos.py [module ids]
 """
 
+# Narration voices viewers can pick on the site. The first is the default (files <id>.mp4 / <id>.vtt);
+# others render to <id>-<voice id>.mp4 / .vtt. Engines are Windows System.Speech voice names.
+VOICES = [
+    {"id": "david", "name": "David", "engine": "Microsoft David Desktop"},
+    {"id": "zira", "name": "Zira", "engine": "Microsoft Zira Desktop"},
+]
+
+
+def media_stem(lec_id, voice):
+    return lec_id if voice["id"] == VOICES[0]["id"] else f"{lec_id}-{voice['id']}"
+
+
 LECTURES = [
     {
         "id": "m01", "track": "Track 01", "name": "Opening Act",

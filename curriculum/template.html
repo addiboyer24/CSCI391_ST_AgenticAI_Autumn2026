@@ -46,6 +46,19 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .btn.ghost:hover{background:var(--hero)}
 .btn.sm{padding:7px 14px;font-size:13px}
 
+/* video collage: a wall of lecture thumbnails, each with its label underneath */
+.collage{display:grid;grid-template-columns:repeat(7,1fr);gap:26px 18px;padding:26px 28px 30px;background:#f3ead7}
+.collage .tile{display:block;color:var(--ink);text-decoration:none}
+.collage .thumb{display:block;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(42,36,32,.14)}
+.collage img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.collage .tile:hover img,.collage .tile:focus-visible img{transform:scale(1.05)}
+.collage .lbl{display:block;margin-top:9px;font-size:14.5px;font-weight:700;line-height:1.25}
+.collage .lbl small{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--muted)}
+.collage .tile:hover .lbl{color:var(--maroon)}
+@media (max-width:1100px){.collage{grid-template-columns:repeat(5,1fr)}}
+@media (max-width:800px){.collage{grid-template-columns:repeat(3,1fr);gap:20px 14px;padding:20px 16px}}
+@media (max-width:480px){.collage{grid-template-columns:repeat(2,1fr)}}
+
 /* hero */
 .hero{background:linear-gradient(120deg,var(--hero) 0%,#fff 55%,#fdf3e4 100%);padding:28px 0 96px;border:0}
 .crumbs{font-size:13px;color:var(--muted);margin-bottom:28px}
@@ -123,6 +136,12 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .player .trk{color:#9ff6ff;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
 .player b{font-size:16px;color:#fff}
 .player .note{margin-left:auto;color:#b8b0c9;font-size:12.5px}
+.voices{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12.5px;color:#b8b0c9}
+.voices+.note{margin-left:0}
+.voices button{font:inherit;font-weight:700;color:#e9e4f5;background:transparent;border:1px solid rgba(159,246,255,.35);border-radius:999px;padding:3px 11px;cursor:pointer}
+.voices button:hover{border-color:#9ff6ff}
+.voices button[aria-pressed="true"]{background:#9ff6ff;border-color:#9ff6ff;color:#120b2e}
+.proj .cover.img span.emo{padding:0;display:inline-grid;place-items:center;width:1.3em;height:1.3em;margin-left:.15em;border-radius:50%;background:rgba(255,255,255,.92);font-size:.78em;line-height:1;vertical-align:.12em}
 .visuals{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
 .visual{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--soft);display:block;height:290px}
 .visual img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .3s}
@@ -285,6 +304,7 @@ dialog img{width:100%;height:auto}
   </div>
 </header>
 
+$collage
 <div class="hero">
   <div class="wrap">
     <div class="crumbs"><a href="#">Computer Science</a> › <a href="#">Artificial Intelligence</a> › Agentic AI</div>
@@ -303,7 +323,7 @@ dialog img{width:100%;height:auto}
         </div>
         <p class="pilot">$pilot · semester- and instructor-neutral</p>
       </div>
-      <a class="hero-art" href="curriculum/img/m03-mindmap.svg" data-lightbox="curriculum/img/m03-mindmap.svg" data-caption="Sample mind map · The Anatomy of an Agent"><img src="curriculum/img/m03-mindmap.svg" alt="Sample mind map: the five-part anatomy of an agent"></a>
+      <a class="hero-art" href="$hero_href" target="_blank" rel="noopener"><img src="$hero_img" alt="Sample mind map: the illustrated board from the Module 3 video, The Anatomy of an Agent"></a>
     </div>
   </div>
 </div>
@@ -311,7 +331,7 @@ dialog img{width:100%;height:auto}
 <div class="wrap stats">
   <div class="card">
     <div class="stat"><b>$n_mod modules</b><span>in 4 parts over 15 weeks</span></div>
-    <div class="stat"><b>$n_vid video lectures</b><span>robot-narrated, captioned</span></div>
+    <div class="stat"><b>$n_vid video lectures</b><span>illustrated, narrated, captioned</span></div>
     <div class="stat"><b>$n_labs labs · $n_quiz quizzes</b><span>hands-on Python every week</span></div>
     <div class="stat"><b>2 projects</b><span>midterm agent + capstone</span></div>
     <div class="stat"><b>Intermediate</b><span>$prereq</span></div>
@@ -360,7 +380,7 @@ dialog img{width:100%;height:auto}
     <h2>Projects</h2>
     <div class="projects">
       <div class="proj">
-        <div class="cover img" style="background-image:url('curriculum/img/encore-cover.webp');background-position:62% center"><span>Encore 🤘</span></div>
+        <div class="cover img" style="background-image:url('curriculum/img/encore-cover.webp');background-position:62% center"><span>Encore <span class="emo">🤘</span></span></div>
         <div class="bd">
           <span class="eyebrow">Midterm project · Weeks 6–11 · 20%</span>
           <h3>A ListenBrainz music agent that remembers</h3>
@@ -369,7 +389,7 @@ dialog img{width:100%;height:auto}
         </div>
       </div>
       <div class="proj">
-        <div class="cover img" style="background-image:url('curriculum/img/encore-ensemble-cover.webp')"><span>Encore Ensemble 🎶</span></div>
+        <div class="cover img" style="background-image:url('curriculum/img/encore-ensemble-cover.webp')"><span>Encore Ensemble <span class="emo">🎶</span></span></div>
         <div class="bd">
           <span class="eyebrow">Final capstone · Weeks 12–15 · 25%</span>
           <h3>From a single agent to a production-minded system</h3>
@@ -576,6 +596,32 @@ dialog img{width:100%;height:auto}
   });
   document.getElementById('prog-reset').onclick = function () { store = {}; save(); refresh(); };
   refresh();
+
+  // Narrator voice picker: swaps every player's video + captions; the choice is remembered in this browser.
+  var VKEY = 'csci391-voice';
+  function setVoice(id, fig) {
+    Array.prototype.forEach.call(fig ? [fig] : document.querySelectorAll('figure.player'), function (f) {
+      var b = f.querySelector('.voices button[data-voice="' + id + '"]');
+      if (!b || b.getAttribute('aria-pressed') === 'true') return;
+      var v = f.querySelector('video'), stem = b.getAttribute('data-stem');
+      var playing = !v.paused, frac = v.duration ? v.currentTime / v.duration : 0;
+      f.querySelector('source').src = stem + '.mp4';
+      var tr = f.querySelector('track'); tr.src = stem + '.vtt';
+      v.load();
+      if (frac || playing) v.addEventListener('loadedmetadata', function () {
+        v.currentTime = frac * v.duration; if (playing) v.play();
+      }, { once: true });
+      Array.prototype.forEach.call(f.querySelectorAll('.voices button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.voices button');
+    if (!b) return;
+    try { localStorage.setItem(VKEY, b.dataset.voice); } catch (err) {}
+    setVoice(b.dataset.voice, b.closest('figure.player'));
+    setVoice(b.dataset.voice);
+  });
+  try { var saved = localStorage.getItem(VKEY); if (saved) setVoice(saved); } catch (err) {}
 
   var tabs = document.querySelectorAll('.tabs a, .toc a');
   var targets = Array.prototype.map.call(tabs, function (a) { return document.querySelector(a.getAttribute('href')); });

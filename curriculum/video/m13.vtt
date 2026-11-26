@@ -1,74 +1,74 @@
 WEBVTT
 
 1
-00:00:02.200 --> 00:00:05.454
+00:00:01.500 --> 00:00:04.754
 This is track thirteen: Sound Check.
 
 2
-00:00:05.834 --> 00:00:12.503
+00:00:05.134 --> 00:00:11.803
 Not just, did it run and how fast, but did it behave correctly, why, and is it drifting?
 
 3
-00:00:14.103 --> 00:00:17.702
+00:00:13.403 --> 00:00:17.002
 A support agent passed every integration test.
 
 4
-00:00:18.082 --> 00:00:28.769
+00:00:17.382 --> 00:00:28.069
 Two weeks later, customers noticed it was subtly rude, in a specific and reproducible way, and complaints ran three times higher than with the humans it replaced.
 
 5
-00:00:29.149 --> 00:00:36.303
+00:00:28.449 --> 00:00:35.603
 The cause: whenever it detected emotional language, it leaned heavily on a coldly worded legal FAQ.
 
 6
-00:00:36.683 --> 00:00:47.786
+00:00:35.983 --> 00:00:47.086
 Nothing was wrong with any single step, so no log surfaced it. Diagnosis took three days, because nobody had recorded what was retrieved, or why.
 
 7
-00:00:49.386 --> 00:00:56.479
+00:00:48.686 --> 00:00:55.779
 Following Caldwell's chapter fourteen, agents need more than metrics, logs, and traces.
 
 8
-00:00:56.859 --> 00:01:05.632
+00:00:56.159 --> 00:01:04.932
 Their behavior is non-deterministic, and they fail semantically: answers that are valid, but wrong, off-tone, or off-policy.
 
 9
-00:01:06.012 --> 00:01:19.109
+00:01:05.312 --> 00:01:18.409
 So trace every step with spans, log tool calls and token spend in a structured way, score quality with a calibrated LLM judge, and keep regression suites that catch drift before customers do.
 
 10
-00:01:20.709 --> 00:01:25.058
+00:01:20.009 --> 00:01:24.358
 Standard deviation measures how much a metric normally wobbles.
 
 11
-00:01:25.438 --> 00:01:33.166
+00:01:24.738 --> 00:01:32.466
 The three-sigma rule flags a day more than three wobbles from the average. It catches big, sudden spikes.
 
 12
-00:01:33.546 --> 00:01:41.689
+00:01:32.846 --> 00:01:40.989
 CUSUM adds up small deviations over time, so it catches slow drift that never crosses three sigma on any single day.
 
 13
-00:01:42.069 --> 00:01:45.608
+00:01:41.369 --> 00:01:44.908
 Both depend on a baseline from a known-good period.
 
 14
-00:01:47.208 --> 00:01:54.791
+00:01:46.508 --> 00:01:54.091
 From the enterprise side: a spike in cost per run often signals a behavior change before quality metrics move.
 
 15
-00:01:55.171 --> 00:02:01.425
+00:01:54.471 --> 00:02:00.725
 Link every evaluation score to a trace, so a drop is one click from the run that caused it.
 
 16
-00:02:01.805 --> 00:02:10.602
+00:02:01.105 --> 00:02:09.902
 Baseline, gate releases, monitor live traffic, and shadow-evaluate a new version beside production before you promote it.
 
 17
-00:02:12.202 --> 00:02:14.602
+00:02:11.502 --> 00:02:13.902
 Here's the map for this module.
 
 18
-00:02:14.982 --> 00:02:18.251
+00:02:14.282 --> 00:02:17.551
 Last track: keeping the show safe.
 

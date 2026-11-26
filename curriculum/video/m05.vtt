@@ -1,82 +1,82 @@
 WEBVTT
 
 1
-00:00:02.200 --> 00:00:05.669
+00:00:01.500 --> 00:00:04.969
 This is track five: Tuning the Instrument.
 
 2
-00:00:06.049 --> 00:00:12.867
+00:00:05.349 --> 00:00:12.167
 We'll look at the model as a reasoning engine, and the tools as contracts that decide what actually happens.
 
 3
-00:00:14.467 --> 00:00:20.631
+00:00:13.767 --> 00:00:19.931
 Today's agent models are almost always instruction-tuned language models with tool-use support.
 
 4
-00:00:21.011 --> 00:00:26.954
+00:00:20.311 --> 00:00:26.254
 Pre-training on huge amounts of text teaches language, reasoning patterns, and facts.
 
 5
-00:00:27.334 --> 00:00:32.948
+00:00:26.634 --> 00:00:32.248
 Instruction tuning teaches the model to act like an assistant instead of an autocomplete.
 
 6
-00:00:33.328 --> 00:00:39.491
+00:00:32.628 --> 00:00:38.791
 Tool-use training teaches it to recognize when it lacks information and to emit a precise tool call.
 
 7
-00:00:39.871 --> 00:00:45.585
+00:00:39.171 --> 00:00:44.885
 And alignment rewards accurate, safe tool use, and penalizes guessing.
 
 8
-00:00:47.185 --> 00:00:49.169
+00:00:46.485 --> 00:00:48.469
 Here's the big idea.
 
 9
-00:00:49.549 --> 00:00:57.517
+00:00:48.849 --> 00:00:56.817
 The model has implicit objectives shaped by training you didn't run and can't inspect, and the provider can update it at any time.
 
 10
-00:00:57.897 --> 00:01:06.225
+00:00:57.197 --> 00:01:05.525
 So treat it as a black box with an interface: messages and tool definitions go in, text or a tool call comes out.
 
 11
-00:01:06.605 --> 00:01:12.208
+00:01:05.905 --> 00:01:11.508
 Your engineering question is what you can reliably cause it to do, and what you can't.
 
 12
-00:01:13.808 --> 00:01:20.647
+00:01:13.108 --> 00:01:19.947
 Benchmarks are not your task. Build a held-out set of thirty to a hundred realistic inputs.
 
 13
-00:01:21.027 --> 00:01:26.100
+00:01:20.327 --> 00:01:25.400
 Include happy paths, edge cases, and failures you already know about.
 
 14
-00:01:26.480 --> 00:01:35.924
+00:01:25.780 --> 00:01:35.224
 Trade off cost, latency, and quality with evidence, tracking tokens, cache behavior, step counts, and retries.
 
 15
-00:01:37.524 --> 00:01:42.152
+00:01:36.824 --> 00:01:41.452
 Tool-use quality is bounded by the quality of your tool definitions.
 
 16
-00:01:42.532 --> 00:01:46.201
+00:01:41.832 --> 00:01:45.501
 Keep schemas narrow, explicit, and versioned.
 
 17
-00:01:46.581 --> 00:01:54.484
+00:01:45.881 --> 00:01:53.784
 In one case, a single added sentence describing what a tool does not do eliminated an entire class of production bugs.
 
 18
-00:01:54.864 --> 00:02:03.622
+00:01:54.164 --> 00:02:02.922
 Tell the caller whether an error is retryable or terminal, and protect every write with an idempotency key so a retry can't do it twice.
 
 19
-00:02:05.222 --> 00:02:07.621
+00:02:04.522 --> 00:02:06.921
 Here's the map for this module.
 
 20
-00:02:08.001 --> 00:02:15.694
+00:02:07.301 --> 00:02:14.994
 In lab, you'll build a tool router that picks the right toolset before the agent even starts. See you there.
 

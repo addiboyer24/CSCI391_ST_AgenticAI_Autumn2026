@@ -1,0 +1,74 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.579
+This is track seven: The Setlist.
+
+2
+00:00:04.959 --> 00:00:11.393
+Every good show starts with a plan. So does every agent that has more than one thing to do.
+
+3
+00:00:12.993 --> 00:00:19.566
+A planning agent was asked to research a list of engineering initiatives and produce a prioritized roadmap.
+
+4
+00:00:19.946 --> 00:00:26.424
+With four or five initiatives, it was fine. With more, it failed every time.
+
+5
+00:00:26.804 --> 00:00:33.353
+It followed a chain of dependencies on the first initiative for twenty steps, and never got to the others.
+
+6
+00:00:33.733 --> 00:00:44.260
+The fix was a planning step: list the initiatives, what to learn about each, and a step budget for each. About two hundred tokens and one extra call.
+
+7
+00:00:45.860 --> 00:00:50.714
+Following Caldwell's chapter eight, there are four planning strategies.
+
+8
+00:00:51.094 --> 00:00:58.887
+ReAct interleaves thought, action, and observation. It's fluid, but it drifts without budgets.
+
+9
+00:00:59.267 --> 00:01:06.141
+Plan-and-Execute writes the plan up front and executes it step by step, which makes checkpoints easy.
+
+10
+00:01:06.521 --> 00:01:10.240
+Reflexion revises the plan in response to failure.
+
+11
+00:01:10.620 --> 00:01:16.333
+And Tree-of-Thoughts explores several plans in parallel, when being wrong is expensive.
+
+12
+00:01:17.933 --> 00:01:20.912
+In production, these get blended.
+
+13
+00:01:21.292 --> 00:01:29.735
+Propose a plan, execute one step, verify it, and replan only when an observation meaningfully changes the picture.
+
+14
+00:01:30.115 --> 00:01:38.423
+Reflection fires per step, when a tool call fails or a validator rejects output, not by replaying whole episodes.
+
+15
+00:01:38.803 --> 00:01:46.456
+Tree-of-Thoughts needs a judge to pick a branch, and that judge is another probabilistic model. Test the judge.
+
+16
+00:01:46.836 --> 00:01:54.599
+And persist the plan. A plan that lives only in the context window can't be audited, resumed, or reviewed.
+
+17
+00:01:56.199 --> 00:01:58.658
+Here's the map for this module.
+
+18
+00:01:59.038 --> 00:02:05.072
+This week's lab is a midterm workshop. Bring your Encore agent and your questions.
+

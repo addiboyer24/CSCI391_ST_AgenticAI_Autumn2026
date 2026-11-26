@@ -4,7 +4,7 @@
     python curriculum/build_videos.py m03 m07    # selected modules
 
 Inputs : curriculum/video_scripts.py (anonymized scripts — no student names, voices, or faces)
-Outputs: curriculum/video/<id>.mp4  (720p, narration + soft subtitle stream)
+Outputs: curriculum/video/<id>[-<voice>].mp4  (720p, narration + soft subtitle stream, one per voice)
          curriculum/video/<id>.vtt  (WebVTT captions for the site player)
          curriculum/video/<id>.jpg  (poster frame)
 
@@ -35,7 +35,6 @@ WORK = os.path.join(tempfile.gettempdir(), "csci391_video_build")
 FFMPEG = os.environ.get("FFMPEG") or shutil.which("ffmpeg")
 EDGE = next((p for p in [r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
                          r"C:\Program Files\Microsoft\Edge\Application\msedge.exe"] if os.path.exists(p)), None)
-VOICE = os.environ.get("CSCI391_VOICE", "Microsoft David Desktop")
 RATE = 22050
 GAP = 0.38          # silence between sentences (s)
 LEAD, TAIL = 0.7, 0.9  # silence at the start / end of each scene (s)
@@ -74,7 +73,7 @@ def spoken(text):
     return text
 
 
-def synthesize(items):
+def synthesize(items, engine):
     todo = [it for it in items if not os.path.exists(it["out"])]
     if not todo:
         return
@@ -84,7 +83,7 @@ def synthesize(items):
         json.dump(todo, f)
     with open(ps, "w", encoding="utf-8") as f:
         f.write(PS_TTS)
-    subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps, jf, VOICE], check=True)
+    subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps, jf, engine], check=True)
 
 
 def read_wav(path):
@@ -190,18 +189,19 @@ def ts(sec, vtt=True):
     return f"{int(h):02d}:{int(m):02d}:{s:06.3f}" if vtt else f"{int(h):02d}:{int(m):02d}:{s:06.3f}".replace(".", ",")
 
 
-def build(lec, n, enc):
-    d = os.path.join(WORK, lec["id"])
+def build(lec, n, enc, voice):
+    d = os.path.join(WORK, lec["id"], voice["id"])
+    stem = V.media_stem(lec["id"], voice)
     os.makedirs(d, exist_ok=True)
     # 1. speech
     items, idx = [], 0
     for scene in lec["scenes"]:
         for line in scene["lines"]:
             say = spoken(line)
-            key = hashlib.sha1(f"{VOICE}|{say}".encode("utf-8")).hexdigest()[:16]
+            key = hashlib.sha1(f"{voice['engine']}|{say}".encode("utf-8")).hexdigest()[:16]
             items.append({"say": say, "out": os.path.join(d, f"tts_{key}.wav")})
             idx += 1
-    synthesize(items)
+    synthesize(items, voice["engine"])
     # 2. timeline
     audio, cues, robot, slides = [], [], [], []
     t, idx = 0.0, 0
@@ -252,7 +252,7 @@ def build(lec, n, enc):
     robot_txt = concat_file("robot.txt", robot)
     # 4. captions
     os.makedirs(OUT, exist_ok=True)
-    vtt = os.path.join(OUT, f"{lec['id']}.vtt")
+    vtt = os.path.join(OUT, f"{stem}.vtt")
     srt = os.path.join(d, "captions.srt")
     with open(vtt, "w", encoding="utf-8") as f:
         f.write("WEBVTT\n\n")
@@ -262,7 +262,7 @@ def build(lec, n, enc):
         for i, (a, b, text) in enumerate(cues, 1):
             f.write(f"{i}\n{ts(a, False)} --> {ts(b, False)}\n{text}\n\n")
     # 5. video
-    mp4 = os.path.join(OUT, f"{lec['id']}.mp4")
+    mp4 = os.path.join(OUT, f"{stem}.mp4")
     raw = os.path.join(d, "raw.mp4")
     # Pass 1: picture only. (Muxing audio + subtitles in the same pass stalls the overlay graph.)
     subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-y",
@@ -283,8 +283,9 @@ def build(lec, n, enc):
                    check=True, timeout=300)
     shutil.copyfile(final, mp4)
     os.remove(final)
-    subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-y", "-ss", "3", "-i", mp4, "-frames:v", "1", "-q:v", "4",
-                    os.path.join(OUT, f"{lec['id']}.jpg")], check=True)
+    if stem == lec["id"]:  # one shared poster, taken from the default voice
+        subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-y", "-ss", "3", "-i", mp4, "-frames:v", "1", "-q:v", "4",
+                        os.path.join(OUT, f"{lec['id']}.jpg")], check=True)
     return t
 
 
@@ -293,12 +294,15 @@ def main():
         sys.exit("Need ffmpeg (on PATH or FFMPEG env var) and Microsoft Edge.")
     os.makedirs(WORK, exist_ok=True)
     want = set(sys.argv[1:])
+    only = os.environ.get("CSCI391_VOICES")  # e.g. "zira" to render just one voice
+    voices = [v for v in V.VOICES if not only or v["id"] in only.split(",")]
     enc = ES.Encore(WORK)
-    for n, lec in enumerate(V.LECTURES, 1):
-        if want and lec["id"] not in want:
-            continue
-        dur = build(lec, int(lec["id"][1:]), enc)
-        print(f"{lec['id']}  {lec['track']}  {lec['name']}  {dur/60:.1f} min", flush=True)
+    for voice in voices:
+        for n, lec in enumerate(V.LECTURES, 1):
+            if want and lec["id"] not in want:
+                continue
+            dur = build(lec, int(lec["id"][1:]), enc, voice)
+            print(f"{lec['id']}  {voice['name']:<6} {lec['track']}  {lec['name']}  {dur/60:.1f} min", flush=True)
 
 
 if __name__ == "__main__":

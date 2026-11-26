@@ -1,0 +1,132 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:#f3ead7}
+  #paper{position:fixed;inset:0;width:1280px;height:720px}
+  #stage{position:fixed;inset:0;width:1280px;height:720px}
+  #grain{position:fixed;inset:0;width:1280px;height:720px;mix-blend-mode:multiply;opacity:.55;pointer-events:none}
+  #vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(90,60,30,.22));pointer-events:none}
+  text{font-family:'Ink Free','Segoe Print',cursive;fill:#2a2420}
+</style></head>
+<body>
+<svg id="paper" viewBox="0 0 1280 720"><rect width="1280" height="720" fill="#f3ead7"/></svg>
+<svg id="stage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- three "boil" variants: the ink wobbles slightly a few times a second, like hand-drawn animation -->
+    <filter id="rough0" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="rough1" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="rough2" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="13"/><feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="9" stroke="#2a2420" stroke-width="1.6" opacity=".35"/></pattern>
+  </defs>
+  <g id="world"></g>
+</svg>
+<svg id="grain" viewBox="0 0 1280 720"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .45  0 0 0 0 .33  0 0 0 .5 0"/></filter><rect width="1280" height="720" filter="url(#g)"/></svg>
+<div id="vignette"></div>
+<script>
+// window.TL = {items:[{id, svg, fx, t0, dur, out}], cam:[{t, dur, x, y, w}]}
+(function () {
+  var NS = 'http://www.w3.org/2000/svg', world = document.getElementById('world'), stage = document.getElementById('stage');
+  var items = [];
+  function ease(p) { p = Math.max(0, Math.min(1, p)); return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+  function back(p) { p = Math.max(0, Math.min(1, p)); var c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }
+  window.setup = function (tl) {
+    window.TL = tl;
+    tl.items.forEach(function (it) {
+      var g = document.createElementNS(NS, 'g');
+      g.innerHTML = it.svg;
+      g.setAttribute('opacity', '0');
+      world.appendChild(g);
+      var rec = { it: it, g: g, strokes: [], texts: [] };
+      if (it.fx === 'draw') {
+        g.querySelectorAll('path,line,polyline,circle,ellipse,rect,polygon').forEach(function (p) {
+          var len = 0;
+          try { len = p.getTotalLength(); } catch (e) { len = 0; }
+          if (len > 0 && p.getAttribute('stroke') !== 'none') {
+            p.style.strokeDasharray = len + ' ' + len;
+            rec.strokes.push({ el: p, len: len, fill: p.getAttribute('fill'), fo: p.getAttribute('fill-opacity') || '1' });
+          }
+        });
+      }
+      if (it.fx === 'write') {
+        g.querySelectorAll('text').forEach(function (tx, k) {
+          var b = tx.getBBox(), id = 'clip_' + it.id + '_' + k;
+          var cp = document.createElementNS(NS, 'clipPath'); cp.setAttribute('id', id);
+          var r = document.createElementNS(NS, 'rect');
+          r.setAttribute('x', b.x - 6); r.setAttribute('y', b.y - 14); r.setAttribute('height', b.height + 28); r.setAttribute('width', 0);
+          cp.appendChild(r); g.appendChild(cp); tx.setAttribute('clip-path', 'url(#' + id + ')');
+          rec.texts.push({ r: r, w: b.width + 12 });
+        });
+      }
+      if (it.fx === 'pop') {
+        var b = g.getBBox(); rec.cx = b.x + b.width / 2; rec.cy = b.y + b.height / 2;
+      }
+      items.push(rec);
+    });
+  };
+  function lerp(a, k, p) { return { x: a.x + (k.x - a.x) * p, y: a.y + (k.y - a.y) * p, w: a.w + (k.w - a.w) * p }; }
+  function camAt(t) {
+    // each move starts from wherever the camera is when it begins, so overlapping moves never jump
+    var keys = window.TL.cam, start = keys[0], prev = null;
+    for (var i = 1; i < keys.length; i++) {
+      var k = keys[i];
+      if (t < k.t) break;
+      if (prev) start = lerp(start, prev, ease((k.t - prev.t) / prev.dur));
+      prev = k;
+    }
+    return prev ? lerp(start, prev, ease((t - prev.t) / prev.dur)) : { x: start.x, y: start.y, w: start.w };
+  }
+  // whole board, flat (no boil, grain or vignette) for the printable PDF / thumbnail
+  window.poster = function (x0, y0, x1, y1, W, H) {
+    window.render(1e6);
+    document.documentElement.style.width = document.body.style.width = W + 'px';
+    document.documentElement.style.height = document.body.style.height = H + 'px';
+    ['paper', 'stage'].forEach(function (id) { var e = document.getElementById(id); e.style.width = W + 'px'; e.style.height = H + 'px'; });
+    document.getElementById('paper').setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    document.querySelector('#paper rect').setAttribute('width', W); document.querySelector('#paper rect').setAttribute('height', H);
+    stage.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+    stage.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    world.removeAttribute('filter');
+    document.getElementById('grain').style.display = 'none';
+    document.getElementById('vignette').style.display = 'none';
+    return true;
+  };
+  window.render = function (t) {
+    var c = camAt(t), h = c.w * 9 / 16;
+    stage.setAttribute('viewBox', (c.x - c.w / 2) + ' ' + (c.y - h / 2) + ' ' + c.w + ' ' + h);
+    world.setAttribute('filter', 'url(#rough' + (Math.floor(t * 6) % 3) + ')');
+    items.forEach(function (r) {
+      var it = r.it, p = (t - it.t0) / it.dur;
+      var vis = t >= it.t0 ? 1 : 0;
+      if (it.out != null && t >= it.out) vis = Math.max(0, 1 - (t - it.out) / 0.6);
+      r.g.setAttribute('opacity', vis);
+      if (!vis) return;
+      if (it.fx === 'draw') {
+        var n = r.strokes.length;
+        r.strokes.forEach(function (s, i) {
+          // strokes draw one after another across the item's duration
+          var a = i / n, b = (i + 1) / n, q = Math.max(0, Math.min(1, (p - a) / (b - a)));
+          s.el.style.strokeDashoffset = s.len * (1 - ease(q));
+          if (s.fill && s.fill !== 'none') s.el.setAttribute('fill-opacity', String(s.fo * Math.max(0, Math.min(1, (p - b + .15) / .3))));
+        });
+      } else if (it.fx === 'write') {
+        r.texts.forEach(function (x, i) {
+          var n = r.texts.length, a = i / n, b = (i + 1) / n, q = Math.max(0, Math.min(1, (p - a) / (b - a)));
+          x.r.setAttribute('width', x.w * q);
+        });
+      } else if (it.fx === 'pop') {
+        var s = Math.max(0.001, back(p));
+        r.g.setAttribute('transform', 'translate(' + r.cx + ' ' + r.cy + ') scale(' + s + ') translate(' + (-r.cx) + ' ' + (-r.cy) + ')');
+      } else if (it.fx === 'fade') {
+        r.g.setAttribute('opacity', vis * Math.max(0, Math.min(1, p)));
+      } else if (it.fx === 'orbit') {
+        // it.path: [cx, cy, rx, ry, turnsPerSecond]
+        var o = it.path, ang = (t - it.t0) * o[4] * Math.PI * 2 - Math.PI / 2;
+        r.g.setAttribute('transform', 'translate(' + (o[0] + o[2] * Math.cos(ang)) + ' ' + (o[1] + o[3] * Math.sin(ang)) + ')');
+        r.g.setAttribute('opacity', vis * Math.max(0, Math.min(1, p)));
+      }
+    });
+    return true;
+  };
+})();
+</script>
+</body></html>

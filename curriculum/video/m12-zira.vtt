@@ -1,0 +1,86 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.609
+This is track twelve: The Long Tour.
+
+2
+00:00:04.989 --> 00:00:14.717
+Machines reboot, networks flap, APIs throttle, and users change their minds. Long-running agents have to survive all of it.
+
+3
+00:00:16.317 --> 00:00:24.684
+A fintech team built an agent to monitor regulatory filings, cross-reference their product roadmap, and write a weekly briefing.
+
+4
+00:00:25.064 --> 00:00:28.138
+On paper, it took forty minutes.
+
+5
+00:00:28.518 --> 00:00:37.456
+In practice, the filings site throttled requests, document parsing hit retry storms, and summarization calls piled up.
+
+6
+00:00:37.836 --> 00:00:47.179
+They woke up to a $340 bill, a half-finished briefing saved nowhere, and a crash when the container was recycled after six hours.
+
+7
+00:00:47.559 --> 00:00:53.263
+The tools were fine. The agent had been designed like a synchronous function call.
+
+8
+00:00:54.863 --> 00:01:03.741
+Following Caldwell's chapter thirteen, the core shift is this: agent state is a persistent artifact, not a variable in memory.
+
+9
+00:01:04.121 --> 00:01:10.784
+Checkpoint at well-defined stages, so a crash at hour five doesn't throw away hours one through four.
+
+10
+00:01:11.164 --> 00:01:16.747
+Use task queues so runs can pause, resume, and cancel without losing their place.
+
+11
+00:01:17.127 --> 00:01:21.846
+Account for cost at every step, so you can stop a runaway run.
+
+12
+00:01:22.226 --> 00:01:27.370
+And report progress, send heartbeats, and handle cancellation cleanly.
+
+13
+00:01:28.970 --> 00:01:35.173
+At minimum, a checkpoint holds the current stage, its inputs, and every output so far.
+
+14
+00:01:35.553 --> 00:01:45.726
+In practice, add operational metadata: when the stage started, tokens consumed, the tool-call history, and the exact model and settings.
+
+15
+00:01:46.106 --> 00:01:51.090
+Resuming from a checkpoint should produce the same result as one continuous run.
+
+16
+00:01:52.690 --> 00:01:58.023
+From the enterprise side, this is the saga pattern from distributed systems.
+
+17
+00:01:58.403 --> 00:02:07.056
+Named stages with deterministic outputs, persisted before moving on. You trade a little flexibility for recoverability.
+
+18
+00:02:07.436 --> 00:02:13.939
+Make idempotency a first-class constraint, so retried tools don't repeat side effects.
+
+19
+00:02:14.319 --> 00:02:19.178
+And put budget alarms in the run loop, not in next month's invoice.
+
+20
+00:02:20.778 --> 00:02:23.237
+Here's the map for this module.
+
+21
+00:02:23.617 --> 00:02:28.891
+Next, the sound check: how to see what your agent is actually doing.
+

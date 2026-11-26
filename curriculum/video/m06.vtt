@@ -1,86 +1,86 @@
 WEBVTT
 
 1
-00:00:02.200 --> 00:00:05.509
+00:00:01.500 --> 00:00:04.809
 This is track six: Muscle Memory.
 
 2
-00:00:05.889 --> 00:00:12.162
+00:00:05.189 --> 00:00:11.462
 A brilliant agent with amnesia is still frustrating to work with. Today we fix that.
 
 3
-00:00:13.762 --> 00:00:17.066
+00:00:13.062 --> 00:00:16.366
 An analyst agent was excellent on day one.
 
 4
-00:00:17.446 --> 00:00:25.855
+00:00:16.746 --> 00:00:25.155
 But every session, users had to re-explain their competitors, their preferred frameworks, and their open research threads.
 
 5
-00:00:26.235 --> 00:00:34.872
+00:00:25.535 --> 00:00:34.172
 After two weeks, usage dropped sixty percent. Starting from scratch was more frustrating than the agent was useful.
 
 6
-00:00:35.252 --> 00:00:42.411
+00:00:34.552 --> 00:00:41.711
 Adding a memory layer didn't make it smarter. It made it something you could have a continuing relationship with.
 
 7
-00:00:44.011 --> 00:00:48.794
+00:00:43.311 --> 00:00:48.094
 Following Caldwell's chapter seven, there are four kinds of memory.
 
 8
-00:00:49.174 --> 00:00:52.848
+00:00:48.474 --> 00:00:52.148
 Working memory is what the model is attending to right now.
 
 9
-00:00:53.228 --> 00:00:57.012
+00:00:52.528 --> 00:00:56.312
 Episodic memory is what happened in past sessions.
 
 10
-00:00:57.392 --> 00:01:01.591
+00:00:56.692 --> 00:01:00.891
 Semantic memory holds facts and knowledge that don't expire.
 
 11
-00:01:01.971 --> 00:01:07.869
+00:01:01.271 --> 00:01:07.169
 And procedural memory is the routines an agent accumulates over the lifetime of its deployment.
 
 12
-00:01:09.469 --> 00:01:12.458
+00:01:08.769 --> 00:01:11.758
 Each memory type wants a different store.
 
 13
-00:01:12.838 --> 00:01:20.127
+00:01:12.138 --> 00:01:19.427
 Fast-changing session state, like the current project or the tool-call count, fits a key-value store.
 
 14
-00:01:20.507 --> 00:01:29.739
+00:01:19.807 --> 00:01:29.039
 For recall, hybrid search, combining vector similarity with keyword search, beats pure vector search on most production tasks.
 
 15
-00:01:30.119 --> 00:01:37.817
+00:01:29.419 --> 00:01:37.117
 And when the question is about relationships, like competitors, board members, or subsidiaries, reach for a graph.
 
 16
-00:01:39.417 --> 00:01:42.761
+00:01:38.717 --> 00:01:42.061
 Here's what shows up after months in production.
 
 17
-00:01:43.141 --> 00:01:51.814
+00:01:42.441 --> 00:01:51.114
 A user who asks about the same company in ten sessions leaves ten overlapping summaries. Design consolidation from day one.
 
 18
-00:01:52.194 --> 00:02:02.997
+00:01:51.494 --> 00:02:02.297
 Memory also accumulates names, affiliations, and financial data. Retention, tenancy boundaries, and deletion are requirements, not features.
 
 19
-00:02:03.377 --> 00:02:10.260
+00:02:02.677 --> 00:02:09.560
 And add stores only when production evidence justifies the cost, not because the diagram looks elegant.
 
 20
-00:02:11.860 --> 00:02:14.259
+00:02:11.160 --> 00:02:13.559
 Here's the map for this module.
 
 21
-00:02:14.639 --> 00:02:22.697
+00:02:13.939 --> 00:02:21.997
 Your midterm project, Encore, puts all four memory types to work in a music agent. Have fun with it.
 

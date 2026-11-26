@@ -4,7 +4,8 @@
 
 Reads curriculum/course_data.py and writes:
   * index.html                          (repo root, Coursera-style course page)
-  * curriculum/img/<id>-mindmap.svg     (radial mind map per module)
+  * curriculum/img/<id>-mindmap.svg     (radial mind map; fallback when no explainer board exists)
+  * curriculum/img/<id>-board.pdf/.jpg   (the illustrated board from the video = the module mind map; made by build_explainer.py)
   * curriculum/img/<id>-onepager.svg    (one-page lecture guide per module)
 Optional inputs: video_scripts.py (Encore lectures) and checks.py (practice quizzes).
 """
@@ -258,17 +259,45 @@ def chapter_titles(m):
     return [(k, D.CHAPTERS[k - 1]) for k in nums]
 
 
+def board_files(m):
+    """(preview image, link) for the module's map: the finished explainer board as a PDF when it exists."""
+    if os.path.exists(os.path.join(IMG, f"{m['id']}-board.pdf")):
+        return f"curriculum/img/{m['id']}-board.jpg", f"curriculum/img/{m['id']}-board.pdf"
+    return (f"curriculum/img/{m['id']}-mindmap.svg",) * 2
+
+
+def collage_html():
+    """Wall of video posters at the top of the page; each tile jumps to (and opens) its module's lecture."""
+    tiles = []
+    for m in D.MODULES:
+        lec = video_for(m)
+        if not lec or not os.path.exists(os.path.join(HERE, "video", f"{m['id']}.jpg")):
+            continue
+        tiles.append(f'<a class="tile" href="#{m["id"]}-video"><span class="thumb"><img src="curriculum/video/{m["id"]}.jpg" alt="" loading="eager"></span>'
+                     f'<span class="lbl">{E(lec["name"])}<small>{E(lec["track"])} · {E(m["title"])}</small></span></a>')
+    if not tiles:
+        return ""
+    return f'<section class="collage" aria-label="Video lectures">{"".join(tiles)}</section>'
+
+
 def player(m):
     lec = video_for(m)
     if not lec:
         return ""
     v = f"curriculum/video/{m['id']}"
+    voices = [x for x in getattr(VS, "VOICES", []) if os.path.exists(os.path.join(HERE, "video", VS.media_stem(m["id"], x) + ".mp4"))]
+    picker = ""
+    if len(voices) > 1:
+        btns = "".join(
+            f'<button type="button" data-voice="{x["id"]}" data-stem="curriculum/video/{VS.media_stem(m["id"], x)}" aria-pressed="{"true" if i == 0 else "false"}">{E(x["name"])}</button>'
+            for i, x in enumerate(voices))
+        picker = f'<span class="voices" role="group" aria-label="Narrator voice"><span>Voice</span>{btns}</span>'
     return f'''<figure class="player" id="{m['id']}-video">
       <video controls preload="none" poster="{v}.jpg" playsinline>
         <source src="{v}.mp4" type="video/mp4">
         <track kind="captions" src="{v}.vtt" srclang="en" label="English" default>
       </video>
-      <figcaption><span class="trk">Encore Lectures · {E(lec['track'])}</span><b>{E(lec['name'])}</b><span class="note">Synthetic narrator · captions on by default</span></figcaption>
+      <figcaption><span class="trk">Encore Lectures · {E(lec['track'])}</span><b>{E(lec['name'])}</b>{picker}<span class="note">Synthetic narrator · captions on by default</span></figcaption>
     </figure>'''
 
 
@@ -303,7 +332,7 @@ def module_html(m, n):
         items.append(("reading", f"Reading · Caldwell, Chapter {k}", t, None))
     for t, u in D.SUPPLEMENTAL.get(m["id"], []):
         items.append(("reading", "Supplemental reading", t, u))
-    items.append(("map", "Mind map", f"Module {n} concept map", f"curriculum/img/{m['id']}-mindmap.svg"))
+    items.append(("map", "Mind map", f"Module {n} board from the video · printable PDF", board_files(m)[1]))
     items.append(("page", "One-page lecture guide", "Printable lecture companion", f"curriculum/img/{m['id']}-onepager.svg"))
     lec = video_for(m)
     if lec:
@@ -316,7 +345,7 @@ def module_html(m, n):
     li = []
     for kind, label, text, href in items:
         is_img = href and href.endswith(".svg")
-        target = "" if (not href or is_img or not href.startswith("http")) else ' target="_blank" rel="noopener"'
+        target = ' target="_blank" rel="noopener"' if href and (href.startswith("http") or href.endswith(".pdf")) else ""
         inner = f'{icon(kind)}<span><b>{E(label)}</b><span class="it-text">{E(text)}</span></span>'
         if href:
             attr = f' data-lightbox="{E(href)}" data-caption="{E(label + " · " + m["title"])}"' if is_img else ""
@@ -328,7 +357,7 @@ def module_html(m, n):
     prompts = "".join(f"<li>{E(p)}</li>" for p in m["prompts"])
     fname, fitems = m["framework"]
     fw = "".join(f"<li>{E(x)}</li>" for x in fitems)
-    mm, op = f"curriculum/img/{m['id']}-mindmap.svg", f"curriculum/img/{m['id']}-onepager.svg"
+    (mm_img, mm), op = board_files(m), f"curriculum/img/{m['id']}-onepager.svg"
     return f'''
 <details class="module" id="{m['id']}">
   <summary>
@@ -344,7 +373,7 @@ def module_html(m, n):
     <p class="mod-summary">{E(m['summary'])}</p>
     {player(m)}
     <div class="visuals">
-      <a class="visual" href="{mm}" data-lightbox="{mm}" data-caption="Mind map · {E(m['title'])}"><img src="{mm}" alt="Mind map for module {n}: {E(m['title'])}" loading="lazy"><span>{icon('map')} Mind map</span></a>
+      <a class="visual" href="{mm}"{' target="_blank" rel="noopener"' if mm.endswith(".pdf") else f' data-lightbox="{mm}" data-caption="Mind map · {E(m["title"])}"'}><img src="{mm_img}" alt="Mind map for module {n}: the whole illustrated board from the video, {E(m['title'])}" loading="lazy"><span>{icon('map')} Mind map{" · PDF" if mm.endswith(".pdf") else ""}</span></a>
       <a class="visual tall" href="{op}" data-lightbox="{op}" data-caption="One-page guide · {E(m['title'])}"><img src="{op}" alt="One-page lecture guide for module {n}" loading="lazy"><span>{icon('page')} One-page guide</span></a>
     </div>
     <div class="cols">
@@ -399,7 +428,8 @@ def page():
         repo=E(C["repo"]), syllabus=E(C["syllabus"]),
         n_vid=sum(1 for m in D.MODULES if video_for(m)), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
         outcomes=outcomes, skills=skills, modules="\n".join(mods), chapters="".join(chap_rows),
-        grading=grading, tech=tech, faq=faq, toc=toc,
+        grading=grading, tech=tech, faq=faq, toc=toc, collage=collage_html(),
+        hero_img=board_files(D.MODULES[2])[0], hero_href=board_files(D.MODULES[2])[1],
     )
     for k, v in {"$ICON_PERSON": icon("person"), "$ICON_BOOK": icon("book"), "$ICON_CHEV": icon("chev", "chev")}.items():
         out = out.replace(k, v)
