@@ -1,0 +1,62 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.869
+This is lab track three: Road Case.
+
+2
+00:00:05.249 --> 00:00:11.878
+Lab two asked, does the loop work? Lab three asks, does it keep working?
+
+3
+00:00:13.478 --> 00:00:21.621
+You'll take your lab two agent and stress it: longer conversations, more tool calls, and a bigger step budget.
+
+4
+00:00:22.001 --> 00:00:29.895
+You'll run it two ways: online through OpenRouter, and offline against a local model served by llama dot c p p.
+
+5
+00:00:30.275 --> 00:00:37.628
+And you'll tier it: a cheap model drives tool selection, and an expensive model writes only the final answer.
+
+6
+00:00:39.228 --> 00:00:48.576
+As context grows, details in the middle get lost. Summarize older turns in a window, so the context stays bounded.
+
+7
+00:00:48.956 --> 00:00:54.330
+Critical rules fade over a long run. Re-inject them on every step.
+
+8
+00:00:54.710 --> 00:01:02.473
+Models invent arguments with confidence. Enforce a schema on every tool call, online and offline.
+
+9
+00:01:02.853 --> 00:01:10.326
+And design tools that fail loudly, with an explicit error, instead of quietly returning an empty result.
+
+10
+00:01:11.926 --> 00:01:19.149
+Log every tool call as a structured record: the tool, the arguments, the result, and the time it took.
+
+11
+00:01:19.529 --> 00:01:27.258
+Write tool names and descriptions so clear that a junior engineer, or a small model, gets them right the first time.
+
+12
+00:01:27.638 --> 00:01:35.276
+Check which model actually answered. Pinning a version in configuration doesn't guarantee it's the one being served.
+
+13
+00:01:35.656 --> 00:01:42.759
+Then measure latency, token cost, and how much the answers vary from run to run, on the same prompt.
+
+14
+00:01:44.359 --> 00:01:46.693
+Here's the lab on one board.
+
+15
+00:01:47.073 --> 00:01:52.582
+Next, lab four decides which tools the agent sees before it even starts.
+

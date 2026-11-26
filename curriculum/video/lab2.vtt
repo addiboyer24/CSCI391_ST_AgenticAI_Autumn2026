@@ -1,0 +1,66 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.964
+This is lab track two: First Rehearsal.
+
+2
+00:00:05.344 --> 00:00:11.957
+Today your chatbot becomes a minimum viable agent, with a loop you can watch and a limit it can't cross.
+
+3
+00:00:13.557 --> 00:00:20.461
+In lab one, your code decided when to search. In lab two, the model decides.
+
+4
+00:00:20.841 --> 00:00:30.434
+Before you code, read chapter two of the A I textbook on intelligent agents: percepts, actions, environments, and performance measures.
+
+5
+00:00:30.814 --> 00:00:38.417
+Then classify a few systems on the five-level ladder from track two, from scripted automation up to multiple agents.
+
+6
+00:00:40.017 --> 00:00:42.451
+Your agent has four pieces.
+
+7
+00:00:42.831 --> 00:00:46.130
+A goal, set by the system prompt.
+
+8
+00:00:46.510 --> 00:00:54.218
+Tools: a calculator and a web search, written as ordinary Python functions that return results to your code.
+
+9
+00:00:54.598 --> 00:01:00.502
+Context: the user's request, plus every observation the tools return.
+
+10
+00:01:00.882 --> 00:01:09.480
+And the loop: thought, action, observation, and again, until a final answer, or until it gives up.
+
+11
+00:01:11.080 --> 00:01:16.919
+Make the loop bounded: a hard limit on steps, so it can never spin forever.
+
+12
+00:01:17.299 --> 00:01:25.097
+Make it observable: print or log every thought, action, and observation, so you can see why it did what it did.
+
+13
+00:01:25.477 --> 00:01:34.545
+Treat model output as untrusted. A calculator built on Python's eval needs a restricted namespace, or a safer parser.
+
+14
+00:01:34.925 --> 00:01:42.663
+Then try to break it, with missing information, repeated actions, and the wrong tool, and write down what happens.
+
+15
+00:01:44.263 --> 00:01:46.597
+Here's the lab on one board.
+
+16
+00:01:46.977 --> 00:01:53.631
+Defend the level of agency you built. Next, lab three hardens it for the long haul.
+

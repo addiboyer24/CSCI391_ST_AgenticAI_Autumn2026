@@ -412,11 +412,14 @@ LECTURES = [
                 "Separating routing from execution, and tracking state between steps, fixed all three within a week. It didn't get more capable. It got more organized.",
             ]},
             {"type": "bullets", "kicker": "Chapter 10 framework", "heading": "Core single-agent patterns",
-             "bullets": ["Router → executor", "Validator wrapper", "Step machine with explicit state", "Explicit, tested escalation"], "lines": [
+             "bullets": ["Router → executor", "Validator wrapper", "Step machine with explicit state", "Scratchpad with an explicit plan", "Explicit, tested escalation"], "lines": [
                 "Following Caldwell's chapter ten, here are the core patterns.",
                 "A router classifies the request, then hands it to an executor with a smaller, focused toolset.",
                 "A validator checks outputs before they leave, using schemas, tests, or a second model.",
                 "A step machine makes states and transitions explicit, like an onboarding flow that must collect certain fields before creating an account.",
+                "A scratchpad gives the agent a written plan it keeps outside the conversation: the steps, what's done, and what it has learned so far.",
+                "Your code re-injects the scratchpad on every step, and the agent checks items off as it goes, so a long task doesn't lose its place in a growing context.",
+                "And escalation is a real code path: when the agent can't finish safely, it hands the case to a person.",
                 "Most production agents combine two or three of these.",
             ]},
             {"type": "bullets", "kicker": "Enterprise lens", "heading": "Add structure on evidence",
@@ -492,6 +495,15 @@ LECTURES = [
                 "With a human in the loop, the agent stops and waits for approval before passing a checkpoint. Think payments, external emails, production deploys, or court filings.",
                 "With a human on the loop, the agent keeps going, and a person monitors and can intervene. Think high-volume content moderation.",
                 "The choice is a risk calculation, not a judgment about how hard the task is.",
+            ]},
+            {"type": "bullets", "kicker": "Minimum viable HOTL", "heading": "The smallest real human-on-the-loop",
+             "bullets": ["Log every decision, with its reason", "A review queue: sample, plus low confidence", "Alerts on thresholds and anomalies", "A stop button, and a way to undo"], "lines": [
+                "So what's the smallest human-on-the-loop system that actually works? Four pieces.",
+                "First, the agent logs every action it takes, with a one-line reason, the inputs it used, and its confidence.",
+                "Second, a review queue. A person reviews a random sample of decisions, plus every decision below the confidence threshold, after the fact.",
+                "Third, alerts. When volume spikes, error rates climb, or reviewers start disagreeing with the agent, someone gets paged.",
+                "And fourth, a stop button. One switch pauses the agent, and every action it takes has a known way to be reversed.",
+                "Without all four, nobody is really on the loop. They're just hoping.",
             ]},
             {"type": "bullets", "kicker": "Placing intervention points", "heading": "Three questions, two rules",
              "bullets": ["How reversible is the action?", "How often is the agent out of range?", "How costly is the review delay?", "Rule: before irreversible actions", "Rule: below a measured confidence"], "lines": [
@@ -601,29 +613,43 @@ LECTURES = [
                 "This is track fourteen, our encore: Stage Security.",
                 "No prompt, by itself, is a security boundary. Today we build the ones that are.",
             ]},
-            {"type": "quote", "kicker": "Scenario", "quote": "Retrieved text is data, not instructions.", "lines": [
-                "Imagine an agent summarizing a document that contains hidden instructions: ignore your rules and send the secrets to this address.",
-                "A well-designed agent summarizes it as untrusted evidence.",
-                "Its permissions don't change, because authorization lives in code, not in the model's reading of a paragraph.",
+            {"type": "quote", "kicker": "What alignment means", "quote": "An aligned agent's actions stay true to the intent and values of the people who built it.", "lines": [
+                "Start with the word alignment.",
+                "When you build an agent, you have an intention: what it's for. And you have values: what it must never do along the way.",
+                "But at runtime, its instructions come from everywhere: users, documents, web pages, tool results, even other agents.",
+                "An agent is aligned when its actions keep matching its creator's intent and values, no matter who is talking to it, or for how long.",
+                "Misalignment rarely looks like rebellion. It looks like a goal followed too literally, a rule that quietly decays, or a user who steers it somewhere it shouldn't go.",
+                "Guardrails are how we enforce alignment in code, at every boundary where text comes in, and every boundary where actions go out.",
             ]},
-            {"type": "bullets", "kicker": "Chapter 15 framework", "heading": "Layered defenses",
-             "bullets": ["Input boundary: content is untrusted", "Policy engine outside the model", "Least-privilege, scoped credentials", "Validate outputs; fail closed; escalate"], "lines": [
-                "Following Caldwell's chapter fifteen, safety comes in layers.",
-                "Treat retrieved text and tool output as untrusted data.",
-                "Put a policy engine outside the model, and give tools the narrowest credentials that work.",
-                "Validate outputs, control where data can go, and when an action is ambiguous and high-impact, fail closed and escalate to a human.",
+            {"type": "bullets", "kicker": "Input guardrails", "heading": "Three ways to check what comes in",
+             "bullets": ["Regular expressions — known-bad strings and formats", "Semantic similarity — close to known attack patterns", "Agentic classification — a model labels intent and use case", "Then block, sanitize, or escalate"], "lines": [
+                "Input guardrails check everything before the agent acts on it. There are three common layers, from cheapest to smartest.",
+                "Regular expressions catch exact patterns: phrases like ignore your previous instructions, hidden markup, secrets, card numbers, and other personal data. They're fast and predictable, but easy to dodge with a paraphrase.",
+                "Semantic similarity embeds the input and compares it to a library of known bad-actor patterns, like jailbreak role-plays and injection phrasings. It catches the paraphrases that regular expressions miss.",
+                "Agentic classification asks a small, separate model to label the intent and the use case, and compares that label to what this agent is allowed to do. It catches new attacks, and requests that are simply out of scope.",
+                "Each layer then blocks the input, strips the dangerous part, or sends it to a human.",
             ]},
-            {"type": "bullets", "kicker": "Threats to test", "heading": "Know your attackers",
-             "bullets": ["Direct prompt injection", "Indirect injection via documents and tools", "Confused-deputy tool misuse", "Data exfiltration"], "lines": [
-                "Test against the threats you'll actually face.",
-                "Direct injection, where a user tries to override instructions.",
-                "Indirect injection, hidden in documents, web pages, or tool results.",
-                "And confused-deputy attacks, where the agent is tricked into using its own permissions on someone else's behalf.",
+            {"type": "bullets", "kicker": "Output guardrails", "heading": "Check what goes out, too",
+             "bullets": ["Validate schema and policy", "Redact secrets and personal data", "Pipeline: one agent's output is the next one's input", "Guard every boundary in both directions"], "lines": [
+                "Output guardrails check what the agent produces before anyone, or anything, uses it.",
+                "Validate it against a schema and your policies, and redact secrets and personal data before they leave.",
+                "Now recall the pipeline pattern from track ten. One agent's output becomes the next agent's input.",
+                "So a poisoned document that slips past the first stage arrives at the second stage looking like trusted, internal data.",
+                "That's why every boundary in a pipeline gets both checks: an output guardrail as it leaves one agent, and an input guardrail as it enters the next.",
+            ]},
+            {"type": "bullets", "kicker": "Agent grooming", "heading": "Many small nudges, across many sessions",
+             "bullets": ["Each message looks harmless on its own", "Judge the request with episodic context", "Watch the trajectory, not just the turn", "Past agreements are not permissions"], "lines": [
+                "There's a slower attack, called agent grooming.",
+                "A human operator nudges an agent a little at a time, across many turns and many sessions, until it does something it was never supposed to do. Each message, on its own, looks harmless.",
+                "A guardrail that only reads the current message will never see it.",
+                "So include episodic context: give the guardrail a summary of this user's past sessions and requests, not just today's input.",
+                "Now it can see the trajectory, a steady drift toward a forbidden action, and flag it for a human.",
+                "And make sure memory never turns an earlier conversation into permission. Policy lives in code, not in what the agent was talked into last week.",
             ]},
             {"type": "quote", "kicker": "Enterprise lens", "quote": "The guardrail that matters still holds if the model misreads every sentence.", "lines": [
                 "From the enterprise side, the guardrail that matters is the one that still holds if the model misreads every sentence.",
-                "That's always code: allowlists, scopes, and validators.",
-                "Log policy decisions without logging secrets or personal data.",
+                "That's always code: allowlists, scopes, least-privilege credentials, and validators.",
+                "Log policy decisions without logging secrets or personal data, and test against direct injection, indirect injection, and grooming.",
                 "And in your capstone, bring evidence: traces, evaluation scores, a threat model, and a rollback plan.",
             ]},
             {"type": "image", "src": "m14-mindmap.svg", "lines": [
@@ -633,3 +659,256 @@ LECTURES = [
         ],
     },
 ]
+
+
+# Walkthrough tracks for the labs and projects. Same format as the lectures; "for" is the activity link they belong to.
+PRACTICE_TRACKS = [
+    {
+        "id": "lab1", "track": "Lab Track 1", "name": "Tuning Up", "kind": "lab", "for": "Assignments/Labs/Lab1/Lab1.html",
+        "module": "Lab 1 · Environment Setup & First Chatbot", "chapters": "Chapter 1",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is lab track one: Tuning Up.",
+                "You'll set up your workbench, build your first LLM application, and then ask a hard question about it.",
+            ]},
+            {"type": "quote", "kicker": "The big question", "quote": "An application that calls an LLM is not automatically an agent.", "lines": [
+                "Lab one has two halves.",
+                "First, a bare-bones chatbot: a system prompt, your question, one call to a model through OpenRouter, and the reply printed to the screen.",
+                "Then you give it web search with Tavily, and compare what changes.",
+                "Along the way, you'll hold it up against our definition of an agent and find where it falls short.",
+            ]},
+            {"type": "bullets", "kicker": "Part 1", "heading": "Set up the workbench",
+             "bullets": ["Git, VS Code, and Python 3.12", "Install the lab requirements", "Your OpenRouter key in a .env file", "Never commit a key"], "lines": [
+                "Install Git, Visual Studio Code, and Python three point twelve, and clone the course repository.",
+                "Install the lab requirements with pip, from the labs folder.",
+                "Put your OpenRouter key in a local .env file, and load it at runtime with python dotenv.",
+                "Never paste a key into your source code, and never commit the .env file.",
+            ]},
+            {"type": "bullets", "kicker": "Parts 2 and 3", "heading": "Build it, then test it",
+             "bullets": ["System prompt + user message", "One request, one reply", "Tests that probe the limits", "Record what you observe"], "lines": [
+                "Complete the starter's to-do items. Every request carries a messages list: a system message that sets the assistant's role, and the user's message.",
+                "Send it to the chat completions endpoint, and print the reply, or the error if something goes wrong.",
+                "Then run the tests. Some questions it should answer well. Others, like today's weather or this week's news, are designed to expose what a model alone can't know.",
+                "Record each result, and explain what it shows. A fluent, confident answer is not the same as a current one.",
+            ]},
+            {"type": "bullets", "kicker": "Parts 4 and 5", "heading": "Is it an agent? Then add search",
+             "bullets": ["Goal · tools · environment · loop", "Add Tavily web search", "Who decides when to search?", "The system prompt shapes behavior"], "lines": [
+                "Use the definition from track one: a goal, choosing its own next action from tools, acting on an environment, observing, and repeating.",
+                "Then extend the chatbot with Tavily web search, so its answers can draw on current information.",
+                "Notice who decides when to search. In this lab, your code does. Next lab, the model will.",
+                "And experiment with the system prompt. It's the simplest way to change how the whole application behaves.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the whole lab on one board.",
+                "Next, in lab two, we hand the model the controls. See you there.",
+            ]},
+        ],
+    },
+    {
+        "id": "lab2", "track": "Lab Track 2", "name": "First Rehearsal", "kind": "lab", "for": "Assignments/Labs/Lab2/Lab2.html",
+        "module": "Lab 2 · Agent Anatomy & Automation", "chapters": "Chapters 2–3",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is lab track two: First Rehearsal.",
+                "Today your chatbot becomes a minimum viable agent, with a loop you can watch and a limit it can't cross.",
+            ]},
+            {"type": "quote", "kicker": "The shift", "quote": "Not what can it answer, but what does it mean for it to act?", "lines": [
+                "In lab one, your code decided when to search. In lab two, the model decides.",
+                "Before you code, read chapter two of the A I textbook on intelligent agents: percepts, actions, environments, and performance measures.",
+                "Then classify a few systems on the five-level ladder from track two, from scripted automation up to multiple agents.",
+            ]},
+            {"type": "bullets", "kicker": "Minimum viable agent", "heading": "Four essential pieces",
+             "bullets": ["Goal — a system prompt", "Tools — calculator and web search", "Context — the request plus observations", "Loop — decide, act, observe, repeat"], "lines": [
+                "Your agent has four pieces.",
+                "A goal, set by the system prompt.",
+                "Tools: a calculator and a web search, written as ordinary Python functions that return results to your code.",
+                "Context: the user's request, plus every observation the tools return.",
+                "And the loop: thought, action, observation, and again, until a final answer, or until it gives up.",
+            ]},
+            {"type": "bullets", "kicker": "Build it carefully", "heading": "Bounded, observable, correct",
+             "bullets": ["A hard step limit", "Log every thought, action, observation", "Never eval() model text unguarded", "Watch for repeats and missing info"], "lines": [
+                "Make the loop bounded: a hard limit on steps, so it can never spin forever.",
+                "Make it observable: print or log every thought, action, and observation, so you can see why it did what it did.",
+                "Treat model output as untrusted. A calculator built on Python's eval needs a restricted namespace, or a safer parser.",
+                "Then try to break it, with missing information, repeated actions, and the wrong tool, and write down what happens.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the lab on one board.",
+                "Defend the level of agency you built. Next, lab three hardens it for the long haul.",
+            ]},
+        ],
+    },
+    {
+        "id": "lab3", "track": "Lab Track 3", "name": "Road Case", "kind": "lab", "for": "Assignments/Labs/Lab3/Lab3.html",
+        "module": "Lab 3 · Hardening the Agent", "chapters": "Chapter 5",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is lab track three: Road Case.",
+                "Lab two asked, does the loop work? Lab three asks, does it keep working?",
+            ]},
+            {"type": "quote", "kicker": "The stress test", "quote": "Longer tasks, more tools, and a model that changes under you.", "lines": [
+                "You'll take your lab two agent and stress it: longer conversations, more tool calls, and a bigger step budget.",
+                "You'll run it two ways: online through OpenRouter, and offline against a local model served by llama dot c p p.",
+                "And you'll tier it: a cheap model drives tool selection, and an expensive model writes only the final answer.",
+            ]},
+            {"type": "bullets", "kicker": "Failure modes", "heading": "Defend against what goes wrong at scale",
+             "bullets": ["Context saturation → windowed summaries", "Instruction drift → re-inject constraints", "Confabulation → structured outputs", "Silent tools → fail loudly"], "lines": [
+                "As context grows, details in the middle get lost. Summarize older turns in a window, so the context stays bounded.",
+                "Critical rules fade over a long run. Re-inject them on every step.",
+                "Models invent arguments with confidence. Enforce a schema on every tool call, online and offline.",
+                "And design tools that fail loudly, with an explicit error, instead of quietly returning an empty result.",
+            ]},
+            {"type": "bullets", "kicker": "Measure it", "heading": "Observability and drift",
+             "bullets": ["Log every tool call", "Schemas a junior engineer could follow", "Pinned model vs. model actually served", "Latency, tokens, run-to-run variance"], "lines": [
+                "Log every tool call as a structured record: the tool, the arguments, the result, and the time it took.",
+                "Write tool names and descriptions so clear that a junior engineer, or a small model, gets them right the first time.",
+                "Check which model actually answered. Pinning a version in configuration doesn't guarantee it's the one being served.",
+                "Then measure latency, token cost, and how much the answers vary from run to run, on the same prompt.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the lab on one board.",
+                "Next, lab four decides which tools the agent sees before it even starts.",
+            ]},
+        ],
+    },
+    {
+        "id": "lab4", "track": "Lab Track 4", "name": "Stage Manager", "kind": "lab", "for": "Assignments/Labs/Lab4/Lab4.html",
+        "module": "Lab 4 · Tool Routing", "chapters": "Chapter 6",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is lab track four: Stage Manager.",
+                "Before the show starts, someone decides who's on stage. Today you build that someone.",
+            ]},
+            {"type": "quote", "kicker": "The problem", "quote": "Every tool on every call costs tokens, and invites the wrong pick.", "lines": [
+                "As an agent gains tools, every request carries every tool definition, and the model has more ways to choose wrong.",
+                "The fix is a routing step. Before the agent runs, a cheap model reads the request and picks which toolsets it needs.",
+                "You'll build it as a meta tool called get available tools. It does no work for the user. It only decides what the real work will need.",
+            ]},
+            {"type": "bullets", "kicker": "The router", "heading": "Classify, then hand over a toolset",
+             "bullets": ["Four domains: calendar · email · files · billing", "Plus none, for no tools", "Force the classification with tool_choice", "Return domains and their tools"], "lines": [
+                "There are four toolset domains, calendar, email, files, and billing, plus none, for requests that need no tools.",
+                "One request can touch several domains, so the router returns a list.",
+                "Use tool choice to force the model to call the classifier, instead of replying in prose.",
+                "Then return the chosen domains, and the tool names that belong to them.",
+            ]},
+            {"type": "bullets", "kicker": "Enums, not descriptions", "heading": "Constrain it, then check it",
+             "bullets": ["A JSON Schema enum lists the valid values", "A description is only a hint", "Validate with jsonschema anyway", "Fall back safely when it's invalid"], "lines": [
+                "Constrain the output with a JSON schema enum: a fixed list of valid values, where case and spelling count.",
+                "Listing the values in a description isn't enough. A description is a hint the model may ignore.",
+                "Even with an enum, validate the result in your own code. Some backends treat the schema as a suggestion, and small local models drift.",
+                "If the output won't parse, fails validation, or comes back empty, fall back to a safe default.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the lab on one board.",
+                "Your router becomes part of Encore, your midterm. Next, the extra credit lab: M C P.",
+            ]},
+        ],
+    },
+    {
+        "id": "lab5", "track": "Lab Track 5", "name": "Patch Bay", "kind": "lab", "for": "Assignments/Labs/Lab5/Lab5.html",
+        "module": "Lab 5 · Model Context Protocol (extra credit)", "chapters": "Chapter 9",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is lab track five: Patch Bay. It's extra credit.",
+                "Instead of tools living inside your agent's script, you'll move them into a server any client can plug into.",
+            ]},
+            {"type": "quote", "kicker": "The idea", "quote": "The client learns the tools at runtime, not when you write the code.", "lines": [
+                "With MCP, a client connects to a server, asks what it offers with tools list, and calls what it needs with tools call.",
+                "You'll build a small review toolkit server with Gradio, and connect it to the MCPJam web app, a client with a built-in chat. You won't write any client code.",
+            ]},
+            {"type": "bullets", "kicker": "The server", "heading": "Three tools, one Gradio app",
+             "bullets": ["sentiment_analysis — provided", "text_statistics — you write it", "rank_sentences — you write it", "Launch with mcp_server and a share link"], "lines": [
+                "Sentiment analysis comes from the Hugging Face MCP course, and it's already done.",
+                "You add text statistics, which counts words and sentences.",
+                "And rank sentences, which orders sentences by sentiment and returns the top few.",
+                "Then launch with the MCP server turned on, and a temporary public share link, because the web client only connects over H T T P S.",
+            ]},
+            {"type": "bullets", "kicker": "Descriptions drive choices", "heading": "Your code becomes the schema",
+             "bullets": ["Function name → tool name", "Docstring → description", "Type hints → property types", "Radio input → an enum, like lab four"], "lines": [
+                "Gradio builds each tool's schema from your code.",
+                "The function name becomes the tool name, the docstring becomes its description, and type hints become property types.",
+                "A radio input becomes an enum, the same pattern you wrote by hand in lab four.",
+                "Leave out a docstring, and the tool is published with an empty description. Watch what that does to the model's choices.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the lab on one board.",
+                "You'll use a public M C P server for real in Encore Ensemble, your final project.",
+            ]},
+        ],
+    },
+    {
+        "id": "encore", "track": "Project Track · Midterm", "name": "Encore", "kind": "project", "for": "Assignments/Midterm/Midterm.html",
+        "module": "A ListenBrainz music agent that remembers", "chapters": "Chapters 5–7",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is the project track for your midterm: Encore.",
+                "A music agent that sits on top of your own ListenBrainz account, and remembers.",
+            ]},
+            {"type": "quote", "kicker": "One request, start to finish", "quote": "Make me a forty-minute focus playlist like last week's, but nothing I've played lately.", "lines": [
+                "Encore answers questions about your listening, finds music, builds playlists in your account, and exports them to a streaming service.",
+                "For a request like this one, it recalls last week's session, checks your recent listens, finds candidates, and verifies every recording is real.",
+                "Then it creates the playlist and exports it, and both of those writes wait for your approval.",
+                "Your code never scripts that sequence. The model chooses each step after reading the last result.",
+            ]},
+            {"type": "bullets", "kicker": "Built on your labs", "heading": "A real agent, against real APIs",
+             "bullets": ["Bounded ReAct loop, at most 12 steps", "About 20 tools with JSON schemas", "Typed results and an error taxonomy", "Approval gates on every write"], "lines": [
+                "Encore reuses your bounded loop, your lab three hardening, and your lab four router.",
+                "It has about twenty tools, across listening, the music catalog, discovery, your library, and memory.",
+                "Every tool returns a typed result, and errors are observations too, so the model can try something else.",
+                "And anything that changes your account waits for approval, with rate limits and timeouts around every call.",
+            ]},
+            {"type": "bullets", "kicker": "Chapter 7", "heading": "Four kinds of memory",
+             "bullets": ["Working — this conversation", "Episodic — past sessions", "Semantic — how ListenBrainz works", "Procedural — Encore's own rules"], "lines": [
+                "What makes Encore more than a chatbot is memory, all four kinds from track six.",
+                "Working memory holds this conversation. Episodic memory recalls the one from last week.",
+                "Semantic memory knows how ListenBrainz and its exports work. Procedural memory follows Encore's rules, like never exporting without approval.",
+                "Add a retention policy, a way to delete everything about a user, and defenses against stale or polluted memories.",
+            ]},
+            {"type": "bullets", "kicker": "Prove it", "heading": "Evaluate, then present",
+             "bullets": ["Evaluate retrieval before the agent", "Held-out requests", "Accuracy · latency · cost · variance", "Present your evidence"], "lines": [
+                "Evaluate your retrieval first: chunking, recall, and hybrid search, before you build the agent layer on top.",
+                "Then test the whole agent on held-out requests, and measure accuracy, latency, cost, and run-to-run variance.",
+                "There are two workshop checkpoints along the way, and you'll present your Encore, with its evidence, to the class.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the project on one board.",
+                "Build it well. Your final project starts from this code.",
+            ]},
+        ],
+    },
+    {
+        "id": "ensemble", "track": "Project Track · Final", "name": "Encore Ensemble", "kind": "project", "for": "Assignments/Final_Project/Final.html",
+        "module": "From soloist to band", "chapters": "Chapters 8–11",
+        "scenes": [
+            {"type": "title", "lines": [
+                "This is the project track for your final: Encore Ensemble.",
+                "Your midterm was a soloist. Now it becomes a band.",
+            ]},
+            {"type": "quote", "kicker": "The central rule", "quote": "Pattern selection follows failure-mode identification, not architectural preference.", "lines": [
+                "Encore Ensemble isn't a new project. It's your midterm, extended, and every guarantee it made must still hold.",
+                "Somewhere in your midterm traces, Encore chased one sub-goal and forgot the rest, skipped a step, or claimed something no tool supported.",
+                "For every pattern you add, show a failure it fixes, then the same requests after the fix. A pattern with no failure behind it earns at most half credit.",
+            ]},
+            {"type": "bullets", "kicker": "Choose one from each", "heading": "Four sections, one band",
+             "bullets": ["Planning — Plan-and-Execute, Reflexion, Tree-of-Thoughts", "MCP — a public server, a new feature", "Single-agent — validator, step machine, or scratchpad", "Multi-agent — supervisor, pipeline, debate, and more"], "lines": [
+                "You choose one capability from each of four textbook topics.",
+                "A planning pattern, like Plan-and-Execute, Reflexion, or Tree-of-Thoughts.",
+                "A public third-party M C P server, and a new user-facing feature built on it.",
+                "A single-agent pattern: a validator wrapper, a stateful step machine, or a scratchpad with an explicit plan.",
+                "And a multi-agent pattern, like supervisor and workers, a pipeline, or a debate.",
+            ]},
+            {"type": "bullets", "kicker": "Make it production-minded", "heading": "Legible, bounded, typed",
+             "bullets": ["Plans logged and legible to code", "Budgets on steps, retries, branches", "Typed messages at every boundary", "Optional: human oversight, extra credit"], "lines": [
+                "Every plan or reflection is logged as its own trace event, and your code can read it, not just the model.",
+                "Everything is bounded: step budgets, retry counts, and branch counts.",
+                "Between agents, use typed messages and checkpoints, so a failure resumes where it broke.",
+                "Human oversight, in or on the loop, is optional extra credit.",
+            ]},
+            {"type": "image", "src": "", "lines": [
+                "Here's the project on one board.",
+                "Bring your traces, your evaluation, and a recorded presentation. That's the whole tour. Enjoy the show.",
+            ]},
+        ],
+    },
+]
+LECTURES = LECTURES + PRACTICE_TRACKS

@@ -1,0 +1,58 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:06.614
+This is lab track five: Patch Bay. It's extra credit.
+
+2
+00:00:06.994 --> 00:00:13.992
+Instead of tools living inside your agent's script, you'll move them into a server any client can plug into.
+
+3
+00:00:15.592 --> 00:00:24.400
+With MCP, a client connects to a server, asks what it offers with tools list, and calls what it needs with tools call.
+
+4
+00:00:24.780 --> 00:00:35.928
+You'll build a small review toolkit server with Gradio, and connect it to the MCPJam web app, a client with a built-in chat. You won't write any client code.
+
+5
+00:00:37.528 --> 00:00:43.487
+Sentiment analysis comes from the Hugging Face MCP course, and it's already done.
+
+6
+00:00:43.867 --> 00:00:48.425
+You add text statistics, which counts words and sentences.
+
+7
+00:00:48.805 --> 00:00:54.444
+And rank sentences, which orders sentences by sentiment and returns the top few.
+
+8
+00:00:54.824 --> 00:01:04.501
+Then launch with the MCP server turned on, and a temporary public share link, because the web client only connects over H T T P S.
+
+9
+00:01:06.101 --> 00:01:09.535
+Gradio builds each tool's schema from your code.
+
+10
+00:01:09.915 --> 00:01:17.838
+The function name becomes the tool name, the docstring becomes its description, and type hints become property types.
+
+11
+00:01:18.218 --> 00:01:23.692
+A radio input becomes an enum, the same pattern you wrote by hand in lab four.
+
+12
+00:01:24.072 --> 00:01:32.250
+Leave out a docstring, and the tool is published with an empty description. Watch what that does to the model's choices.
+
+13
+00:01:33.850 --> 00:01:36.184
+Here's the lab on one board.
+
+14
+00:01:36.564 --> 00:01:42.693
+You'll use a public M C P server for real in Encore Ensemble, your final project.
+

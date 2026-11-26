@@ -1,0 +1,62 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:05.044
+This is lab track four: Stage Manager.
+
+2
+00:00:05.424 --> 00:00:12.123
+Before the show starts, someone decides who's on stage. Today you build that someone.
+
+3
+00:00:13.723 --> 00:00:21.431
+As an agent gains tools, every request carries every tool definition, and the model has more ways to choose wrong.
+
+4
+00:00:21.811 --> 00:00:30.109
+The fix is a routing step. Before the agent runs, a cheap model reads the request and picks which toolsets it needs.
+
+5
+00:00:30.489 --> 00:00:39.757
+You'll build it as a meta tool called get available tools. It does no work for the user. It only decides what the real work will need.
+
+6
+00:00:41.357 --> 00:00:50.060
+There are four toolset domains, calendar, email, files, and billing, plus none, for requests that need no tools.
+
+7
+00:00:50.440 --> 00:00:55.553
+One request can touch several domains, so the router returns a list.
+
+8
+00:00:55.933 --> 00:01:02.142
+Use tool choice to force the model to call the classifier, instead of replying in prose.
+
+9
+00:01:02.522 --> 00:01:07.340
+Then return the chosen domains, and the tool names that belong to them.
+
+10
+00:01:08.940 --> 00:01:16.519
+Constrain the output with a JSON schema enum: a fixed list of valid values, where case and spelling count.
+
+11
+00:01:16.899 --> 00:01:23.317
+Listing the values in a description isn't enough. A description is a hint the model may ignore.
+
+12
+00:01:23.697 --> 00:01:33.510
+Even with an enum, validate the result in your own code. Some backends treat the schema as a suggestion, and small local models drift.
+
+13
+00:01:33.890 --> 00:01:41.373
+If the output won't parse, fails validation, or comes back empty, fall back to a safe default.
+
+14
+00:01:42.973 --> 00:01:45.272
+Here's the lab on one board.
+
+15
+00:01:45.652 --> 00:01:53.681
+Your router becomes part of Encore, your midterm. Next, the extra credit lab: M C P.
+

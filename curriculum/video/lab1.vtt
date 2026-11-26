@@ -1,0 +1,82 @@
+WEBVTT
+
+1
+00:00:01.500 --> 00:00:04.719
+This is lab track one: Tuning Up.
+
+2
+00:00:05.099 --> 00:00:12.478
+You'll set up your workbench, build your first LLM application, and then ask a hard question about it.
+
+3
+00:00:14.078 --> 00:00:16.357
+Lab one has two halves.
+
+4
+00:00:16.737 --> 00:00:27.095
+First, a bare-bones chatbot: a system prompt, your question, one call to a model through OpenRouter, and the reply printed to the screen.
+
+5
+00:00:27.475 --> 00:00:32.173
+Then you give it web search with Tavily, and compare what changes.
+
+6
+00:00:32.553 --> 00:00:38.872
+Along the way, you'll hold it up against our definition of an agent and find where it falls short.
+
+7
+00:00:40.472 --> 00:00:48.300
+Install Git, Visual Studio Code, and Python three point twelve, and clone the course repository.
+
+8
+00:00:48.680 --> 00:00:53.024
+Install the lab requirements with pip, from the labs folder.
+
+9
+00:00:53.404 --> 00:01:00.177
+Put your OpenRouter key in a local .env file, and load it at runtime with python dotenv.
+
+10
+00:01:00.557 --> 00:01:06.126
+Never paste a key into your source code, and never commit the .env file.
+
+11
+00:01:07.726 --> 00:01:18.003
+Complete the starter's to-do items. Every request carries a messages list: a system message that sets the assistant's role, and the user's message.
+
+12
+00:01:18.383 --> 00:01:25.332
+Send it to the chat completions endpoint, and print the reply, or the error if something goes wrong.
+
+13
+00:01:25.712 --> 00:01:37.205
+Then run the tests. Some questions it should answer well. Others, like today's weather or this week's news, are designed to expose what a model alone can't know.
+
+14
+00:01:37.585 --> 00:01:45.968
+Record each result, and explain what it shows. A fluent, confident answer is not the same as a current one.
+
+15
+00:01:47.568 --> 00:01:57.726
+Use the definition from track one: a goal, choosing its own next action from tools, acting on an environment, observing, and repeating.
+
+16
+00:01:58.106 --> 00:02:04.649
+Then extend the chatbot with Tavily web search, so its answers can draw on current information.
+
+17
+00:02:05.029 --> 00:02:13.488
+Notice who decides when to search. In this lab, your code does. Next lab, the model will.
+
+18
+00:02:13.868 --> 00:02:21.171
+And experiment with the system prompt. It's the simplest way to change how the whole application behaves.
+
+19
+00:02:22.771 --> 00:02:25.360
+Here's the whole lab on one board.
+
+20
+00:02:25.740 --> 00:02:31.859
+Next, in lab two, we hand the model the controls. See you there.
+

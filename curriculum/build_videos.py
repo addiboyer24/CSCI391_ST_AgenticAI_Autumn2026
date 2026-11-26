@@ -62,6 +62,8 @@ SAY_FIXES = [  # spoken-form fixes so captions stay readable while the voice pro
     (r"\bHITL\b", "H-I-T-L"), (r"\bHOTL\b", "H-O-T-L"), (r"\bMCP\b", "M-C-P"), (r"\bRAG\b", "rag"),
     (r"\bLLMs\b", "L-L-Ms"), (r"\bLLM\b", "L-L-M"), (r"\bJSON-RPC\b", "jason R-P-C"), (r"\bJSON\b", "jason"),
     (r"\bCUSUM\b", "cue-sum"), (r"3σ", "three sigma"), (r"σ", "sigma"), (r"\bstdio\b", "standard I-O"),
+    (r"\bMVP\b", "M-V-P"), (r"\bPII\b", "P-I-I"), (r"\bregex\b", "rej-ex"), (r"\.env\b", "dot env"), (r"\bMBIDs?\b", "M-B-I-Ds"),
+    (r"\bHTTPS\b", "H-T-T-P-S"), (r"\bVS Code\b", "V-S Code"), (r"\bUI\b", "U-I"),
     (r"\bReAct\b", "re-act"), (r"\bRLHF\b", "R-L-H-F"), (r"\bSETNX\b", "set-N-X"), (r"\bAPI\b", "A-P-I"),
     (r"\bAPIs\b", "A-P-Is"), (r"\bSSE\b", "S-S-E"), (r"\bBM25\b", "B-M-25"), (r"—", ", "), (r"\$(\d+)", r"\1 dollars"),
 ]
@@ -77,8 +79,9 @@ def synthesize(items, engine):
     todo = [it for it in items if not os.path.exists(it["out"])]
     if not todo:
         return
-    jf = os.path.join(WORK, "tts.json")
-    ps = os.path.join(WORK, "tts.ps1")
+    d = os.path.dirname(todo[0]["out"])          # per-lecture folder, so parallel builds never share these files
+    jf = os.path.join(d, "tts.json")
+    ps = os.path.join(d, "tts.ps1")
     with open(jf, "w", encoding="utf-8") as f:
         json.dump(todo, f)
     with open(ps, "w", encoding="utf-8") as f:

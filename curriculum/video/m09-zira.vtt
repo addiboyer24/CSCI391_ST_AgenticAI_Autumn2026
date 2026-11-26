@@ -45,30 +45,42 @@ A validator checks outputs before they leave, using schemas, tests, or a second 
 A step machine makes states and transitions explicit, like an onboarding flow that must collect certain fields before creating an account.
 
 12
-00:01:21.840 --> 00:01:25.544
-Most production agents combine two or three of these.
+00:01:21.840 --> 00:01:30.933
+A scratchpad gives the agent a written plan it keeps outside the conversation: the steps, what's done, and what it has learned so far.
 
 13
-00:01:27.144 --> 00:01:30.373
-The flat loop is still the right place to start.
+00:01:31.313 --> 00:01:41.281
+Your code re-injects the scratchpad on every step, and the agent checks items off as it goes, so a long task doesn't lose its place in a growing context.
 
 14
-00:01:30.753 --> 00:01:35.341
-Add a pattern only when production evidence shows the failure it prevents.
+00:01:41.661 --> 00:01:48.884
+And escalation is a real code path: when the agent can't finish safely, it hands the case to a person.
 
 15
-00:01:35.721 --> 00:01:42.910
-Keep validators to the minimum needed to catch failures you've actually seen. Every check costs latency.
+00:01:49.264 --> 00:01:52.968
+Most production agents combine two or three of these.
 
 16
-00:01:43.290 --> 00:01:49.323
-And if an escalation path isn't in the code, and covered by a test, it doesn't exist.
+00:01:54.568 --> 00:01:57.797
+The flat loop is still the right place to start.
 
 17
-00:01:50.923 --> 00:01:53.382
-Here's the map for this module.
+00:01:58.177 --> 00:02:02.765
+Add a pattern only when production evidence shows the failure it prevents.
 
 18
-00:01:53.762 --> 00:01:58.911
+00:02:03.145 --> 00:02:10.334
+Keep validators to the minimum needed to catch failures you've actually seen. Every check costs latency.
+
+19
+00:02:10.714 --> 00:02:16.747
+And if an escalation path isn't in the code, and covered by a test, it doesn't exist.
+
+20
+00:02:18.347 --> 00:02:20.806
+Here's the map for this module.
+
+21
+00:02:21.186 --> 00:02:26.335
 Next time, we form the band: multiple agents working together.
 

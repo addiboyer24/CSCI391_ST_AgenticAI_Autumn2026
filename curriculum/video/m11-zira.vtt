@@ -45,42 +45,66 @@ With a human on the loop, the agent keeps going, and a person monitors and can i
 The choice is a risk calculation, not a judgment about how hard the task is.
 
 12
-00:01:20.622 --> 00:01:32.784
-Ask three questions. How reversible is the action? How often does the agent operate outside its reliable range? And how expensive is the delay of a human review?
+00:01:20.622 --> 00:01:26.820
+So what's the smallest human-on-the-loop system that actually works? Four pieces.
 
 13
-00:01:33.164 --> 00:01:35.353
-Then follow two rules.
+00:01:27.200 --> 00:01:35.603
+First, the agent logs every action it takes, with a one-line reason, the inputs it used, and its confidence.
 
 14
-00:01:35.733 --> 00:01:44.236
-Place intervention points before irreversible actions, like sending an email, committing a transaction, or deleting data.
+00:01:35.983 --> 00:01:46.361
+Second, a review queue. A person reviews a random sample of decisions, plus every decision below the confidence threshold, after the fact.
 
 15
-00:01:44.616 --> 00:01:49.469
-And place them where the agent's confidence drops below a threshold you've measured.
+00:01:46.741 --> 00:01:56.764
+Third, alerts. When volume spikes, error rates climb, or reviewers start disagreeing with the agent, someone gets paged.
 
 16
-00:01:51.069 --> 00:01:57.608
-Design from the reviewer's chair. What do they need to know, and what do they need to be able to do?
+00:01:57.144 --> 00:02:05.612
+And fourth, a stop button. One switch pauses the agent, and every action it takes has a known way to be reversed.
 
 17
-00:01:57.988 --> 00:02:02.891
-Usually that's a concise summary and three buttons, not a raw trace.
+00:02:05.992 --> 00:02:11.456
+Without all four, nobody is really on the loop. They're just hoping.
 
 18
-00:02:03.271 --> 00:02:10.504
-Treat the threshold as a tunable parameter. Track how often reviewers agree, and move it with evidence.
+00:02:13.056 --> 00:02:25.218
+Ask three questions. How reversible is the action? How often does the agent operate outside its reliable range? And how expensive is the delay of a human review?
 
 19
-00:02:10.884 --> 00:02:19.132
-And paused runs must survive restarts. Keep run state in a database, and confirm nothing changed before resuming.
+00:02:25.598 --> 00:02:27.787
+Then follow two rules.
 
 20
-00:02:20.732 --> 00:02:23.191
-Here's the map for this module.
+00:02:28.167 --> 00:02:36.670
+Place intervention points before irreversible actions, like sending an email, committing a transaction, or deleting data.
 
 21
-00:02:23.571 --> 00:02:29.360
+00:02:37.050 --> 00:02:41.903
+And place them where the agent's confidence drops below a threshold you've measured.
+
+22
+00:02:43.503 --> 00:02:50.042
+Design from the reviewer's chair. What do they need to know, and what do they need to be able to do?
+
+23
+00:02:50.422 --> 00:02:55.325
+Usually that's a concise summary and three buttons, not a raw trace.
+
+24
+00:02:55.705 --> 00:03:02.938
+Treat the threshold as a tunable parameter. Track how often reviewers agree, and move it with evidence.
+
+25
+00:03:03.318 --> 00:03:11.566
+And paused runs must survive restarts. Keep run state in a database, and confirm nothing changed before resuming.
+
+26
+00:03:13.166 --> 00:03:15.625
+Here's the map for this module.
+
+27
+00:03:16.005 --> 00:03:21.794
 Next, we take agents on the road: runs that last hours, or days.
 

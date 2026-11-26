@@ -463,6 +463,27 @@ def twin(cx, cy, s=1):
     return monitor(cx - 65 * s, cy, .55 * s) + monitor(cx + 65 * s, cy, .55 * s) + T(cx + 65 * s, cy - 70 * s, "shadow", int(28 * s), TEAL)
 
 
+def regex(cx, cy, s=1):
+    return (P(rrect(cx - 115 * s, cy - 60 * s, 230 * s, 120 * s, 14), fill="#fff") + T(cx, cy + 16 * s, "/ign.re/i", int(40 * s), MAROON)
+            + P(f"M{cx-90*s} {cy+30*s} H{cx+90*s}", COPPER, w=4))
+
+
+def vectors(cx, cy, s=1):
+    out = P(f"M{cx-110*s} {cy+90*s} H{cx+110*s} M{cx-110*s} {cy+90*s} V{cy-100*s}", w=4)
+    for dx, dy in [(-40, -50), (-20, -30), (-55, -20), (-30, -70), (-5, -55)]:
+        out += C(cx + dx * s, cy + dy * s, 11 * s, fill=MAROON, op=.85, w=2)
+    out += f'<circle cx="{cx-30*s}" cy="{cy-45*s}" r="{62*s}" stroke="{MAROON}" stroke-width="3" fill="none" stroke-dasharray="8 8"/>'
+    return out + C(cx + 70 * s, cy + 40 * s, 13 * s, fill=TEAL, w=2) + C(cx + 5 * s, cy - 10 * s, 13 * s, fill=COPPER, w=2)
+
+
+def redact(cx, cy, s=1):
+    out = P(f"M{cx-75*s} {cy-100*s} H{cx+40*s} L{cx+75*s} {cy-65*s} V{cy+100*s} H{cx-75*s}Z", fill="#fff")
+    for i, (w, black) in enumerate([(100, False), (70, True), (100, False), (55, True), (85, False)]):
+        y = cy - 55 * s + i * 34 * s
+        out += P(rrect(cx - 50 * s, y - 9 * s, w * s, 18 * s, 3), fill=INK, w=2) if black else P(f"M{cx-50*s} {y} H{cx+(w-50)*s}", w=4)
+    return out
+
+
 ICONS = {
     # existing library, normalised to a ~200px box centred on (cx, cy)
     "bubble": lambda x, y, s: bubble(x - 110 * s, y - 75 * s, 220 * s, 130 * s), "kettle": lambda x, y, s: kettle(x, y + 10 * s, .8 * s),
@@ -484,6 +505,7 @@ ICONS = {
     "tree": tree, "envelope": envelope, "hierarchy": hierarchy, "swap": swap, "server": server, "tangle": tangle, "log": log, "lock": lock,
     "funnel": funnel, "states": states, "bell": bell, "person": person, "mismatch": mismatch, "trophy": trophy, "fence": fence,
     "slider": slider, "pause": pause, "eye": eye, "undo": undo, "buttons": buttons, "road": road, "flag": flag, "queue": queue,
+    "regex": regex, "vectors": vectors, "redact": redact,
     "heartbeat": heartbeat, "gavel": gavel, "bellcurve": bellcurve, "spike": spike, "drift": drift, "gate": gate, "twin": twin,
 }
 
@@ -576,8 +598,8 @@ def bullet_station(b, sc, first, x, y, cards):
         if n == 4:
             cx, cy, cw, ch = x + (-380 if k % 2 == 0 else 380), y - 70 + (k // 2) * 330, 720, 300
             b.add(P(rrect(cx - cw / 2, cy - ch / 2, cw, ch, 22), accents[k], fill="#fff", op=.55, w=4) + icon(name, cx - 235, cy, .72), "draw", li, off, 0.9)
-            text_block(b, cx - 115, cy, wrap(head, 17), wrap(rest, 20), li, off + 0.6, 56, 44, accents[k], "start", 270,
-                       lambda q, h=head, r=rest: (wrap(h, int(17 / q)), wrap(r, int(20 / q))))
+            text_block(b, cx - 115, cy, wrap(head, 16), wrap(rest, 20), li, off + 0.6, 56, 44, accents[k], "start", 270,
+                       lambda q, h=head, r=rest: (wrap(h, int(16 / q)), wrap(r, int(20 / q))))
         elif n == 5:
             cx, cy, cw, ch = x - 660 + k * 330, y + 110, 310, 560
             b.add(P(rrect(cx - cw / 2, cy - ch / 2, cw, ch, 22), accents[k], fill="#fff", op=.55, w=4) + icon(name, cx, cy - 150, .7), "draw", li, off, 0.9)
@@ -619,6 +641,23 @@ def anatomy_station(b, x, y, first):
 
 
 # ───────────────────────── generic storyboard ─────────────────────────
+def absolute(sp, f):
+    """Specs marked rel=True count lines from the start of their scene; convert them to lecture-wide numbers."""
+    if not sp.get("rel"):
+        return sp
+    sp = dict(sp)
+    if "cards" in sp:
+        sp["cards"] = [(c[0], c[1] + f) + tuple(c[2:]) for c in sp["cards"]]
+    if "beats" in sp:
+        sp["beats"] = [(b[0] + f,) + tuple(b[1:]) for b in sp["beats"]]
+    if "quote_at" in sp:
+        sp["quote_at"] = (sp["quote_at"][0] + f, sp["quote_at"][1])
+    if "close" in sp:
+        sp["close"] = (sp["close"][0] + f,) + tuple(sp["close"][1:])
+    return sp
+
+
+
 def make_board(spec):
     def board(b):
         lec = b.lec
@@ -626,7 +665,9 @@ def make_board(spec):
         for sc in scenes:
             first.append(li); li += len(sc["lines"])
         plan = []  # (kind, scene index)
-        for si, (sc, sp) in enumerate(zip(scenes, spec)):
+        assert len(spec) == len(scenes), f"{lec['id']}: {len(spec)} specs for {len(scenes)} scenes"
+        specs = [absolute(sp, first[si]) for si, sp in enumerate(spec)]
+        for si, (sc, sp) in enumerate(zip(scenes, specs)):
             if sc["type"] == "image" and "custom" not in sp:
                 plan.append(("overview", si))
                 if sp.get("close"):
@@ -637,7 +678,7 @@ def make_board(spec):
         b.cells = cells
         ci = 0
         for kind, si in plan:
-            sc, sp = scenes[si], spec[si]
+            sc, sp = scenes[si], specs[si]
             if kind == "overview":
                 b.overview(first[si])
                 continue
@@ -726,9 +767,9 @@ SPECS = {
         {"deco": ["fanout", "shield"]},
         {"beats": [(2, "chart", "six good months"), (3, "retry", "the same call, again"), (4, "question", "nothing changed?"),
                    (5, "cycle", "one flat loop"), (6, "states", "routing + state")], "quote_at": (4, 0.8)},
-        {"cards": [("fanout", 8), ("shield", 9), ("states", 10), ("bell", 11)]},
-        {"cards": [("cycle", 12), ("chartdown", 13), ("shield", 14), ("bell", 15)]},
-        {"close": (17, "hierarchy", "next: forming the band")},
+        {"cards": [("fanout", 8), ("shield", 9), ("states", 10), ("notebook", 11), ("bell", 13)]},
+        {"cards": [("cycle", 15), ("chartdown", 16), ("shield", 17), ("bell", 18)]},
+        {"close": (20, "hierarchy", "next: forming the band")},
     ],
     "m10": [
         {"deco": ["network", "hierarchy"]},
@@ -743,9 +784,10 @@ SPECS = {
         {"beats": [(2, "magnifier", "a fraud-detection agent"), (3, "check", "the clear 85%"), (4, "question", "the hard 15%"),
                    (6, "buttons", "escalate below a threshold")], "quote_at": (5, 0.3)},
         {"cards": [("pause", 8), ("eye", 9), ("scale", 10)]},
-        {"cards": [("undo", 11), ("target", 11, 3.0), ("clock", 11, 6.0), ("stop", 13), ("slider", 14)]},
-        {"cards": [("doc", 16), ("buttons", 16, 2.0), ("slider", 17), ("database", 18)]},
-        {"close": (20, "road", "next: the long tour")},
+        {"cards": [("log", 12), ("queue", 13), ("bell", 14), ("stop", 15)]},
+        {"cards": [("undo", 17), ("target", 17, 3.0), ("clock", 17, 6.0), ("stop", 19), ("slider", 20)]},
+        {"cards": [("doc", 22), ("buttons", 22, 2.0), ("slider", 23), ("database", 24)]},
+        {"close": (26, "road", "next: the long tour")},
     ],
     "m12": [
         {"deco": ["clock", "flag"]},
@@ -768,12 +810,68 @@ SPECS = {
     ],
     "m14": [
         {"deco": ["shield", "lock"]},
-        {"beats": [(2, "doc", "a document with hidden orders"), (3, "magnifier", "summarized as evidence"), (4, "lock", "permissions unchanged")], "quote_at": (3, 1.0)},
-        {"cards": [("funnel", 6), ("gavel", 7), ("key", 7, 2.5), ("stop", 8)]},
-        {"cards": [("bubble", 10), ("doc", 11), ("idcard", 12), ("envelope", 12, 3.5)]},
-        {"beats": [(13, "shield", "holds even if misread"), (14, "lock", "allowlists · scopes · validators"), (15, "log", "log decisions, not secrets"),
-                   (16, "flag", "capstone: bring evidence")], "quote_at": (13, 0.8)},
-        {"close": (18, "music", "that's the whole show · thank you")},
+        {"beats": [(3, "compass", "the creator's intent and values"), (4, "tangle", "instructions from everywhere"), (6, "drift", "a quiet drift"),
+                   (7, "shield", "guardrails at every boundary")], "quote_at": (5, 1.0)},
+        {"cards": [("regex", 9), ("vectors", 10), ("brain", 11), ("funnel", 12)]},
+        {"cards": [("contract", 14), ("redact", 14, 3.5), ("swap", 15), ("fence", 17)]},
+        {"cards": [("bubble", 19), ("film", 21), ("drift", 22), ("lock", 23)]},
+        {"beats": [(24, "shield", "holds even if misread"), (25, "lock", "allowlists · scopes · validators"), (26, "log", "log decisions, test grooming"),
+                   (27, "flag", "capstone: bring evidence")], "quote_at": (24, 0.8)},
+        {"close": (29, "music", "that's the whole show · thank you")},
+    ],
+
+    # ── lab and project tracks (line numbers relative to each scene) ──
+    "lab1": [
+        {"deco": ["monitor", "bubble"]},
+        {"rel": True, "beats": [(1, "bubble", "a bare-bones chatbot"), (2, "globe", "add web search"), (3, "question", "is it an agent?")], "quote_at": (0, 1.5)},
+        {"rel": True, "cards": [("monitor", 0), ("docs", 1), ("key", 2), ("lock", 3)]},
+        {"rel": True, "cards": [("bubble", 0), ("swap", 1), ("question", 2), ("log", 3)]},
+        {"rel": True, "cards": [("target", 0), ("globe", 1), ("compass", 2), ("scroll", 3)]},
+        {"rel": True, "close": (1, "brain", "next: the model takes the controls")},
+    ],
+    "lab2": [
+        {"deco": ["cycle", "toolbox"]},
+        {"rel": True, "beats": [(0, "compass", "the model decides"), (1, "book", "agents, percepts, environments"), (2, "blocks", "the five-level ladder")], "quote_at": (2, 1.0)},
+        {"rel": True, "cards": [("target", 1), ("toolbox", 2), ("docs", 3), ("cycle", 4)]},
+        {"rel": True, "cards": [("stop", 0), ("log", 1), ("shield", 2), ("retry", 3)]},
+        {"rel": True, "close": (1, "road", "next: harden it for the road")},
+    ],
+    "lab3": [
+        {"deco": ["shield", "server"]},
+        {"rel": True, "beats": [(0, "chain", "longer, harder tasks"), (1, "server", "online and offline"), (2, "coin", "cheap and expensive tiers")], "quote_at": (0, 2.5)},
+        {"rel": True, "cards": [("docs", 0), ("scroll", 1), ("contract", 2), ("megaphone", 3)]},
+        {"rel": True, "cards": [("log", 0), ("doc", 1), ("pin", 2), ("chart", 3)]},
+        {"rel": True, "close": (1, "fanout", "next: tool routing")},
+    ],
+    "lab4": [
+        {"deco": ["fanout", "toolbox"]},
+        {"rel": True, "beats": [(0, "toolbox", "every tool, every call"), (1, "fanout", "route first"), (2, "gear", "a meta tool")], "quote_at": (0, 2.5)},
+        {"rel": True, "cards": [("calendar", 0), ("cross", 0, 3.0), ("lock", 2), ("checklist", 3)]},
+        {"rel": True, "cards": [("checklist", 0), ("bubble", 1), ("shield", 2), ("undo", 3)]},
+        {"rel": True, "close": (1, "music", "next: Encore, and MCP")},
+    ],
+    "lab5": [
+        {"deco": ["plug", "server"]},
+        {"rel": True, "beats": [(0, "swap", "list, then call"), (1, "plug", "a Gradio server, a web client")], "quote_at": (1, 2.0)},
+        {"rel": True, "cards": [("bubble", 0), ("calculator", 1), ("trophy", 2), ("globe", 3)]},
+        {"rel": True, "cards": [("function", 1, 0.3), ("doc", 1, 2.5), ("kv", 1, 4.5), ("slider", 2)]},
+        {"rel": True, "close": (1, "hierarchy", "use it in Encore Ensemble")},
+    ],
+    "encore": [
+        {"deco": ["music", "notebook"]},
+        {"rel": True, "beats": [(0, "music", "answers, finds, builds"), (1, "film", "recalls last week"), (2, "lock", "writes wait for approval"),
+                                (3, "cycle", "the model picks each step")], "quote_at": (0, 2.5)},
+        {"rel": True, "cards": [("cycle", 0), ("toolbox", 1), ("contract", 2), ("lock", 3)]},
+        {"rel": True, "cards": [("brain", 1), ("film", 1, 3.0), ("book", 2), ("checklist", 2, 4.0)]},
+        {"rel": True, "cards": [("magnifier", 0), ("docs", 1), ("chart", 1, 3.5), ("curtain", 2)]},
+        {"rel": True, "close": (1, "hierarchy", "next: Encore Ensemble")},
+    ],
+    "ensemble": [
+        {"deco": ["hierarchy", "music"]},
+        {"rel": True, "beats": [(0, "music", "your midterm, extended"), (1, "crack", "failures in your traces"), (2, "scale", "before and after")], "quote_at": (2, 1.0)},
+        {"rel": True, "cards": [("map", 1), ("plug", 2), ("shield", 3), ("hierarchy", 4)]},
+        {"rel": True, "cards": [("log", 0), ("stop", 1), ("contract", 2), ("person", 3)]},
+        {"rel": True, "close": (1, "trophy", "enjoy the show")},
     ],
 }
 

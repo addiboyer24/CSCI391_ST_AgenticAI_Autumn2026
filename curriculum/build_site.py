@@ -3,13 +3,14 @@
     python curriculum/build_site.py
 
 Reads curriculum/course_data.py and writes:
-  * index.html                          (repo root, Coursera-style course page)
+  * index.html                          (repo root, the course page)
+  * instructor-guide.html               (repo root, the same course with module maps and track scripts instead of videos)
   * curriculum/img/<id>-mindmap.svg     (radial mind map; fallback when no explainer board exists)
   * curriculum/img/<id>-board.pdf/.jpg   (the illustrated board from the video = the module mind map; made by build_explainer.py)
-  * curriculum/img/<id>-onepager.svg    (one-page lecture guide per module)
 Optional inputs: video_scripts.py (Encore lectures) and checks.py (practice quizzes).
 """
 import html
+import re
 import string
 import os
 import sys
@@ -31,6 +32,15 @@ try:
     CHECKS = CK.CHECKS
 except ImportError:
     CHECKS = {}
+
+
+def track_video(lec_id):
+    """A lab or project walkthrough track, if its rendered MP4 exists."""
+    lec = LECTURE.get(lec_id)
+    return lec if lec and os.path.exists(os.path.join(HERE, "video", lec_id + ".mp4")) else None
+
+
+TRACK_FOR = {l["for"]: l["id"] for l in LECTURE.values() if l.get("for")}
 
 
 def video_for(m):
@@ -117,106 +127,6 @@ def mindmap_svg(m, n):
 
 
 # ───────────────────────── one-pager ─────────────────────────
-def onepager_svg(m, n):
-    W, PAD = 850, 40
-    inner = W - 2 * PAD
-    body = []
-    y = 0
-    # header
-    title_lines = wrap(m["title"], 46, 2)
-    tag_lines = wrap(m["tagline"], 92, 2)
-    hh = 70 + len(title_lines) * 36 + len(tag_lines) * 21 + 20
-    body.append(f'<rect width="{W}" height="{hh}" fill="{MAROON}"/>')
-    body.append(f'<text x="{PAD}" y="42" fill="{COPPER}" font-size="13" font-weight="700" letter-spacing="2">CSCI 391 · MODULE {n:02d} · ONE-PAGE LECTURE GUIDE</text>')
-    ty = 82
-    for l in title_lines:
-        body.append(f'<text x="{PAD}" y="{ty}" fill="#fff" font-size="30" font-weight="800">{E(l)}</text>')
-        ty += 36
-    ty += 2
-    for l in tag_lines:
-        body.append(f'<text x="{PAD}" y="{ty}" fill="#f1dbe4" font-size="16" font-style="italic">{E(l)}</text>')
-        ty += 21
-    y = hh + 30
-    body.append(f'<text x="{PAD}" y="{y}" fill="#555" font-size="13"><tspan font-weight="700" fill="{MAROON}">{E(part_label(m))}</tspan>   ·   {E(m["weeks"])}   ·   Read: {E(chapter_text(m))}</text>')
-    y += 26
-
-    def heading(label, color=MAROON):
-        nonlocal y
-        body.append(f'<text x="{PAD}" y="{y}" fill="{color}" font-size="13" font-weight="800" letter-spacing="1.8">{E(label.upper())}</text>')
-        y += 20
-
-    # opening case
-    lines = wrap(m["case"], 118)
-    bh = 44 + len(lines) * 20
-    body.append(f'<rect x="{PAD}" y="{y}" width="{inner}" height="{bh}" rx="10" fill="{CREAM}"/>')
-    body.append(f'<text x="{PAD+20}" y="{y+28}" fill="{MAROON}" font-size="13" font-weight="800" letter-spacing="1.8">OPENING CASE</text>')
-    for i, l in enumerate(lines):
-        body.append(f'<text x="{PAD+20}" y="{y+52+i*20}" fill="{INK}" font-size="14">{E(l)}</text>')
-    y += bh + 30
-    # big idea
-    lines = wrap(m["big_idea"], 76)
-    body.append(f'<rect x="{PAD}" y="{y-6}" width="6" height="{len(lines)*27+8}" fill="{COPPER}"/>')
-    for i, l in enumerate(lines):
-        body.append(f'<text x="{PAD+22}" y="{y+16+i*27}" fill="{MAROON}" font-size="20" font-weight="700">{E(l)}</text>')
-    y += len(lines) * 27 + 34
-    # two columns
-    colw = (inner - 30) / 2
-    lx, rx = PAD, PAD + colw + 30
-    fname, fitems = m["framework"]
-    ly = ry = y
-    body.append(f'<text x="{lx}" y="{ly}" fill="{MAROON}" font-size="13" font-weight="800" letter-spacing="1.8">KEY FRAMEWORK</text>')
-    ly += 22
-    for l in wrap(fname, 48):
-        body.append(f'<text x="{lx}" y="{ly}" fill="{INK}" font-size="16" font-weight="700">{E(l)}</text>')
-        ly += 21
-    ly += 6
-    for i, item in enumerate(fitems, 1):
-        body.append(f'<circle cx="{lx+11}" cy="{ly+2}" r="11" fill="{BRANCH_COLORS[(i-1) % 6]}"/>')
-        body.append(f'<text x="{lx+11}" y="{ly+7}" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">{i}</text>')
-        for l in wrap(item, 52):
-            body.append(f'<text x="{lx+30}" y="{ly+7}" fill="{INK}" font-size="13.5">{E(l)}</text>')
-            ly += 19
-        ly += 9
-    body.append(f'<text x="{rx}" y="{ry}" fill="{MAROON}" font-size="13" font-weight="800" letter-spacing="1.8">YOU SHOULD BE ABLE TO</text>')
-    ry += 28
-    for obj in m["objectives"]:
-        body.append(f'<path d="M{rx+2},{ry} l5,5 l10,-11" fill="none" stroke="#3f7a55" stroke-width="3" stroke-linecap="round"/>')
-        for l in wrap(obj, 52):
-            body.append(f'<text x="{rx+26}" y="{ry+4}" fill="{INK}" font-size="13.5">{E(l)}</text>')
-            ry += 19
-        ry += 11
-    y = max(ly, ry) + 16
-    # enterprise lens
-    lens_lines = [wrap(b, 114) for b in m["lens"]]
-    bh = 50 + sum(len(ls) * 19 + 10 for ls in lens_lines)
-    body.append(f'<rect x="{PAD}" y="{y}" width="{inner}" height="{bh}" rx="10" fill="#fff6e8" stroke="#f0c98a"/>')
-    body.append(f'<rect x="{PAD}" y="{y}" width="7" height="{bh}" rx="3" fill="{COPPER}"/>')
-    body.append(f'<text x="{PAD+22}" y="{y+28}" fill="#9a5a00" font-size="13" font-weight="800" letter-spacing="1.8">ENTERPRISE LENS · {E(D.COURSE["author"].upper())}</text>')
-    yy = y + 52
-    for ls in lens_lines:
-        body.append(f'<circle cx="{PAD+28}" cy="{yy-4}" r="3.5" fill="{COPPER}"/>')
-        for l in ls:
-            body.append(f'<text x="{PAD+40}" y="{yy}" fill="{INK}" font-size="13.5">{E(l)}</text>')
-            yy += 19
-        yy += 10
-    y += bh + 30
-    # prompts
-    heading("Discuss")
-    for p in m["prompts"]:
-        for i, l in enumerate(wrap(p, 116)):
-            body.append(f'<text x="{PAD}" y="{y}" fill="{INK}" font-size="14">{"→  " if i == 0 else "    "}{E(l)}</text>')
-            y += 20
-        y += 6
-    y += 14
-    H = y + 50
-    body.append(f'<line x1="{PAD}" y1="{H-46}" x2="{W-PAD}" y2="{H-46}" stroke="#ddd"/>')
-    body.append(f'<text x="{PAD}" y="{H-22}" fill="#777" font-size="11.5">Concepts after {E(chapter_text(m))}. Case framing, synthesis, and enterprise lens: {E(D.COURSE["author"])}.</text>')
-    head = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="{FONT}">',
-            f'<title>Module {n:02d} one-page guide: {E(m["title"])}</title>',
-            '<rect width="100%" height="100%" fill="#fff"/>']
-    return "\n".join(head + body + ["</svg>"])
-
-
 # ───────────────────────── HTML ─────────────────────────
 ICON = {
     "video": '<path d="M4 6h11v12H4zM15 10l5-3v10l-5-3z"/>',
@@ -232,6 +142,7 @@ ICON = {
     "chev": '<path d="m6 9 6 6 6-6"/>',
     "person": '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>',
     "book": '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
+    "script": '<path d="M6 3h9l3 3v15H6zM9 9h6M9 12.5h6M9 16h4"/>',
 }
 
 
@@ -266,38 +177,126 @@ def board_files(m):
     return (f"curriculum/img/{m['id']}-mindmap.svg",) * 2
 
 
-def collage_html():
-    """Wall of video posters at the top of the page; each tile jumps to (and opens) its module's lecture."""
+MOSAIC = ["m01", "m02", "encore", "m03", "m05", "m06", "m07", "m10", "ensemble", "m11", "m12", "m14"]
+COVERS = {"encore": ("curriculum/img/encore-cover.webp", "#projects", "Encore · midterm project"),
+          "ensemble": ("curriculum/img/encore-ensemble-cover.webp", "#projects", "Encore Ensemble · final project")}
+
+
+def mosaic_html(guide):
+    """Tiles around the title card: track posters (module maps in the guide) mixed with the project cover art."""
     tiles = []
-    for m in D.MODULES:
-        lec = video_for(m)
-        if not lec or not os.path.exists(os.path.join(HERE, "video", f"{m['id']}.jpg")):
-            continue
-        tiles.append(f'<a class="tile" href="#{m["id"]}-video"><span class="thumb"><img src="curriculum/video/{m["id"]}.jpg" alt="" loading="eager"></span>'
-                     f'<span class="lbl">{E(lec["name"])}<small>{E(lec["track"])} · {E(m["title"])}</small></span></a>')
-    if not tiles:
+    for mid in MOSAIC:
+        if mid in COVERS:
+            img, href, lbl = COVERS[mid]
+        else:
+            n = next(i for i, m in enumerate(D.MODULES, 1) if m["id"] == mid)
+            if guide:
+                img, href, lbl = board_files(D.MODULES[n - 1])[0], f"#{mid}", f"Module {n} map · {D.MODULES[n - 1]['title']}"
+            elif video_for(D.MODULES[n - 1]):
+                img, href, lbl = f"curriculum/video/{mid}.jpg", f"#{mid}-video", f"Track {n} · {LECTURE[mid]['name']}"
+            else:
+                continue
+        tiles.append(f'<a class="tile" href="{href}" title="{E(lbl)}" aria-label="{E(lbl)}"><img src="{img}" alt="" loading="eager"></a>')
+    return "\n      ".join(tiles)
+
+
+def contents_html():
+    out = ['<nav class="contents" aria-label="Contents"><h2>Contents</h2>', '<a href="#intro">Introduction</a>',
+           '<a href="#about">What you\'ll learn</a>', '<a href="#modules">Modules</a>']
+    current = None
+    for n, m in enumerate(D.MODULES, 1):
+        if m["part"] != current:
+            current = m["part"]
+            out.append(f'<div class="grp">{E(D.PARTS[current][0])} · {E(D.PARTS[current][1])}</div>')
+        out.append(f'<a class="sub" href="#{m["id"]}"><span>{n:02d}</span>{E(m["title"])}</a>')
+    out += ['<a href="#projects">Projects</a>', '<a href="#textbook">Textbook</a>', '<a href="#author">Author</a>',
+            '<a href="#adopt">Adopt this course</a>', '<a href="#faq">FAQ</a>', "</nav>"]
+    return "\n".join(out)
+
+
+def duration(vid):
+    """Running time from the last caption cue, e.g. '3 min'."""
+    try:
+        h, mi, sec = re.findall(r"--> (\d+):(\d+):(\d+(?:\.\d+)?)", open(os.path.join(HERE, "video", vid + ".vtt"), encoding="utf8").read())[-1]
+    except (OSError, IndexError):
         return ""
-    return f'<section class="collage" aria-label="Video lectures">{"".join(tiles)}</section>'
+    return f"{max(1, round((int(h) * 3600 + int(mi) * 60 + float(sec)) / 60))} min"
+
+
+def thumb(kind, img=None, play=False):
+    inner = f'<img src="{E(img)}" alt="" loading="lazy">' if img else icon(kind if kind in ICON else "page")
+    return f'<span class="th k-{kind}">{inner}{"<i class=play></i>" if play else ""}</span>'
+
+
+def text(meta, title, sub=""):
+    return (f'<span class="tx"><span class="meta">{E(meta)}</span><span class="ttl">{E(title)}</span>'
+            + (f'<span class="sub">{E(sub)}</span>' if sub else "") + "</span>")
+
+
+def row(kind, meta, title, sub="", href=None, img=None):
+    if not href:
+        return f'<div class="row">{thumb(kind, img)}{text(meta, title, sub)}</div>'
+    ext = href.startswith("http") or href.endswith(".pdf")
+    return (f'<a class="row" href="{E(href)}"{" target=_blank rel=noopener" if ext else ""}>{thumb(kind, img)}{text(meta, title, sub)}'
+            f'<span class="go">{"Open" if not href.startswith("#") else "Go"}</span></a>')
+
+
+def fold(kind, meta, title, sub, body, img=None, play=False, open_=False, rid=None):
+    return (f'<details class="row"{f" id={rid}" if rid else ""}{" open" if open_ else ""}><summary>{thumb(kind, img, play)}{text(meta, title, sub)}'
+            f'{icon("chev", "chev")}</summary><div class="body">{body}</div></details>')
+
+
+def script_html(lec):
+    """The track's narration as readable text, with what appears on screen in each scene."""
+    out = []
+    for i, sc in enumerate(lec["scenes"], 1):
+        t = sc["type"]
+        kick = sc.get("kicker") or {"title": "Opening", "image": "Closing"}.get(t, "")
+        head = sc.get("heading") or ""
+        screen = ""
+        if t == "quote":
+            screen = f'<div class="screen"><b>On screen</b><br><q>{E(sc["quote"])}</q></div>'
+        elif t == "bullets":
+            screen = '<div class="screen"><b>On screen</b><ul>' + "".join(f"<li>{E(x)}</li>" for x in sc["bullets"]) + "</ul></div>"
+        elif t == "image":
+            screen = '<div class="screen"><b>On screen</b><br>The finished board — the module map.</div>'
+        lines = "".join(f"<p>{E(x)}</p>" for x in sc["lines"])
+        out.append(f'<div class="scene"><span class="sk">Scene {i} · {E(kick)}</span>{f"<h5>{E(head)}</h5>" if head else ""}{screen}{lines}</div>')
+    return f'<div class="script">{"".join(out)}</div>'
+
+
+def track_block(lec, series, guide, pid=None):
+    """One track: a video row on the site, a script row in the guide."""
+    vid, d = lec["id"], duration(lec["id"])
+    if guide:
+        n = sum(len(sc["lines"]) for sc in lec["scenes"])
+        return fold("script", f"Script · {d} track · {lec['track']}", lec["name"], f"{len(lec['scenes'])} scenes · {n} narration lines",
+                    script_html(lec), open_=True, rid=f"{pid or vid}-script")
+    return fold("video", f"Video · {d} · {lec['track']}", lec["name"], "Narrated by Encore · captions on · choose a voice",
+                player_for(lec, series, pid), img=f"curriculum/video/{vid}.jpg", play=True)
 
 
 def player(m):
     lec = video_for(m)
-    if not lec:
-        return ""
-    v = f"curriculum/video/{m['id']}"
-    voices = [x for x in getattr(VS, "VOICES", []) if os.path.exists(os.path.join(HERE, "video", VS.media_stem(m["id"], x) + ".mp4"))]
+    return player_for(lec, "Encore Lectures") if lec else ""
+
+
+def player_for(lec, series, pid=None):
+    vid = lec["id"]
+    v = f"curriculum/video/{vid}"
+    voices = [x for x in getattr(VS, "VOICES", []) if os.path.exists(os.path.join(HERE, "video", VS.media_stem(vid, x) + ".mp4"))]
     picker = ""
     if len(voices) > 1:
         btns = "".join(
-            f'<button type="button" data-voice="{x["id"]}" data-stem="curriculum/video/{VS.media_stem(m["id"], x)}" aria-pressed="{"true" if i == 0 else "false"}">{E(x["name"])}</button>'
+            f'<button type="button" data-voice="{x["id"]}" data-stem="curriculum/video/{VS.media_stem(vid, x)}" aria-pressed="{"true" if i == 0 else "false"}">{E(x["name"])}</button>'
             for i, x in enumerate(voices))
         picker = f'<span class="voices" role="group" aria-label="Narrator voice"><span>Voice</span>{btns}</span>'
-    return f'''<figure class="player" id="{m['id']}-video">
+    return f'''<figure class="player" id="{pid or vid}-video">
       <video controls preload="none" poster="{v}.jpg" playsinline>
         <source src="{v}.mp4" type="video/mp4">
         <track kind="captions" src="{v}.vtt" srclang="en" label="English" default>
       </video>
-      <figcaption><span class="trk">Encore Lectures · {E(lec['track'])}</span><b>{E(lec['name'])}</b>{picker}<span class="note">Synthetic narrator · captions on by default</span></figcaption>
+      <figcaption><span class="trk">{E(series)} · {E(lec['track'])}</span><b>{E(lec['name'])}</b>{picker}<span class="note">Synthetic narrator · captions on by default</span></figcaption>
     </figure>'''
 
 
@@ -326,87 +325,116 @@ def check_html(m, n):
     </section>'''
 
 
-def module_html(m, n):
-    items = []
-    for k, t in chapter_titles(m):
-        items.append(("reading", f"Reading · Caldwell, Chapter {k}", t, None))
-    for t, u in D.SUPPLEMENTAL.get(m["id"], []):
-        items.append(("reading", "Supplemental reading", t, u))
-    items.append(("map", "Mind map", f"Module {n} board from the video · printable PDF", board_files(m)[1]))
-    items.append(("page", "One-page lecture guide", "Printable lecture companion", f"curriculum/img/{m['id']}-onepager.svg"))
+TAILOR = ("Use these as a starting point, not as the quiz. Each semester you teach, write tailored questions in your own quiz style — "
+          "your format (multiple choice, short answer, scenario, code reading), your examples from that term's discussions and labs, "
+          "and fresh scenarios and distractors — so the quiz fits your teaching and old answers don't carry over between terms.")
+
+
+def bank_html(m):
+    out = []
+    for q in CHECKS[m["id"]]:
+        opts = "".join(f'<li class="{"key" if i == q["answer"] else ""}">{E(t)}<span>{E(why)}</span></li>' for i, (t, why) in enumerate(q["options"]))
+        out.append(f'<li><p class="stem">{E(q["q"])}</p><ol type="A">{opts}</ol></li>')
+    graded = [a["title"] for a in m["activities"] if a["kind"] == "quiz"]
+    g = f" This week's graded quiz: {E(graded[0])} — give it in class, unannounced." if graded else ""
+    return f'<div class="tailor"><b>Write your own each semester.</b> {E(TAILOR)}{g}</div><ol class="bank">{"".join(out)}</ol>'
+
+
+def module_html(m, n, guide, shown):
+    """Track, reading, quiz and application (when one is assigned that week). The guide adds teaching notes."""
+    sec = []
     lec = video_for(m)
+    track = []
+    mm_img, mm = board_files(m)
+    if guide:
+        track.append(f'<figure class="mapfig"><a href="{mm}" target="_blank" rel="noopener"><img src="{mm_img}" alt="Module {n} map: the finished illustrated board from the track, {E(m["title"])}" loading="lazy"></a>'
+                     f'<figcaption>Module map · the board the track draws, scene by scene · <a href="{mm}" target="_blank" rel="noopener">printable PDF</a></figcaption></figure>')
     if lec:
-        items.insert(0, ("video", f"Video lecture · Encore {lec['track']}", f"{lec['name']} — narrated by Encore, with captions", f"#{m['id']}-video"))
+        track.append(track_block(lec, "Encore Lectures", guide))
+    if not guide:
+        track.append(row("map", "PDF · Module map", "The finished board from the track", "Print it, annotate it, review with it", mm, mm_img))
+    sec.append(("Track", track))
+
+    reading = [row("reading", f"Required reading · Caldwell, Chapter {k}", t, D.COURSE["book"]["title"], "#textbook") for k, t in chapter_titles(m)]
+    reading += [row("reading", "Supplemental reading", t, "", u) for t, u in D.SUPPLEMENTAL.get(m["id"], [])]
+    if guide:
+        outline = "".join(f"<li><b>{E(h)}</b><ul>{''.join(f'<li>{E(x)}</li>' for x in leaves)}</ul></li>" for h, leaves in m["branches"])
+        reading.append(f'''<div class="outline"><h5>Reading outline · {E(m['chapters'])}</h5>
+      <p class="big">{E(m['big_idea'])}</p><ol>{outline}</ol>
+      <p class="src">{E(m['textbook'])} Outline written for this course; assign the chapter itself.</p></div>''')
+    sec.append(("Reading", reading))
+
+    quiz = []
     if m["id"] in CHECKS:
-        items.append(("practice", "Practice quiz · Check your progress", f"{len(CHECKS[m['id']])} questions · ungraded · instant feedback", f"#{m['id']}-check"))
-    for a in m["activities"]:
-        label = {"lab": "Lab", "quiz": "Graded quiz", "project": "Project", "code": "Code example"}[a["kind"]]
-        items.append((a["kind"], label, f'{a["title"]} — {a["desc"]}', a.get("href")))
-    li = []
-    for kind, label, text, href in items:
-        is_img = href and href.endswith(".svg")
-        target = ' target="_blank" rel="noopener"' if href and (href.startswith("http") or href.endswith(".pdf")) else ""
-        inner = f'{icon(kind)}<span><b>{E(label)}</b><span class="it-text">{E(text)}</span></span>'
-        if href:
-            attr = f' data-lightbox="{E(href)}" data-caption="{E(label + " · " + m["title"])}"' if is_img else ""
-            li.append(f'<li><a class="item k-{kind}" href="{E(href)}"{target}{attr}>{inner}<span class="go">Open</span></a></li>')
+        k = len(CHECKS[m["id"]])
+        if guide:
+            quiz.append(fold("practice", f"Question bank · {k} questions · answer key", "Quiz questions for this module",
+                             "Starting points — write your own each semester", bank_html(m), open_=True, rid=f"{m['id']}-bank"))
         else:
-            li.append(f'<li><div class="item k-{kind}">{inner}</div></li>')
-    obj = "".join(f"<li>{icon('check')}<span>{E(o)}</span></li>" for o in m["objectives"])
-    lens = "".join(f"<li>{E(b)}</li>" for b in m["lens"])
-    prompts = "".join(f"<li>{E(p)}</li>" for p in m["prompts"])
-    fname, fitems = m["framework"]
-    fw = "".join(f"<li>{E(x)}</li>" for x in fitems)
-    (mm_img, mm), op = board_files(m), f"curriculum/img/{m['id']}-onepager.svg"
-    return f'''
-<details class="module" id="{m['id']}">
-  <summary>
-    <div class="mod-num"><span>Module {n}</span><small>{E(m['weeks'])}</small></div>
-    <div class="mod-head">
-      <h3>{E(m['title'])}</h3>
-      <p class="mod-tag">{E(m['tagline'])}</p>
-      <p class="mod-meta">{E(' · '.join(counts(m)))} · Reading {E(m['chapters'])}<span class="done" data-done="{m['id']}" hidden>{icon('check')} Check passed</span></p>
-    </div>
-    {icon('chev', 'chev')}
-  </summary>
-  <div class="mod-body">
-    <p class="mod-summary">{E(m['summary'])}</p>
-    {player(m)}
-    <div class="visuals">
-      <a class="visual" href="{mm}"{' target="_blank" rel="noopener"' if mm.endswith(".pdf") else f' data-lightbox="{mm}" data-caption="Mind map · {E(m["title"])}"'}><img src="{mm_img}" alt="Mind map for module {n}: the whole illustrated board from the video, {E(m['title'])}" loading="lazy"><span>{icon('map')} Mind map{" · PDF" if mm.endswith(".pdf") else ""}</span></a>
-      <a class="visual tall" href="{op}" data-lightbox="{op}" data-caption="One-page guide · {E(m['title'])}"><img src="{op}" alt="One-page lecture guide for module {n}" loading="lazy"><span>{icon('page')} One-page guide</span></a>
-    </div>
-    <div class="cols">
-      <div>
-        <h4>Learning objectives</h4>
-        <ul class="checks">{obj}</ul>
-        <h4>Key framework · {E(fname)}</h4>
-        <ol class="framework">{fw}</ol>
-      </div>
-      <div>
-        <div class="case"><h4>Opening case</h4><p>{E(m['case'])}</p></div>
+            quiz.append(fold("practice", f"Practice quiz · {k} questions · ungraded", "Check your progress", "Instant feedback · best score saved in this browser",
+                             check_html(m, n)))
+    for a in m["activities"]:
+        if a["kind"] == "quiz":
+            quiz.append(row("quiz", "Graded quiz · in class, unannounced", a["title"], a["desc"]))
+    if quiz:
+        sec.append(("Quiz", quiz))
+
+    app = []
+    for a in m["activities"]:
+        if a["kind"] == "quiz":
+            continue
+        label = {"lab": "Lab", "project": "Project", "code": "Code example"}[a["kind"]]
+        app.append(row(a["kind"], label, a["title"], a["desc"], a.get("href")))
+        t = track_video(TRACK_FOR.get(a.get("href"), ""))
+        if t and t["id"] not in shown:
+            shown.add(t["id"])
+            app.append(track_block(t, "Lab walkthrough" if a["kind"] == "lab" else "Project walkthrough", guide))
+    if app:
+        sec.append(("Application", app))
+
+    if guide:
+        obj = "".join(f"<li>{icon('check')}<span>{E(o)}</span></li>" for o in m["objectives"])
+        fname, fitems = m["framework"]
+        sec.append(("Teaching notes", [f'''<div class="notes">
+      <div><h4>Learning objectives</h4><ul class="checks">{obj}</ul>
+        <h4>Key framework · {E(fname)}</h4><ol class="framework">{"".join(f"<li>{E(x)}</li>" for x in fitems)}</ol>
+        <h4>Discussion prompts</h4><ul class="prompts">{"".join(f"<li>{E(p)}</li>" for p in m["prompts"])}</ul></div>
+      <div><div class="case"><h4>Opening case</h4><p>{E(m['case'])}</p></div>
         <div class="callout book">{icon('book')}<div><h4>Textbook foundation</h4><p>{E(m['textbook'])}</p></div></div>
-        <div class="callout lens"><div><h4>Enterprise lens · {E(D.COURSE['author'])}</h4><ul>{lens}</ul></div></div>
-      </div>
-    </div>
-    <h4>What's included</h4>
-    <ul class="items">{''.join(li)}</ul>
-    <h4>Discussion prompts</h4>
-    <ul class="prompts">{prompts}</ul>
-    {check_html(m, n)}
-  </div>
-</details>'''
+        <div class="callout lens"><div><h4>Enterprise lens · {E(D.COURSE['author'])}</h4><ul>{"".join(f"<li>{E(b)}</li>" for b in m["lens"])}</ul></div></div></div>
+    </div>''']))
+
+    panel = "".join(f'<h4>{E(h)}</h4><div class="rows">{"".join(r)}</div>' for h, r in sec)
+    return f'''
+<article class="module" id="{m['id']}">
+  <span class="eyebrow">Module {n} · {E(m['weeks'])} · Reading {E(m['chapters'])}</span><span class="done" data-done="{m['id']}" hidden>{icon('check')} Check passed</span>
+  <h3>{E(m['title'])}</h3>
+  <p class="mod-tag">{E(m['tagline'])}</p>
+  <p class="mod-summary">{E(m['summary'])}</p>
+  <div class="panel">{panel}</div>
+</article>'''
 
 
-def page():
+SITE_INTRO = ("Fourteen modules on building AI agents that act — and on keeping them reliable, observable, and safe. "
+              "Every module works the same way: watch the track, do the reading, check yourself with a quiz, then apply it in that week's lab or project.")
+SITE_MODS = ("Each module has a track (an illustrated, narrated video lecture, plus its finished board as a printable module map), "
+             "the required reading, a quiz, and the application: the lab or project assigned that week, if there is one.")
+GUIDE_INTRO = ("The whole course, arranged for teaching. In place of the videos, each module shows its module map and the full narration "
+               "script of its track, scene by scene, followed by the reading, quizzes, assignments, and teaching notes.")
+GUIDE_MODS = ("Each module: the module map and the track script, the required reading with an outline, a quiz question bank with its answer key, "
+              "the lab or project assigned that week with its walkthrough script, and teaching notes (objectives, key framework, opening case, "
+              "textbook foundation, enterprise lens, discussion prompts). Quiz questions are starting points: write tailored ones each semester.")
+
+
+def page(guide=False):
     C, B = D.COURSE, D.COURSE["book"]
-    mods, current = [], None
+    mods, current, shown = [], None, set()
     for n, m in enumerate(D.MODULES, 1):
         if m["part"] != current:
             current = m["part"]
             p = D.PARTS[current]
             mods.append(f'<div class="part"><span>{E(p[0])}</span><h3>{E(p[1])}</h3><p>{E(p[2])}</p></div>')
-        mods.append(module_html(m, n))
+        mods.append(module_html(m, n, guide, shown))
     n_labs = sum(1 for m in D.MODULES for a in m["activities"] if a["kind"] == "lab")
     n_quiz = sum(1 for m in D.MODULES for a in m["activities"] if a["kind"] == "quiz")
     outcomes = "".join(f"<li>{icon('check')}<span>{E(o)}</span></li>" for o in D.OUTCOMES)
@@ -420,16 +448,20 @@ def page():
     grading = "".join(f'<div class="grade"><b>{w}%</b><span>{E(name)}</span><i style="width:{w*2.6}%"></i></div>' for name, w in D.GRADING)
     tech = "".join(f"<span class='chip ghost'>{E(t)}</span>" for t in D.TECH)
     faq = "".join(f"<details class='faq'><summary>{E(q)}{icon('chev','chev')}</summary><p>{E(a)}</p></details>" for q, a in D.FAQ)
-    toc = "".join(f'<a href="#{m["id"]}"><span>{n:02d}</span>{E(m["title"])}</a>' for n, m in enumerate(D.MODULES, 1))
     out = string.Template(TEMPLATE).substitute(
         title=E(C["title"]), code=E(C["code"]), subtitle=E(C["subtitle"]), author=E(C["author"]),
         book_title=E(B["title"]), book_sub=E(B["subtitle"]), book_author=E(B["author"]), book_ed=E(B["edition"]), book_url=E(B["url"]),
         pilot=E(C["pilot"]), credits=C["credits"], length=E(C["length"]), level=E(C["level"]), prereq=E(C["prereq"]),
         repo=E(C["repo"]), syllabus=E(C["syllabus"]),
-        n_vid=sum(1 for m in D.MODULES if video_for(m)), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
+        n_vid=sum(1 for m in D.MODULES if video_for(m)) + sum(1 for l in LECTURE.values() if l.get("for") and track_video(l["id"])), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
         outcomes=outcomes, skills=skills, modules="\n".join(mods), chapters="".join(chap_rows),
-        grading=grading, tech=tech, faq=faq, toc=toc, collage=collage_html(),
-        hero_img=board_files(D.MODULES[2])[0], hero_href=board_files(D.MODULES[2])[1],
+        grading=grading, tech=tech, faq=faq, mosaic=mosaic_html(guide), contents=contents_html(),
+        encore_video=track_block(track_video("encore"), "Project walkthrough", guide, "encore-proj") if track_video("encore") else "",
+        ensemble_video=track_block(track_video("ensemble"), "Project walkthrough", guide, "ensemble-proj") if track_video("ensemble") else "",
+        kind="Instructor's guide" if guide else "Agentic AI Curriculum",
+        switch='<a href="index.html">Student site</a>' if guide else '<a href="instructor-guide.html">Instructor\'s guide</a>',
+        cta2='<a class="btn ghost" href="index.html">Open the student site</a>' if guide else '<a class="btn ghost" href="instructor-guide.html">Instructor\'s guide</a>',
+        intro=E(GUIDE_INTRO if guide else SITE_INTRO), mod_intro=E(GUIDE_MODS if guide else SITE_MODS),
     )
     for k, v in {"$ICON_PERSON": icon("person"), "$ICON_BOOK": icon("book"), "$ICON_CHEV": icon("chev", "chev")}.items():
         out = out.replace(k, v)
@@ -444,11 +476,10 @@ def main():
     for n, m in enumerate(D.MODULES, 1):
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
-        with open(os.path.join(IMG, f"{m['id']}-onepager.svg"), "w", encoding="utf8") as f:
-            f.write(onepager_svg(m, n))
-    with open(os.path.join(ROOT, "index.html"), "w", encoding="utf8", newline="\n") as f:
-        f.write(page())
-    print(f"Built index.html and {2*len(D.MODULES)} images in {IMG}")
+    for name, guide in (("index.html", False), ("instructor-guide.html", True)):
+        with open(os.path.join(ROOT, name), "w", encoding="utf8", newline="\n") as f:
+            f.write(page(guide))
+    print(f"Built index.html, instructor-guide.html and {len(D.MODULES)} fallback maps in {IMG}")
 
 
 if __name__ == "__main__":
