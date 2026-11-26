@@ -46,21 +46,53 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .btn.ghost:hover{background:var(--hero)}
 .btn.sm{padding:7px 14px;font-size:13px}
 
-/* hero (collection-page layout): full-bleed mosaic of flat art tiles around a big title card */
-.hero{background:#fff;padding:14px 0 0;overflow:hidden}
-.crumbs{font-size:13px;color:var(--muted);margin:0 0 12px}
+/* hero: the setlist stage. A gig-poster title card, a stage screen that plays through the tracks, and the full setlist */
+.hero{background:#fff;padding:14px 0 6px}
+.crumbs{font-size:13px;color:var(--muted);margin:0 0 14px}
 .crumbs a{color:var(--ink);text-decoration:none;font-weight:600}
 .crumbs a:hover{text-decoration:underline}
-.mosaic{display:grid;grid-template-columns:1fr 1.75fr .95fr 4.6fr 1fr;grid-template-rows:repeat(2,clamp(120px,14.5vw,200px));gap:10px;margin:0 -70px 0 10px}
-.mosaic .tile{display:block;border-radius:18px;overflow:hidden;background:#e7dfd6}
-.mosaic .tile img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.mosaic .tile:hover img,.mosaic .tile:focus-visible img{transform:scale(1.05)}
-.t-a{grid-column:1;grid-row:1}.t-b{grid-column:2/4;grid-row:1}.t-c{grid-column:1/3;grid-row:2}.t-d{grid-column:3;grid-row:2}
-.t-e{grid-column:5;grid-row:1}.t-f{grid-column:5;grid-row:2}
-.titlecard{grid-column:4;grid-row:1/3;border-radius:18px;background:#f4c56e;color:#5c1424;display:flex;flex-direction:column;justify-content:center;padding:28px 44px}
-.titlecard small{font-size:17px;font-weight:700;color:#7a2a1c}
-.titlecard h1{font-size:clamp(28px,3.3vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:4px 0 10px}
-.titlecard p{margin:0;font-size:16.5px;color:#6b2a20;max-width:520px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:22px;align-items:stretch}
+.titlecard{position:relative;overflow:hidden;background:var(--maroon);color:#fff;border-radius:22px;padding:34px 38px;display:flex;flex-direction:column;justify-content:center}
+.titlecard::after{content:"";position:absolute;right:-90px;bottom:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(244,197,110,.22),rgba(244,197,110,0) 70%);pointer-events:none}
+.titlecard small{font-size:15px;font-weight:700;color:#f4c56e}
+.titlecard h1{font-size:clamp(30px,3.4vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.06;margin:8px 0 12px;color:#fff}
+.titlecard p{margin:0;font-size:16.5px;line-height:1.55;color:#f1dbe4;max-width:460px}
+.titlecard .btn{align-self:flex-start;margin-top:22px;background:#f4c56e;border-color:#f4c56e;color:#4f0020}
+.titlecard .btn:hover{background:#ffd88d;border-color:#ffd88d}
+.eq{position:absolute;right:26px;top:26px;display:flex;gap:4px;align-items:flex-end;height:26px}
+.eq i{width:5px;height:60%;background:#f4c56e;border-radius:2px;animation:eq 1s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{height:20%}to{height:100%}}
+.screen{position:relative;aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#140a1f;box-shadow:0 20px 50px rgba(20,10,31,.3)}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s}
+.screen img.on{opacity:1;animation:kenburns 6s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.beam{position:absolute;top:-30%;width:28%;height:160%;filter:blur(6px);mix-blend-mode:screen;transform-origin:top center;animation:sweep 6s ease-in-out infinite alternate;pointer-events:none}
+.beam.b1{left:12%;background:linear-gradient(180deg,rgba(255,236,180,.5),rgba(255,236,180,0) 70%)}
+.beam.b2{left:60%;animation-delay:-3s;background:linear-gradient(180deg,rgba(159,246,255,.4),rgba(159,246,255,0) 70%)}
+@keyframes sweep{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.now{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;gap:12px;z-index:2}
+.np{background:rgba(255,255,255,.95);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14.5px;line-height:1.3;color:var(--ink)}
+.np small{display:block;font-size:11px;color:var(--copper-d);letter-spacing:.08em;text-transform:uppercase}
+#np-go{margin-left:auto;flex:none;background:var(--maroon);color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;border-radius:999px;padding:9px 16px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+#np-go:hover{background:var(--maroon-d)}
+.bar{position:absolute;left:0;bottom:0;height:4px;width:0;background:#f4c56e;z-index:3}
+.bar.run{animation:fill var(--dwell,5s) linear forwards}
+.screen:hover .bar.run{animation-play-state:paused}
+@keyframes fill{to{width:100%}}
+.setlist{display:flex;gap:22px;overflow-x:auto;padding:18px 2px 12px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.set{flex:none;scroll-snap-align:start}
+.set h4{margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d)}
+.set>div{display:flex;gap:9px}
+.song{flex:none;width:128px;text-decoration:none;color:var(--ink)}
+.song span{display:block;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:#e7dfd6;box-shadow:0 0 0 2px transparent;transition:box-shadow .2s,transform .2s}
+.song img{width:100%;height:100%;object-fit:cover}
+.song b{display:block;font-size:12.5px;font-weight:600;margin-top:5px;line-height:1.25}
+.song:hover span{transform:translateY(-2px)}
+.song:focus-visible{outline:none}
+.song:focus-visible span,.song.on span{box-shadow:0 0 0 3px var(--maroon)}
+.song.on b{color:var(--maroon);font-weight:700}
+@media (prefers-reduced-motion:reduce){.eq i,.screen img.on,.beam,.bar.run{animation:none!important}}
 
 /* guide extras: reading outline and quiz question bank */
 .outline{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 20px}
@@ -320,9 +352,10 @@ dialog img{width:100%;height:auto}
 }
 @media (max-width:760px){
   .hero{padding-bottom:20px}
-  .mosaic{grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto;margin:0 16px}
-  .mosaic .tile{grid-column:auto!important;grid-row:auto!important;aspect-ratio:1}
-  .titlecard{grid-column:1/-1;grid-row:1;padding:24px 22px}
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .titlecard{padding:26px 24px}
+  .now{left:10px;right:10px;bottom:10px}
+  .np{font-size:13px}
   .keyfacts{grid-template-columns:1fr 1fr}
   .keyfacts div:nth-child(2){border-right:0}
   .keyfacts div:nth-child(-n+2){border-bottom:1px solid var(--line)}
@@ -356,9 +389,14 @@ dialog img{width:100%;height:auto}
 
 <div class="hero">
   <div class="wrap"><div class="crumbs"><a href="#">Computer Science</a> › <a href="#">Artificial Intelligence</a> › Agentic AI</div></div>
-  <div class="mosaic">
-    $mosaic
-    <div class="titlecard"><small>$code · $label</small><h1>$title</h1><p>$subtitle</p></div>
+  <div class="wrap">
+    <div class="stage">
+      <div class="titlecard"><div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <small>$code · Live in $n_tracks tracks</small><h1>$title</h1><p>$subtitle</p>
+        <a class="btn" href="#m01">Start with Track 1 →</a></div>
+      $stage
+    </div>
+    $setlist
   </div>
 </div>
 
@@ -689,6 +727,49 @@ $contents
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
     targets.forEach(function (t) { if (t) io.observe(t); });
+  }
+
+  // Setlist stage: the screen plays through every track; click one in the setlist to put it on stage.
+  var screen = document.getElementById('screen');
+  if (screen) {
+    var shots = screen.querySelectorAll('img'), songs = document.querySelectorAll('#setlist .song');
+    var bar = document.getElementById('bar'), np = document.getElementById('np'), go = document.getElementById('np-go');
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var cur = 0, timer = null, visible = true, hover = false, DWELL = 5000;
+    var bySong = {};
+    Array.prototype.forEach.call(songs, function (s) { bySong[s.dataset.i] = s; });
+    function show(i) {
+      cur = i;
+      Array.prototype.forEach.call(shots, function (im) { im.classList.toggle('on', +im.dataset.i === i); });
+      Array.prototype.forEach.call(songs, function (s) { s.classList.toggle('on', +s.dataset.i === i); });
+      var s = bySong[i];
+      np.innerHTML = ''; var sm = document.createElement('small'); sm.textContent = 'Now playing · ' + s.dataset.track;
+      np.appendChild(sm); np.appendChild(document.createTextNode(s.dataset.name));
+      go.href = s.getAttribute('href');
+      var list = s.closest('.setlist'), r = s.getBoundingClientRect(), lr = list.getBoundingClientRect();
+      if (r.left < lr.left || r.right > lr.right) list.scrollTo({ left: list.scrollLeft + r.left - lr.left - 24, behavior: still ? 'auto' : 'smooth' });
+      restart();
+    }
+    function restart() {
+      clearTimeout(timer); bar.classList.remove('run'); void bar.offsetWidth;
+      if (still || !visible || hover) return;
+      bar.classList.add('run');
+      timer = setTimeout(function () { show((cur + 1) % shots.length); }, DWELL);
+    }
+    bar.style.setProperty('--dwell', DWELL / 1000 + 's');
+    Array.prototype.forEach.call(songs, function (s) {
+      s.addEventListener('click', function (e) {
+        if (+s.dataset.i === cur) return;  // a second click on the track on stage follows the link
+        e.preventDefault(); show(+s.dataset.i);
+      });
+    });
+    screen.addEventListener('mouseenter', function () { hover = true; clearTimeout(timer); });
+    screen.addEventListener('mouseleave', function () { hover = false; restart(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; restart(); }, { threshold: .25 }).observe(screen);
+    }
+    document.addEventListener('visibilitychange', function () { visible = !document.hidden; restart(); });
+    restart();
   }
 })();
 </script>

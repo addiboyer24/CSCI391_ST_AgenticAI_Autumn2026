@@ -46,21 +46,53 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .btn.ghost:hover{background:var(--hero)}
 .btn.sm{padding:7px 14px;font-size:13px}
 
-/* hero (collection-page layout): full-bleed mosaic of flat art tiles around a big title card */
-.hero{background:#fff;padding:14px 0 0;overflow:hidden}
-.crumbs{font-size:13px;color:var(--muted);margin:0 0 12px}
+/* hero: the setlist stage. A gig-poster title card, a stage screen that plays through the tracks, and the full setlist */
+.hero{background:#fff;padding:14px 0 6px}
+.crumbs{font-size:13px;color:var(--muted);margin:0 0 14px}
 .crumbs a{color:var(--ink);text-decoration:none;font-weight:600}
 .crumbs a:hover{text-decoration:underline}
-.mosaic{display:grid;grid-template-columns:1fr 1.75fr .95fr 4.6fr 1fr;grid-template-rows:repeat(2,clamp(120px,14.5vw,200px));gap:10px;margin:0 -70px 0 10px}
-.mosaic .tile{display:block;border-radius:18px;overflow:hidden;background:#e7dfd6}
-.mosaic .tile img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.mosaic .tile:hover img,.mosaic .tile:focus-visible img{transform:scale(1.05)}
-.t-a{grid-column:1;grid-row:1}.t-b{grid-column:2/4;grid-row:1}.t-c{grid-column:1/3;grid-row:2}.t-d{grid-column:3;grid-row:2}
-.t-e{grid-column:5;grid-row:1}.t-f{grid-column:5;grid-row:2}
-.titlecard{grid-column:4;grid-row:1/3;border-radius:18px;background:#f4c56e;color:#5c1424;display:flex;flex-direction:column;justify-content:center;padding:28px 44px}
-.titlecard small{font-size:17px;font-weight:700;color:#7a2a1c}
-.titlecard h1{font-size:clamp(28px,3.3vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:4px 0 10px}
-.titlecard p{margin:0;font-size:16.5px;color:#6b2a20;max-width:520px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:22px;align-items:stretch}
+.titlecard{position:relative;overflow:hidden;background:var(--maroon);color:#fff;border-radius:22px;padding:34px 38px;display:flex;flex-direction:column;justify-content:center}
+.titlecard::after{content:"";position:absolute;right:-90px;bottom:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(244,197,110,.22),rgba(244,197,110,0) 70%);pointer-events:none}
+.titlecard small{font-size:15px;font-weight:700;color:#f4c56e}
+.titlecard h1{font-size:clamp(30px,3.4vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.06;margin:8px 0 12px;color:#fff}
+.titlecard p{margin:0;font-size:16.5px;line-height:1.55;color:#f1dbe4;max-width:460px}
+.titlecard .btn{align-self:flex-start;margin-top:22px;background:#f4c56e;border-color:#f4c56e;color:#4f0020}
+.titlecard .btn:hover{background:#ffd88d;border-color:#ffd88d}
+.eq{position:absolute;right:26px;top:26px;display:flex;gap:4px;align-items:flex-end;height:26px}
+.eq i{width:5px;height:60%;background:#f4c56e;border-radius:2px;animation:eq 1s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}.eq i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{height:20%}to{height:100%}}
+.screen{position:relative;aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#140a1f;box-shadow:0 20px 50px rgba(20,10,31,.3)}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s}
+.screen img.on{opacity:1;animation:kenburns 6s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.beam{position:absolute;top:-30%;width:28%;height:160%;filter:blur(6px);mix-blend-mode:screen;transform-origin:top center;animation:sweep 6s ease-in-out infinite alternate;pointer-events:none}
+.beam.b1{left:12%;background:linear-gradient(180deg,rgba(255,236,180,.5),rgba(255,236,180,0) 70%)}
+.beam.b2{left:60%;animation-delay:-3s;background:linear-gradient(180deg,rgba(159,246,255,.4),rgba(159,246,255,0) 70%)}
+@keyframes sweep{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.now{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;gap:12px;z-index:2}
+.np{background:rgba(255,255,255,.95);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14.5px;line-height:1.3;color:var(--ink)}
+.np small{display:block;font-size:11px;color:var(--copper-d);letter-spacing:.08em;text-transform:uppercase}
+#np-go{margin-left:auto;flex:none;background:var(--maroon);color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;border-radius:999px;padding:9px 16px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+#np-go:hover{background:var(--maroon-d)}
+.bar{position:absolute;left:0;bottom:0;height:4px;width:0;background:#f4c56e;z-index:3}
+.bar.run{animation:fill var(--dwell,5s) linear forwards}
+.screen:hover .bar.run{animation-play-state:paused}
+@keyframes fill{to{width:100%}}
+.setlist{display:flex;gap:22px;overflow-x:auto;padding:18px 2px 12px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.set{flex:none;scroll-snap-align:start}
+.set h4{margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d)}
+.set>div{display:flex;gap:9px}
+.song{flex:none;width:128px;text-decoration:none;color:var(--ink)}
+.song span{display:block;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:#e7dfd6;box-shadow:0 0 0 2px transparent;transition:box-shadow .2s,transform .2s}
+.song img{width:100%;height:100%;object-fit:cover}
+.song b{display:block;font-size:12.5px;font-weight:600;margin-top:5px;line-height:1.25}
+.song:hover span{transform:translateY(-2px)}
+.song:focus-visible{outline:none}
+.song:focus-visible span,.song.on span{box-shadow:0 0 0 3px var(--maroon)}
+.song.on b{color:var(--maroon);font-weight:700}
+@media (prefers-reduced-motion:reduce){.eq i,.screen img.on,.beam,.bar.run{animation:none!important}}
 
 /* guide extras: reading outline and quiz question bank */
 .outline{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 20px}
@@ -320,9 +352,10 @@ dialog img{width:100%;height:auto}
 }
 @media (max-width:760px){
   .hero{padding-bottom:20px}
-  .mosaic{grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto;margin:0 16px}
-  .mosaic .tile{grid-column:auto!important;grid-row:auto!important;aspect-ratio:1}
-  .titlecard{grid-column:1/-1;grid-row:1;padding:24px 22px}
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .titlecard{padding:26px 24px}
+  .now{left:10px;right:10px;bottom:10px}
+  .np{font-size:13px}
   .keyfacts{grid-template-columns:1fr 1fr}
   .keyfacts div:nth-child(2){border-right:0}
   .keyfacts div:nth-child(-n+2){border-bottom:1px solid var(--line)}
@@ -356,14 +389,14 @@ dialog img{width:100%;height:auto}
 
 <div class="hero">
   <div class="wrap"><div class="crumbs"><a href="#">Computer Science</a> › <a href="#">Artificial Intelligence</a> › Agentic AI</div></div>
-  <div class="mosaic">
-    <a class="tile t-a" href="#m06" title="Module 6 · LLMs as reasoning engines" aria-label="Module 6 · LLMs as reasoning engines"><img src="curriculum/img/tiles/brain.svg" alt="" loading="eager"></a>
-    <a class="tile t-b" href="#projects" title="Encore · the midterm project" aria-label="Encore · the midterm project"><img src="curriculum/img/encore-cover.webp" alt="" loading="eager"></a>
-    <a class="tile t-c" href="#projects" title="Encore Ensemble · the capstone" aria-label="Encore Ensemble · the capstone"><img src="curriculum/img/encore-ensemble-cover.webp" alt="" loading="eager"></a>
-    <a class="tile t-d" href="#m05" title="Module 5 · tools as contracts" aria-label="Module 5 · tools as contracts"><img src="curriculum/img/tiles/toolbox.svg" alt="" loading="eager"></a>
-    <a class="tile t-e" href="#m10" title="Module 10 · multi-agent systems" aria-label="Module 10 · multi-agent systems"><img src="curriculum/img/tiles/hierarchy.svg" alt="" loading="eager"></a>
-    <a class="tile t-f" href="#m14" title="Module 14 · security and alignment" aria-label="Module 14 · security and alignment"><img src="curriculum/img/tiles/shield.svg" alt="" loading="eager"></a>
-    <div class="titlecard"><small>CSCI 391 · Course collection</small><h1>Agentic Artificial Intelligence</h1><p>Design, build, and operate AI agents that reason, plan, use tools, remember, and know when to stop.</p></div>
+  <div class="wrap">
+    <div class="stage">
+      <div class="titlecard"><div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <small>CSCI 391 · Live in 21 tracks</small><h1>Agentic Artificial Intelligence</h1><p>Design, build, and operate AI agents that reason, plan, use tools, remember, and know when to stop.</p>
+        <a class="btn" href="#m01">Start with Track 1 →</a></div>
+      <div class="screen" id="screen" aria-label="Track preview"><img src="curriculum/video/m01.jpg" alt="" data-i="0" class=on><img src="curriculum/video/m02.jpg" alt="" loading=lazy data-i="1"><img src="curriculum/video/m03.jpg" alt="" loading=lazy data-i="2"><img src="curriculum/video/m04.jpg" alt="" loading=lazy data-i="3"><img src="curriculum/video/m05.jpg" alt="" loading=lazy data-i="4"><img src="curriculum/video/m06.jpg" alt="" loading=lazy data-i="5"><img src="curriculum/video/m07.jpg" alt="" loading=lazy data-i="6"><img src="curriculum/video/m08.jpg" alt="" loading=lazy data-i="7"><img src="curriculum/video/m09.jpg" alt="" loading=lazy data-i="8"><img src="curriculum/video/m10.jpg" alt="" loading=lazy data-i="9"><img src="curriculum/video/m11.jpg" alt="" loading=lazy data-i="10"><img src="curriculum/video/m12.jpg" alt="" loading=lazy data-i="11"><img src="curriculum/video/m13.jpg" alt="" loading=lazy data-i="12"><img src="curriculum/video/m14.jpg" alt="" loading=lazy data-i="13"><img src="curriculum/video/lab1.jpg" alt="" loading=lazy data-i="14"><img src="curriculum/video/lab2.jpg" alt="" loading=lazy data-i="15"><img src="curriculum/video/lab3.jpg" alt="" loading=lazy data-i="16"><img src="curriculum/video/lab4.jpg" alt="" loading=lazy data-i="17"><img src="curriculum/video/lab5.jpg" alt="" loading=lazy data-i="18"><img src="curriculum/img/encore-cover.webp" alt="" loading=lazy data-i="19"><img src="curriculum/img/encore-ensemble-cover.webp" alt="" loading=lazy data-i="20"><span class="beam b1"></span><span class="beam b2"></span><div class="now"><span class="np" id="np" aria-live="polite"><small>Now playing · Track 01</small>Opening Act</span><a href="#m01-video" id="np-go">Watch track →</a></div><i class="bar" id="bar"></i></div>
+    </div>
+    <nav class="setlist" id="setlist" aria-label="Setlist: every track in the course"><div class="set"><h4>Part I · Foundations</h4><div><a class="song on" href="#m01-video" data-i="0" data-track="Track 01" data-name="Opening Act" title="Track 01 · Opening Act"><span><img src="curriculum/video/m01.jpg" alt="" loading="lazy"></span><b>Opening Act</b></a><a class="song" href="#m02-video" data-i="1" data-track="Track 02" data-name="First Riff" title="Track 02 · First Riff"><span><img src="curriculum/video/m02.jpg" alt="" loading="lazy"></span><b>First Riff</b></a><a class="song" href="#m03-video" data-i="2" data-track="Track 03" data-name="Five-Piece Band" title="Track 03 · Five-Piece Band"><span><img src="curriculum/video/m03.jpg" alt="" loading="lazy"></span><b>Five-Piece Band</b></a><a class="song" href="#m04-video" data-i="3" data-track="Track 04" data-name="Know When to Unplug" title="Track 04 · Know When to Unplug"><span><img src="curriculum/video/m04.jpg" alt="" loading="lazy"></span><b>Know When to Unplug</b></a></div></div><div class="set"><h4>Part II · Core capabilities</h4><div><a class="song" href="#m05-video" data-i="4" data-track="Track 05" data-name="Tuning the Instrument" title="Track 05 · Tuning the Instrument"><span><img src="curriculum/video/m05.jpg" alt="" loading="lazy"></span><b>Tuning the Instrument</b></a><a class="song" href="#m06-video" data-i="5" data-track="Track 06" data-name="Muscle Memory" title="Track 06 · Muscle Memory"><span><img src="curriculum/video/m06.jpg" alt="" loading="lazy"></span><b>Muscle Memory</b></a><a class="song" href="#m07-video" data-i="6" data-track="Track 07" data-name="The Setlist" title="Track 07 · The Setlist"><span><img src="curriculum/video/m07.jpg" alt="" loading="lazy"></span><b>The Setlist</b></a><a class="song" href="#m08-video" data-i="7" data-track="Track 08" data-name="Plug and Play?" title="Track 08 · Plug and Play?"><span><img src="curriculum/video/m08.jpg" alt="" loading="lazy"></span><b>Plug and Play?</b></a></div></div><div class="set"><h4>Part III · Patterns</h4><div><a class="song" href="#m09-video" data-i="8" data-track="Track 09" data-name="Solo Practice" title="Track 09 · Solo Practice"><span><img src="curriculum/video/m09.jpg" alt="" loading="lazy"></span><b>Solo Practice</b></a><a class="song" href="#m10-video" data-i="9" data-track="Track 10" data-name="Forming the Band" title="Track 10 · Forming the Band"><span><img src="curriculum/video/m10.jpg" alt="" loading="lazy"></span><b>Forming the Band</b></a><a class="song" href="#m11-video" data-i="10" data-track="Track 11" data-name="The Mixing Desk" title="Track 11 · The Mixing Desk"><span><img src="curriculum/video/m11.jpg" alt="" loading="lazy"></span><b>The Mixing Desk</b></a><a class="song" href="#m12-video" data-i="11" data-track="Track 12" data-name="The Long Tour" title="Track 12 · The Long Tour"><span><img src="curriculum/video/m12.jpg" alt="" loading="lazy"></span><b>The Long Tour</b></a></div></div><div class="set"><h4>Part IV · Hardening</h4><div><a class="song" href="#m13-video" data-i="12" data-track="Track 13" data-name="Sound Check" title="Track 13 · Sound Check"><span><img src="curriculum/video/m13.jpg" alt="" loading="lazy"></span><b>Sound Check</b></a><a class="song" href="#m14-video" data-i="13" data-track="Track 14" data-name="Stage Security" title="Track 14 · Stage Security"><span><img src="curriculum/video/m14.jpg" alt="" loading="lazy"></span><b>Stage Security</b></a></div></div><div class="set"><h4>Labs</h4><div><a class="song" href="#lab1-video" data-i="14" data-track="Lab Track 1" data-name="Tuning Up" title="Lab Track 1 · Tuning Up"><span><img src="curriculum/video/lab1.jpg" alt="" loading="lazy"></span><b>Tuning Up</b></a><a class="song" href="#lab2-video" data-i="15" data-track="Lab Track 2" data-name="First Rehearsal" title="Lab Track 2 · First Rehearsal"><span><img src="curriculum/video/lab2.jpg" alt="" loading="lazy"></span><b>First Rehearsal</b></a><a class="song" href="#lab3-video" data-i="16" data-track="Lab Track 3" data-name="Road Case" title="Lab Track 3 · Road Case"><span><img src="curriculum/video/lab3.jpg" alt="" loading="lazy"></span><b>Road Case</b></a><a class="song" href="#lab4-video" data-i="17" data-track="Lab Track 4" data-name="Stage Manager" title="Lab Track 4 · Stage Manager"><span><img src="curriculum/video/lab4.jpg" alt="" loading="lazy"></span><b>Stage Manager</b></a><a class="song" href="#lab5-video" data-i="18" data-track="Lab Track 5" data-name="Patch Bay" title="Lab Track 5 · Patch Bay"><span><img src="curriculum/video/lab5.jpg" alt="" loading="lazy"></span><b>Patch Bay</b></a></div></div><div class="set"><h4>Projects</h4><div><a class="song" href="#encore-video" data-i="19" data-track="Project Track · Midterm" data-name="Encore" title="Project Track · Midterm · Encore"><span><img src="curriculum/img/encore-cover.webp" alt="" loading="lazy"></span><b>Encore</b></a><a class="song" href="#ensemble-video" data-i="20" data-track="Project Track · Final" data-name="Encore Ensemble" title="Project Track · Final · Encore Ensemble"><span><img src="curriculum/img/encore-ensemble-cover.webp" alt="" loading="lazy"></span><b>Encore Ensemble</b></a></div></div></nav>
   </div>
 </div>
 
@@ -1092,6 +1125,49 @@ dialog img{width:100%;height:auto}
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
     targets.forEach(function (t) { if (t) io.observe(t); });
+  }
+
+  // Setlist stage: the screen plays through every track; click one in the setlist to put it on stage.
+  var screen = document.getElementById('screen');
+  if (screen) {
+    var shots = screen.querySelectorAll('img'), songs = document.querySelectorAll('#setlist .song');
+    var bar = document.getElementById('bar'), np = document.getElementById('np'), go = document.getElementById('np-go');
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var cur = 0, timer = null, visible = true, hover = false, DWELL = 5000;
+    var bySong = {};
+    Array.prototype.forEach.call(songs, function (s) { bySong[s.dataset.i] = s; });
+    function show(i) {
+      cur = i;
+      Array.prototype.forEach.call(shots, function (im) { im.classList.toggle('on', +im.dataset.i === i); });
+      Array.prototype.forEach.call(songs, function (s) { s.classList.toggle('on', +s.dataset.i === i); });
+      var s = bySong[i];
+      np.innerHTML = ''; var sm = document.createElement('small'); sm.textContent = 'Now playing · ' + s.dataset.track;
+      np.appendChild(sm); np.appendChild(document.createTextNode(s.dataset.name));
+      go.href = s.getAttribute('href');
+      var list = s.closest('.setlist'), r = s.getBoundingClientRect(), lr = list.getBoundingClientRect();
+      if (r.left < lr.left || r.right > lr.right) list.scrollTo({ left: list.scrollLeft + r.left - lr.left - 24, behavior: still ? 'auto' : 'smooth' });
+      restart();
+    }
+    function restart() {
+      clearTimeout(timer); bar.classList.remove('run'); void bar.offsetWidth;
+      if (still || !visible || hover) return;
+      bar.classList.add('run');
+      timer = setTimeout(function () { show((cur + 1) % shots.length); }, DWELL);
+    }
+    bar.style.setProperty('--dwell', DWELL / 1000 + 's');
+    Array.prototype.forEach.call(songs, function (s) {
+      s.addEventListener('click', function (e) {
+        if (+s.dataset.i === cur) return;  // a second click on the track on stage follows the link
+        e.preventDefault(); show(+s.dataset.i);
+      });
+    });
+    screen.addEventListener('mouseenter', function () { hover = true; clearTimeout(timer); });
+    screen.addEventListener('mouseleave', function () { hover = false; restart(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; restart(); }, { threshold: .25 }).observe(screen);
+    }
+    document.addEventListener('visibilitychange', function () { visible = !document.hidden; restart(); });
+    restart();
   }
 })();
 </script>

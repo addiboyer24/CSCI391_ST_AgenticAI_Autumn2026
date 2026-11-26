@@ -186,44 +186,46 @@ def board_files(m):
     return (f"curriculum/img/{m['id']}-mindmap.svg",) * 2
 
 
-# Hero tiles: flat illustrations drawn from the explainer's own icon set, plus the two project covers.
-TILES = [  # (slot, art, background, glow, link, label)
-    ("a", "brain", "#2f6f8f", "#cfe6ef", "#m06", "Module 6 · LLMs as reasoning engines"),
-    ("b", "cover:encore", None, None, "#projects", "Encore · the midterm project"),
-    ("c", "cover:ensemble", None, None, "#projects", "Encore Ensemble · the capstone"),
-    ("d", "toolbox", "#70002e", "#f3c98b", "#m05", "Module 5 · tools as contracts"),
-    ("e", "hierarchy", "#3f7a55", "#d9ecdf", "#m10", "Module 10 · multi-agent systems"),
-    ("f", "shield", "#5a4787", "#e4def3", "#m14", "Module 14 · security and alignment"),
-]
+# Hero: the "setlist stage". Every track appears, in course order, grouped like a concert setlist.
 COVER = {"encore": "curriculum/img/encore-cover.webp", "ensemble": "curriculum/img/encore-ensemble-cover.webp"}
+SETS = [("I", "Part I · Foundations"), ("II", "Part II · Core capabilities"), ("III", "Part III · Patterns"),
+        ("IV", "Part IV · Hardening"), ("lab", "Labs"), ("project", "Projects")]
 
 
-def tile_svgs():
-    """Write curriculum/img/tiles/<icon>.svg: one big hand-drawn icon on a flat color, with a few sparkles."""
-    try:
-        import explainer_modules as XM
-    except ImportError:
-        return
-    os.makedirs(os.path.join(IMG, "tiles"), exist_ok=True)
-    for _, art, bg, glow, _, _ in TILES:
-        if art.startswith("cover:"):
+def setlist(guide):
+    """All tracks that have a rendered video, in course order: (group, track, art, link)."""
+    part = {m["id"]: m["part"] for m in D.MODULES}
+    out = []
+    for lec in LECTURE.values():
+        vid = lec["id"]
+        if not os.path.exists(os.path.join(HERE, "video", vid + ".mp4")):
             continue
-        dots = "".join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{glow}" opacity=".55"/>'
-                       for x, y, r in [(-230, -150, 7), (210, -170, 5), (250, 120, 8), (-260, 140, 5), (150, 200, 4), (-160, -210, 4)])
-        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMid slice">'
-               f'<rect x="-2000" y="-2000" width="4000" height="4000" fill="{bg}"/>{dots}'
-               f'<circle cx="0" cy="0" r="150" fill="{glow}" opacity=".9"/>'
-               f'<g transform="scale(1.05)">{XM.ICONS[art](0, 0, 1)}</g></svg>')
-        with open(os.path.join(IMG, "tiles", art + ".svg"), "w", encoding="utf8") as f:
-            f.write(svg)
+        group = part.get(vid) or lec.get("kind")
+        art = COVER.get(vid) or f"curriculum/video/{vid}.jpg"
+        out.append((group, lec, art, f"#{vid}-script" if guide else f"#{vid}-video"))
+    return out
 
 
-def mosaic_html(guide):
-    tiles = []
-    for slot, art, _, _, href, lbl in TILES:
-        img = COVER[art[6:]] if art.startswith("cover:") else f"curriculum/img/tiles/{art}.svg"
-        tiles.append(f'<a class="tile t-{slot}" href="{href}" title="{E(lbl)}" aria-label="{E(lbl)}"><img src="{img}" alt="" loading="eager"></a>')
-    return "\n    ".join(tiles)
+def stage_html(guide):
+    tracks = setlist(guide)
+    if not tracks:
+        return "", ""
+    screen = "".join(f'<img src="{art}" alt="" {"loading=lazy " if i else ""}data-i="{i}"{" class=on" if not i else ""}>'
+                     for i, (_, _, art, _) in enumerate(tracks))
+    sets = []
+    for g, name in SETS:
+        songs = "".join(
+            f'<a class="song{" on" if not i else ""}" href="{href}" data-i="{i}" data-track="{E(lec["track"])}" data-name="{E(lec["name"])}" title="{E(lec["track"])} · {E(lec["name"])}">'
+            f'<span><img src="{art}" alt="" loading="lazy"></span><b>{E(lec["name"])}</b></a>'
+            for i, (grp, lec, art, href) in enumerate(tracks) if grp == g)
+        if songs:
+            sets.append(f'<div class="set"><h4>{E(name)}</h4><div>{songs}</div></div>')
+    first = tracks[0][1]
+    verb = "Read the script" if guide else "Watch track"
+    screen = (f'<div class="screen" id="screen" aria-label="Track preview">{screen}<span class="beam b1"></span><span class="beam b2"></span>'
+              f'<div class="now"><span class="np" id="np" aria-live="polite"><small>Now playing · {E(first["track"])}</small>{E(first["name"])}</span>'
+              f'<a href="{tracks[0][3]}" id="np-go">{verb} →</a></div><i class="bar" id="bar"></i></div>')
+    return screen, f'<nav class="setlist" id="setlist" aria-label="Setlist: every track in the course">{"".join(sets)}</nav>'
 
 
 def contents_html():
@@ -535,7 +537,7 @@ def page(guide=False):
         repo=E(C["repo"]), syllabus=E(C["syllabus"]),
         n_vid=sum(1 for m in D.MODULES if video_for(m)) + sum(1 for l in LECTURE.values() if l.get("for") and track_video(l["id"])), n_check=sum(1 for m in D.MODULES if m["id"] in CHECKS), n_mod=len(D.MODULES), n_labs=n_labs, n_quiz=n_quiz, n_ch=len(D.CHAPTERS),
         outcomes=outcomes, skills=skills, modules="\n".join(mods), chapters="".join(chap_rows),
-        grading=grading, tech=tech, faq=faq, mosaic=mosaic_html(guide), contents=contents_html(),
+        grading=grading, tech=tech, faq=faq, stage=stage_html(guide)[0], setlist=stage_html(guide)[1], n_tracks=len(setlist(guide)), contents=contents_html(),
         encore_video=track_block(track_video("encore"), "Project walkthrough", guide, "encore-proj") if track_video("encore") else "",
         ensemble_video=track_block(track_video("ensemble"), "Project walkthrough", guide, "ensemble-proj") if track_video("ensemble") else "",
         kind="Instructor's guide" if guide else "Agentic AI Curriculum",
@@ -554,7 +556,6 @@ TEMPLATE = open(os.path.join(HERE, "template.html"), encoding="utf8").read()
 
 
 def main():
-    tile_svgs()
     for n, m in enumerate(D.MODULES, 1):
         with open(os.path.join(IMG, f"{m['id']}-mindmap.svg"), "w", encoding="utf8") as f:
             f.write(mindmap_svg(m, n))
